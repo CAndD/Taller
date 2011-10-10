@@ -1,0 +1,155 @@
+<?php
+include('class/class_lib.php');
+session_start();
+if(isset($_SESSION['usuario']))
+{
+  $usuario = unserialize($_SESSION['usuario']);
+  if(get_class($usuario) == 'administrador') {
+    $usuario = new jefeDeCarrera($usuario->getNombre(),$usuario->getNombreUsuario(),$usuario->getRut(),$usuario->getTipo());
+    $_SESSION['usuario'] = serialize($usuario);
+  }
+
+  if((isset($_POST['submit']) && $_POST['submit'] == 'Elegir') && isset($_POST['codigoCarrera'])) {
+    $_SESSION['carrera'] = $_POST['codigoCarrera'];
+  }
+
+  if(isset($_POST['cambiarCarrera']) && $_POST['cambiarCarrera'] == 'CAMBIAR CARRERA') {
+    $_SESSION['carrera'] = null;
+  }
+
+  if($usuario->getTipo() == 1 || $usuario->getTipo() == 3)
+  {
+?>
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>colour_blue</title>
+  <meta charset="utf-8" />
+  <meta name="description" content="website description" />
+  <meta name="keywords" content="website keywords, website keywords" />
+  <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
+  <link rel="stylesheet" type="text/css" href="style/style.css" title="style" />
+</head>
+
+<body>
+  <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_text">
+          <!-- class="logo_colour", allows you to change the colour of the text -->
+          <h1><a href="index.php">Universidad<span class="logo_colour"> Andrés Bello</span></a></h1>
+          <h2>Herramienta de programación de horarios.</h2>
+        </div>
+      </div>
+      <div id="menubar">
+        <ul id="menu">
+          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+          <li class="selected"><a href="home.php">Home</a></li>
+          <?php
+          if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && (is_string($_SESSION['carrera']) == true)) {
+            echo '<li><a href="">Ramos</a></li>';
+            echo '<li><a href="">Secciones y Vacantes</a></li>';
+            echo '<li><a href="">Semestre</a></li>';
+          }
+          ?>
+          <li><a href="contact.html">Contacto</a></li>
+          <li><a href="logout.php">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="site_content">
+      <div id="content">
+        <!-- insert the page content here -->
+        <h1>Bienvenido <?php echo $usuario->getNombre().' / '.$_SESSION['carrera'].' / Semestre 2011-1';?></h1>
+        <?php
+        if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && (is_string($_SESSION['carrera']) == true)) {?>
+        <table><tr>
+        <td><div class="ramos_malla" style="overflow: scroll;"><span class="title">Ramos de malla</span>
+          <?php
+            $usuario->verMalla($_SESSION['carrera']);
+          ?>
+        </div></td>
+        <td><div class="ramos_piden"><span class="title">Ramos que piden</span><br>
+          <?php
+            $usuario->verRamosQuePiden($_SESSION['carrera']);
+          ?>
+        </div></td>
+        <td><div class="ramos_pido"><span class="title">Ramos que pido</span><br>
+          <?php
+            $usuario->verRamosQuePido($usuario->getNombreUsuario());
+          ?>
+        </div></td></tr>
+        <tr>
+        <td><div class="prog_presu"><span class="title">Programación versus Presupuesto</span><br>
+          <?php
+            $usuario->verProgramacionVsPresupuesto();
+          ?>
+        </div></td></tr>
+        <tr>
+        <td><div class="prof_asig"><span class="title">Profesores asignados</span><br>
+          <?php
+            $usuario->verProfesoresAsignados($_SESSION['carrera']);
+          ?>
+        </div></td>
+        <td><div class="prof_asig_scarga"><span class="title">Profesores sin carga académica</span><br>
+          <?php 
+            $usuario->verProfesoresSinCargaAcademica($_SESSION['carrera']);
+          ?>
+        </div></td>
+        <td><div class="seccion_sprof"><span class="title">Secciones sin profesor</span><br>
+          <?php 
+            $usuario->verSeccionesSinProfesor($_SESSION['carrera']);
+          ?>
+        </div></td>
+        </tr></table>
+        <?php
+        }
+        elseif(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && is_null($_SESSION['carrera'])) {
+          echo 'Elija la carrera: ';
+          $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+          $sql = "CALL jdc_carreras('{$usuario->getNombreUsuario()}')";
+          $res = $mysqli->prepare($sql);
+          $res->execute();
+          $res->bind_result($codigo,$nombre);
+          echo '<table><tr><th>Código</th><th>Nombre</th><th>Elegir</th></tr>';
+          while($res->fetch()) {
+           echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td><form method="post" name="elegir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigo.'"></input><input type="submit" name="submit" value="Elegir"></input></form></td></tr>';
+          }
+          echo '</table>';
+          $res->free_result();
+        }
+        elseif(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && $_SESSION['carrera'] == 0) {
+          echo 'Aún no se le ha asignado una carrera.';
+        }
+        ?>
+      </div>
+    </div>
+    <div id="content_footer"></div>
+    <div id="footer">
+    <?php
+      if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && !is_null($_SESSION['carrera']) &&$_SESSION['nroCarrera'] > 1) {
+        echo '<form method="post" name="cambiarCarrera" target="_self"><input type="submit" name="cambiarCarrera" value="CAMBIAR CARRERA" class="inp"></input></form>';
+        $j = 1;
+      }
+      if($usuario->getTipo() == 2 || $usuario->getTipo() == 3) {
+        if(isset($j) && $j == 1)
+          echo ' / ';
+        echo '<a href="user_admin/admin.php">Modo administrador</a>';
+      }
+    ?>
+    </div>
+  </div></body>
+</html><?php
+  }
+  else
+  {
+    header("Location: index.php");
+    exit();
+  }
+}
+else
+{
+  header("Location: index.php");
+  exit();
+}
