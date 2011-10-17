@@ -187,7 +187,7 @@ ul#menu li a:hover, ul#menu li.selected a, ul#menu li.selected a:hover
 
 #content
 { text-align: left;
-  width: 595px;
+  width: 800px;
   padding: 0;}
 
 #content ul
@@ -379,3 +379,32 @@ input.inp
 
 input.inp:hover
 { text-decoration: underline;}
+
+input.xs {
+           width: 22px;
+         }
+
+input.m {
+          width: 60px;
+        }
+
+input.l {
+          width: 80px;
+        }
+
+input.xl {
+           width: 100px;
+         }
+
+.mid {
+       text-align: center;
+     }
+
+.eliminar {
+            text-align: center;
+          }
+
+.ifr {
+       width: 550px;
+       height: 500px;
+     }

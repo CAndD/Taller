@@ -9,8 +9,12 @@ if(isset($_SESSION['usuario']))
     $_SESSION['usuario'] = serialize($usuario);
   }
 
-  if((isset($_POST['submit']) && $_POST['submit'] == 'Elegir') && isset($_POST['codigoCarrera'])) {
-    $_SESSION['carrera'] = $_POST['codigoCarrera'];
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Crear') 
+  {
+    if(isset($_POST['hiddenCodigoRamo']) && isset($_POST['hiddenCodigoSemestre']) && isset($_POST['hiddenCodigoCarrera']))
+    {
+      $msg = $usuario->crearSeccion($_POST['hiddenCodigoRamo'],$_POST['hiddenCodigoSemestre'],$_POST['hiddenCodigoCarrera']);
+    }  
   }
 
   if(isset($_POST['cambiarCarrera']) && $_POST['cambiarCarrera'] == 'CAMBIAR CARRERA') {
@@ -18,14 +22,6 @@ if(isset($_SESSION['usuario']))
     $_SESSION['codigoSemestre'] = null;
     header("Location: ../home.php");
     exit();
-  }
- 
-  if(isset($_POST['submit']) && $_POST['submit'] == 'Dictar')
-  {
-    if(isset($_POST['codigoCarrera']) && isset($_POST['codigoRamo']) && isset($_POST['codigoSemestre']))
-    {
-      $msg = $usuario->impartirRamo($_POST['codigoCarrera'],$_POST['codigoRamo'],$_POST['codigoSemestre']);
-    }
   }
 
   if($usuario->getTipo() == 1 || $usuario->getTipo() == 3)
@@ -41,6 +37,7 @@ if(isset($_SESSION['usuario']))
   <meta name="keywords" content="website keywords, website keywords" />
   <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
   <link rel="stylesheet" type="text/css" href="../style/style.css" title="style" />
+  <link rel="stylesheet" type="text/css" href="../style/bsc.css" title="style" />
 </head>
 
 <body>
@@ -59,8 +56,8 @@ if(isset($_SESSION['usuario']))
           <li><a href="../home.php">Home</a></li>
           <?php
           if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && (is_string($_SESSION['carrera']) == true)) {
-            echo '<li class="selected"><a href="ramos.php">Ramos</a></li>';
-            echo '<li><a href="secciones.php">Secciones y Vacantes</a></li>';
+            echo '<li><a href="ramos.php">Ramos</a></li>';
+            echo '<li class="selected"><a href="secciones.php">Secciones y Vacantes</a></li>';
             echo '<li><a href="solicitudes.php">Solicitudes</a></li>';
           }
           ?>
@@ -72,18 +69,19 @@ if(isset($_SESSION['usuario']))
     <div id="site_content">
       <div id="content">
         <!-- insert the page content here -->
-        <h2>Ramos a impartir</h2>
+        <h2>Crear sección</h2>
+        Si desea solicitar vacantes a otra carrera, puede presionar el número en la columna "Secciones creadas por otros".
         <?php
           if(isset($msg))
-            echo '<span class="error">'.$msg.'</span>';
-          $usuario->verRamosDeCarrera($_SESSION['carrera'],$_SESSION['codigoSemestre']);
+            echo '<br><span class="error">'.$msg.'</span>';
+          $usuario->verRamosImpartidos($_SESSION['carrera'],$_SESSION['codigoSemestre']);
         ?>
       </div>
     </div>
     <div id="content_footer"></div>
     <div id="footer">
     <?php
-      if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && !is_null($_SESSION['carrera']) && $_SESSION['nroCarrera'] > 1) {
+      if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && !is_null($_SESSION['carrera']) &&$_SESSION['nroCarrera'] > 1) {
         echo '<form method="post" name="cambiarCarrera" target="_self"><input type="submit" name="cambiarCarrera" value="CAMBIAR CARRERA" class="inp"></input></form>';
         $j = 1;
       }
@@ -95,18 +93,21 @@ if(isset($_SESSION['usuario']))
     ?>
     </div>
   </div>
+  <script type='text/javascript' src='../js/jquery.js'></script> 
+  <script type='text/javascript' src='../js/jquery.simplemodal.js'></script> 
+  <script type='text/javascript' src='../js/bsc.js'></script>
 </body>
 </html>
 <?php
   }
   else
   {
-    header("Location: ../index.php");
+    header("Location: index.php");
     exit();
   }
 }
 else
 {
-  header("Location: ../index.php");
+  header("Location: index.php");
   exit();
 }

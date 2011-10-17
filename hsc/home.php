@@ -9,12 +9,19 @@ if(isset($_SESSION['usuario']))
     $_SESSION['usuario'] = serialize($usuario);
   }
 
-  if((isset($_POST['submit']) && $_POST['submit'] == 'Elegir') && isset($_POST['codigoCarrera'])) {
+  if((isset($_POST['submit']) && $_POST['submit'] == 'Elegir') && isset($_POST['codigoCarrera']) && isset($_POST['codigoSemestre'])) {
     $_SESSION['carrera'] = $_POST['codigoCarrera'];
+    $_SESSION['codigoSemestre'] = $_POST['codigoSemestre'];
+  }
+
+  if((isset($_POST['submit']) && $_POST['submit'] == 'Elegir') && isset($_POST['codigoCarrera']) && isset($_POST['codigoTrimestre'])) {
+    $_SESSION['carrera'] = $_POST['codigoCarrera'];
+    $_SESSION['codigoSemestre'] = $_POST['codigoTrimestre'];
   }
 
   if(isset($_POST['cambiarCarrera']) && $_POST['cambiarCarrera'] == 'CAMBIAR CARRERA') {
     $_SESSION['carrera'] = null;
+    $_SESSION['codigoSemestre'] = null;
   }
 
   if($usuario->getTipo() == 1 || $usuario->getTipo() == 3)
@@ -48,12 +55,12 @@ if(isset($_SESSION['usuario']))
           <li class="selected"><a href="home.php">Home</a></li>
           <?php
           if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && (is_string($_SESSION['carrera']) == true)) {
-            echo '<li><a href="">Ramos</a></li>';
-            echo '<li><a href="">Secciones y Vacantes</a></li>';
-            echo '<li><a href="">Semestre</a></li>';
+            echo '<li><a href="user_jc/ramos.php">Ramos</a></li>';
+            echo '<li><a href="user_jc/secciones.php">Secciones y Vacantes</a></li>';
+            echo '<li><a href="user_jc/solicitudes.php">Solicitudes</a></li>';
           }
           ?>
-          <li><a href="contact.html">Contacto</a></li>
+          <li><a href="">Contacto</a></li>
           <li><a href="logout.php">Logout</a></li>
         </ul>
       </div>
@@ -61,7 +68,7 @@ if(isset($_SESSION['usuario']))
     <div id="site_content">
       <div id="content">
         <!-- insert the page content here -->
-        <h1>Bienvenido <?php echo $usuario->getNombre().' / '.$_SESSION['carrera'].' / Semestre 2011-1';?></h1>
+        <h1>Bienvenido <?php echo $usuario->getNombre();?></h1>
         <?php
         if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && (is_string($_SESSION['carrera']) == true)) {?>
         <table><tr>
@@ -70,20 +77,20 @@ if(isset($_SESSION['usuario']))
             $usuario->verMalla($_SESSION['carrera']);
           ?>
         </div></td>
-        <td><div class="ramos_piden"><span class="title">Ramos que piden</span><br>
+        <td><div class="ramos_piden" style="overflow: scroll;"><span class="title">Ramos que piden</span><br>
           <?php
-            $usuario->verRamosQuePiden($_SESSION['carrera']);
+            $usuario->verRamosQuePiden($_SESSION['carrera'],$_SESSION['codigoSemestre']);
           ?>
         </div></td>
-        <td><div class="ramos_pido"><span class="title">Ramos que pido</span><br>
+        <td><div class="ramos_pido" style="overflow: scroll;"><span class="title">Ramos que pido</span><br>
           <?php
-            $usuario->verRamosQuePido($usuario->getNombreUsuario());
+            $usuario->verRamosQuePido($_SESSION['carrera'],$_SESSION['codigoSemestre']);
           ?>
         </div></td></tr>
         <tr>
         <td><div class="prog_presu"><span class="title">Programación versus Presupuesto</span><br>
           <?php
-            $usuario->verProgramacionVsPresupuesto();
+            //$usuario->verProgramacionVsPresupuesto();
           ?>
         </div></td></tr>
         <tr>
@@ -97,24 +104,53 @@ if(isset($_SESSION['usuario']))
             $usuario->verProfesoresSinCargaAcademica($_SESSION['carrera']);
           ?>
         </div></td>
-        <td><div class="seccion_sprof"><span class="title">Secciones sin profesor</span><br>
+        <td><div class="seccion_sprof" style="overflow: scroll;"><span class="title">Secciones sin profesor</span><br>
           <?php 
-            $usuario->verSeccionesSinProfesor($_SESSION['carrera']);
+            $usuario->verSeccionesSinProfesor($_SESSION['carrera'],$_SESSION['codigoSemestre']);
           ?>
         </div></td>
         </tr></table>
         <?php
         }
         elseif(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && is_null($_SESSION['carrera'])) {
+          $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+          $sql = "CALL obtenerSemestre()";
+          $res = $mysqli->prepare($sql);
+          $res->execute();
+          $res->bind_result($codigoSemestre,$numeroSemestre,$anhoSemestre,$fechaInicioSemestre,$fechaTerminoSemestre);
+          $res->fetch();
+          $res->free_result();
+
+          $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+          $sql = "CALL obtenerTrimestre()";
+          $res = $mysqli->prepare($sql);
+          $res->execute();
+          $res->bind_result($codigoTrimestre,$numeroTrimestre,$anhoTrimestre,$fechaInicioTrimestre,$fechaTerminoTrimestre);
+          $res->fetch();
+          $res->free_result();
+     
           echo 'Elija la carrera: ';
           $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
           $sql = "CALL jdc_carreras('{$usuario->getNombreUsuario()}')";
           $res = $mysqli->prepare($sql);
           $res->execute();
-          $res->bind_result($codigo,$nombre);
-          echo '<table><tr><th>Código</th><th>Nombre</th><th>Elegir</th></tr>';
+          $res->bind_result($codigo,$nombre,$periodo);
+          echo '<table><tr><th>Código</th><th>Nombre</th><th>Estado</th><th>Elegir</th></tr>';
           while($res->fetch()) {
-           echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td><form method="post" name="elegir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigo.'"></input><input type="submit" name="submit" value="Elegir"></input></form></td></tr>';
+           if($periodo == 1)
+           {
+             if($fechaTerminoSemestre == NULL)
+               echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$codigoSemestre.'</td><td><form method="post" name="elegir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="Elegir"></input></form></td></tr>';
+             else
+               echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>Cerrado</td><td><form method="post" name="elegir" target="_self"><input type="submit" name="submit" value="Elegir" disabled></input></form></td></tr>';
+           }
+           else
+           {
+             if($fechaTerminoTrimestre == NULL)
+               echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$codigoTrimestre.'</td><td><form method="post" name="elegir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigo.'"></input><input type="hidden" name="codigoTrimestre" value="'.$codigoTrimestre.'"></input><input type="submit" name="submit" value="Elegir"></input></form></td></tr>';
+             else
+               echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>Cerrado</td><td><form method="post" name="elegir" target="_self"><input type="submit" name="submit" value="Elegir" disabled></input></form></td></tr>';
+           }
           }
           echo '</table>';
           $res->free_result();
@@ -139,8 +175,10 @@ if(isset($_SESSION['usuario']))
       }
     ?>
     </div>
-  </div></body>
-</html><?php
+  </div>
+</body>
+</html>
+<?php
   }
   else
   {

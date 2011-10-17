@@ -24,25 +24,55 @@ jQuery(function ($) {
  
         $('a.asigna').click(function (e) {
           var carrera = $(this).attr("id");
-          $('<iframe name="" class="" src="asignar_jdc.php?hidden_car=' + carrera + '&asigna=1" scrolling="no"></iframe>').modal();
+          $('<iframe name="" class="" src="asignar_jdc.php?hidden_car=' + carrera + '&asigna=1" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
 
         $('a.cambia').click(function (e) {
           var carrera = $(this).attr("id");
-          $('<iframe name="" class="" src="asignar_jdc.php?hidden_car=' + carrera + '&cambia=1" scrolling="no"></iframe>').modal();
+          $('<iframe name="" class="" src="asignar_jdc.php?hidden_car=' + carrera + '&cambia=1" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
  
         $('a.eliminar').click(function (e) {
           var carrera = $(this).attr("id");
-          $('<iframe name="" class="" src="eliminar_jdc.php?hidden_jdc=' + carrera + '" scrolling="no"></iframe>').modal();
+          $('<iframe name="" class="" src="eliminar_jdc.php?hidden_jdc=' + carrera + '" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
 
         $('a.eliminar').click(function (e) {
           var carrera = $(this).attr("id");
-          $('<iframe name="" class="" src="eliminar_jdc.php?hidden_jdc=' + carrera + '" scrolling="no"></iframe>').modal();
+          $('<iframe name="" class="" src="eliminar_jdc.php?hidden_jdc=' + carrera + '" scrolling="no" frameborder="0"></iframe>').modal();
+          return false;
+        });
+
+        $('a.relacionar').click(function (e) {
+          var codigoRamo = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="ramosRelacionar.php?codigoRamo=' + codigoRamo + '" scrolling="no" frameborder="0"></iframe>').modal();
+          return false;
+        });
+
+        $('a.verMalla').click(function (e) {
+          var codigoCarrera = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="Malla.php?codigoCarrera=' + codigoCarrera + '" scrolling="no" frameborder="0"></iframe>').modal();
+          return false;
+        });
+
+        $('a.seccionesCreadas').click(function (e) {
+          var codigoRamo = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="secundario/seccion.php?otros=no&codigoRamo=' + codigoRamo + '" scrolling="no" frameborder="0"></iframe>').modal();
+          return false;
+        });
+
+        $('a.seccionesCreadasOtros').click(function (e) {
+          var codigoRamo = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="secundario/seccion.php?otros=si&codigoRamo=' + codigoRamo + '" scrolling="no" frameborder="0"></iframe>').modal();
+          return false;
+        });
+
+        $('a.responderSolicitud').click(function (e) {
+          var idSolicitud = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="secundario/solicitud.php?idSolicitud=' + idSolicitud + '" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
 });

@@ -73,6 +73,8 @@ if(isset($_SESSION['usuario']))
   <meta name="keywords" content="website keywords, website keywords" />
   <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
   <link rel="stylesheet" type="text/css" href="../style/style.css" title="style" />
+  <link rel="stylesheet" type="text/css" href="../style/bsc.css" title="style" />
+  <script type="text/javascript" src="../js/js.js"></script>
 </head>
 
 <body>
@@ -98,28 +100,37 @@ if(isset($_SESSION['usuario']))
       </div>
     </div>
     <div id="site_content">
-      <div class="sidebar">
+      <!--<div class="sidebar">
         <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-      </div>
+      </div>-->
       <div id="content">
         <!-- insert the page content here -->
         <h1>Jefes de Carreras</h1>
+
+        <h2>Agregar Jefe de Carrera:</h2>
+        <?php if(isset($answer)) echo '<td><span class="error">'.$answer.'</span></td>';?>
+        <table>
+        <form method="post" name="agregar" target="_self">
+          <tr><td>RUT</td><td>Nombre</td><td>Nombre usuario</td><td>Contraseña</td></tr>
+          <tr><td><input type="text" name="rut" value="<?php if(isset($rutold)) echo $rutold;?>" maxlength="10" class="l"></input></td>
+          <td><input type="text" name="nombre" value="<?php if(isset($nombreold)) echo $nombreold;?>" maxlength="40"></input></td>
+          <td><input type="text" name="nusuario" value="<?php if(isset($nusuarioold)) echo $nusuarioold;?>" maxlength="40" onkeyup="buscarNombreUsuario(this.value)"></input></td>
+          <td><input type="text" name="pass" value="" maxlength="32"></input></td>
+          <td><?php if(isset($nusuarioold)) echo '<input id="btt" type="submit" name="agrega" value="Agregar"></input>'; else echo '<input id="btt" type="submit" name="agrega" value="Agregar" disabled></input>';?></td></tr>
+          <tr>
+           <td><?php if(isset($ruterror)) echo '<span class="error">'.$ruterror.'</span>';?></td>
+           <td><?php if(isset($nombreerror)) echo '<span class="error">'.$nombreerror.'</span>';?></td>
+           <td><div id="existe"><?php if(isset($nusuarioerror)) echo '<span class="error">'.$nusuarioerror.'</span>';?></div></td>
+           <td><?php if(isset($passerror)) echo '<span class="error">'.$passerror.'</span>';?></td>
+          </tr>
+        </form>
+        </table>
+
         <h2>Lista de jefes carrera:</h2><ul>
         <?php
           $usuario->verJefesDeCarrera();
         ?>
         </ul>
-
-        <h2>Agregar Jefe de Carrera:</h2>
-        <table>
-        <form method="post" name="agregar" target="_self">
-          <tr><td>RUT: </td><td><input type="text" name="rut" value="<?php if(isset($rutold)) echo $rutold;?>" maxlength="10"></input></td><?php if(isset($ruterror)) echo '<td><span class="error">'.$ruterror.'</span></td>';?></tr> 
-          <tr><td>Nombre: </td><td><input type="text" name="nombre" value="<?php if(isset($nombreold)) echo $nombreold;?>" maxlength="40"></input></td><?php if(isset($nombreerror)) echo '<td><span class="error">'.$nombreerror.'</span></td>';?></tr>
-          <tr><td>Nombre usuario: </td><td><input type="text" name="nusuario" value="<?php if(isset($nusuarioold)) echo $nusuarioold;?>" maxlength="40"></input></td><?php if(isset($nusuarioerror)) echo '<td><span class="error">'.$nusuarioerror.'</span></td>';?></tr> 
-          <tr><td>Contraseña: </td><td><input type="text" name="pass" value="" maxlength="32"></input></td><td><input type="checkbox" name="pass" value="noMostrar"> No mostrar password</input></td><?php if(isset($passerror)) echo '<td><span class="error">'.$passerror.'</span></td>';?></tr> 
-          <tr><td></td><td><input type="submit" name="agrega" value="Agregar"></input></td><?php if(isset($answer)) echo '<td><span class="error">'.$answer.'</span></td>';?></tr>
-        </form>
-        </table>
       </div>
     </div>
     <div id="content_footer"></div>

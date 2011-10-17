@@ -58,32 +58,6 @@ if(isset($_SESSION['usuario']))
         }
       }
     }
-
-    if(isset($_POST['submit']) && $_POST['submit'] == 'Relacionar'){
-      if(isset($_POST['codigoramo']) && isset($_POST['codigocarrera']) && isset($_POST['semestre']))
-      {
-        if($_POST['codigoramo'] != '' && $_POST['codigocarrera'] != '' && $_POST['semestre'] != '')
-        {
-          $answer2 = $usuario->relacionarRamoConCarrera($_POST['codigoramo'],$_POST['codigocarrera'],$_POST['semestre']);
-        }
-        else
-        {
-          if($_POST['codigoramo'] == '' && $_POST['codigocarrera'] == '' && $_POST['semestre'])
-          {
-            $answer2 = '*Debe ingresar código del ramo y código de la carrera.';
-          }
-          else
-          {
-            if($_POST['codigoramo'] == ''){
-              $codigoramoerror = '*Debe ingresar el código del ramo.';}
-            if($_POST['codigocarrera'] == ''){
-              $codigocarreraerror = '*Debe ingresar el nombre del ramo.';}
-            if($_POST['semestre'] == ''){
-              $semestreerror = '*Debe ingresar el semestre.';}
-          }
-        }
-      }
-    }
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -95,6 +69,8 @@ if(isset($_SESSION['usuario']))
   <meta name="keywords" content="website keywords, website keywords" />
   <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
   <link rel="stylesheet" type="text/css" href="../style/style.css" title="style" />
+  <link rel="stylesheet" type="text/css" href="../style/bsc.css" title="style" />
+  <script type="text/javascript" src="../js/js.js"></script>
 </head>
 
 <body>
@@ -120,98 +96,44 @@ if(isset($_SESSION['usuario']))
       </div>
     </div>
     <div id="site_content">
-      <div class="sidebar">
-        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-      </div>
+
       <div id="content">
         <!-- insert the page content here -->
         <h1>Ramos</h1>
+ 
+        <h2>Agregar Ramo:</h2>
+        <?php if(isset($answer)) echo '<span class="error">'.$answer.'</span>';?>
+        <table>
+        <tr><td>Codigo</td><td>Nombre</td><td>Teó.</td><td>Ayu.</td><td>Lab.</td><td>Tall.</td><td>Créd.</td><td></td></tr> 
+        <form method="post" name="agregar" target="_self">
+            <tr><td><input type="text" name="codigo" value="<?php if(isset($codigoold)) echo $codigoold;?>" maxlength="6" class="m" onkeyup="buscarCodigoRamo(this.value)"></input></td> 
+            <td><input type="text" name="nombre" value="<?php if(isset($nombreold)) echo $nombreold;?>" maxlength="50"></input></td>
+            <td><input type="text" name="teo" value="<?php if(isset($teoold)) echo $teoold;?>" maxlength="2" class="xs"></input></td>
+            <td><input type="text" name="ayu" value="<?php if(isset($ayuold)) echo $ayuold;?>" maxlength="2" class="xs"></input></td>
+            <td><input type="text" name="lab" value="<?php if(isset($labold)) echo $labold;?>" maxlength="2" class="xs"></input></td>
+            <td><input type="text" name="tall" value="<?php if(isset($tallold)) echo $tallold;?>" maxlength="2" class="xs"></input></td>
+            <td><input type="text" name="cre" value="<?php if(isset($creold)) echo $creold;?>" maxlength="2" class="xs"></input></td>
+            <td><?php if(isset($codigoold))echo '<input type="submit" name="agrega" value="Agregar" id="btt">'; else echo '<input type="submit" name="agrega" value="Agregar" id="btt" disabled>';?></input></td></tr>
+            <tr><td><div id="existe"><?php if(isset($codigoerror)) echo '<td><span class="error">'.$codigoerror.'</span></td>';?></div></td>
+                <td><?php if(isset($nombreerror)) echo '<span class="error">'.$nombreerror.'</span>';?></td>
+                <td><?php if(isset($teoerror)) echo '<span class="error">'.$teoerror.'</span>';?></td>
+                <td><?php if(isset($ayuerror)) echo '<span class="error">'.$ayuerror.'</span>';?></td>
+                <td><?php if(isset($laberror)) echo '<span class="error">'.$laberror.'</span>';?></td>
+                <td><?php if(isset($tallerror)) echo '<span class="error">'.$tallerror.'</span>';?></td>
+                <td><?php if(isset($creerror)) echo '<span class="error">'.$creerror.'</span>';?></td>
+                <td></td></tr>
+          </form>
+        </table>
+
         <h2>Lista de ramos:</h2><ul>
         <?php
+          echo '<table>';
+          echo '<tr><td>Codigo</td><td>Nombre</td><td>Teó.</td><td>Ayu.</td><td>Lab.</td><td>Tall.</td><td>Créd.</td><td>Relacionar</td><td>Eliminar</td></tr>';     
           $usuario->verRamos();
+          echo '</table>';
         ?>
         </ul>
-
-        <h2>Agregar Ramo:</h2>
-        <table>
-        <form method="post" name="agregar" target="_self">
-          <tr><td>Código: </td><td><input type="text" name="codigo" value="<?php if(isset($codigoold)) echo $codigoold;?>" maxlength="6"></input></td><?php if(isset($codigoerror)) echo '<td><span class="error">'.$codigoerror.'</span></td>';?></tr> 
-          <tr><td>Nombre Ramo: </td><td><input type="text" name="nombre" value="<?php if(isset($nombreold)) echo $nombreold;?>" maxlength="50"></input></td><?php if(isset($nombreerror)) echo '<td><span class="error">'.$nombreerror.'</span></td>';?></tr>
-          <tr><td>Teoría: </td><td><input type="text" name="teo" value="<?php if(isset($teoold)) echo $teoold;?>" maxlength="2"></input></td><?php if(isset($teoerror)) echo '<td><span class="error">'.$teoerror.'</span></td>';?></tr>
-          <tr><td>Ayudantía: </td><td><input type="text" name="ayu" value="<?php if(isset($ayuold)) echo $ayuold;?>" maxlength="2"></input></td><?php if(isset($ayuerror)) echo '<td><span class="error">'.$ayuerror.'</span></td>';?></tr>
-          <tr><td>Laboratorio: </td><td><input type="text" name="lab" value="<?php if(isset($labold)) echo $labold;?>" maxlength="2"></input></td><?php if(isset($laberror)) echo '<td><span class="error">'.$laberror.'</span></td>';?></tr>
-          <tr><td>Taller: </td><td><input type="text" name="tall" value="<?php if(isset($tallold)) echo $tallold;?>" maxlength="2"></input></td><?php if(isset($tallerror)) echo '<td><span class="error">'.$tallerror.'</span></td>';?></tr>
-          <tr><td>Créditos: </td><td><input type="text" name="cre" value="<?php if(isset($creold)) echo $creold;?>" maxlength="2"></input></td><?php if(isset($creerror)) echo '<td><span class="error">'.$creerror.'</span></td>';?></tr>
-          <tr><td></td><td><input type="submit" name="agrega" value="Agregar"></input></td><?php if(isset($answer)) echo '<td><span class="error">'.$answer.'</span></td>';?></tr>
-        </form>
-        </table>
      
-      <h2>Relacionar ramo con carrera</h2>
-      <table>
-      <form method="post" name="relacionar" target="_self">
-       <tr><td>Ramo: </td><td><select name="codigoramo"><option value="">Seleccionar ramo</option>
-                                        <?php 
-                                          $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-                                          $sql = "CALL select_cramos()";
-                                          $res = $mysqli->prepare($sql);
-                                          $res->execute();
-                                          $res->bind_result($codigoRamo,$nombreRamo);
-                                          while($res->fetch())
-                                          {
-                                            echo '<option value="'.$codigoRamo.'">'.$nombreRamo.'</option>';
-                                          }
-                                          $res->free_result();
-                                        ?>
-                                        </select></td><?php if(isset($codigoramoerror)) echo '<td><span class="error">'.$codigoramoerror.'</span></td>';?></tr>
-       <tr><td>Carrera: </td><td><select name="codigocarrera"><option value="">Seleccionar carrera</option>
-                                        <?php 
-                                          $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-                                          $sql = "CALL select_ccarreras()";
-                                          $res = $mysqli->prepare($sql);
-                                          $res->execute();
-                                          $res->bind_result($codigoCarrera,$nombreCarrera);
-                                          while($res->fetch())
-                                          {
-                                            echo '<option value="'.$codigoCarrera.'">'.$nombreCarrera.'</option>';
-                                          }
-                                          $res->free_result();
-                                        ?>
-                                        </select></td><?php if(isset($codigocarreraerror)) echo '<td><span class="error">'.$codigocarreraerror.'</span></td>';?></tr>
-      <tr><td>Semestre/Trimestre: </td><td><input type="text" name="semestre" value="" maxlength="2"></input></td><?php if(isset($semestreerror)) echo '<td><span class="error">'.$semestreerror.'</span></td>';?></tr>
-      <tr><td></td><td><input type="submit" name="submit" value="Relacionar"></input></td><?php if(isset($answer2)) echo '<td><span class="error">'.$answer2.'</span></td>';?></tr>
-      </table>
-
-      <h2>Carreras con ramos relacionados</h2>
-      <?php
-       $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-       $sql = "CALL select_ccarreras()";
-       $res = $mysqli->prepare($sql);
-       $res->execute();
-       $res->bind_result($codigoCarrera,$nombreCarrera);
-       while($res->fetch())
-       {
-         echo '<h4>'.$codigoCarrera.' - '.$nombreCarrera.'</h4>';
-         $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-         $sql2 = "CALL select_ramoscarreras('{$codigoCarrera}')";
-         $res2 = $mysqli2->prepare($sql2);
-         $res2->execute();
-         $res2->bind_result($codigoRamo,$nombreRamo,$semestre);
-         $ram = 0;
-         while($res2->fetch())
-         {
-           if($ram == 0){
-             $ram = 1;
-             echo '<table><tr><td>Semestre</td><td>Codigo Ramo</td><td>Nombre</td></tr>';}
-           echo '<tr><td>'.$semestre.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td></tr>';
-         }
-         if($ram == 0)
-           echo 'No tiene ramos asociados.<br><br>';
-         else
-           echo '</table>';
-         $res2->free_result();
-       }
-       $res->free_result();
-     ?>
      </div>
     </div>
     <div id="content_footer"></div>
@@ -222,7 +144,12 @@ if(isset($_SESSION['usuario']))
       }
       ?>
     </div>
-  </div></body>
+  </div>
+
+  <script type='text/javascript' src='../js/jquery.js'></script> 
+  <script type='text/javascript' src='../js/jquery.simplemodal.js'></script> 
+  <script type='text/javascript' src='../js/bsc.js'></script>
+</body>
 </html><?php
   }
   else

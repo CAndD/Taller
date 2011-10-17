@@ -10,34 +10,39 @@ if(isset($_SESSION['usuario']))
   }
   if($usuario->getTipo() == 2 || $usuario->getTipo() == 3)
   {
-    if(isset($_POST['codigo']) && isset($_POST['nombre']) && isset($_POST['periodo']) && isset($_POST['numero']))
+    if(isset($_POST['agrega']) && $_POST['agrega'] == 'Agregar')
     {
-      if($_POST['codigo'] != '' && $_POST['nombre'] != '' && $_POST['periodo'] != '' && $_POST['numero'] != '')
+      if(isset($_POST['codigo']) && isset($_POST['nombre']))
       {
-        $answer = $usuario->agregarCarrera($_POST['codigo'],$_POST['nombre'],$_POST['periodo'],$_POST['numero']);
-      }
-      else
-      {
-        if($_POST['codigo'] == '' && $_POST['nombre'] == '' && $_POST['periodo'] != '' && $_POST['numero'] == '')
+        if(!isset($_POST['periodo']))
+          $_POST['periodo'] = 0;
+        if($_POST['codigo'] != '' && $_POST['nombre'] != '' && $_POST['periodo'] != 0 && $_POST['numero'] != '')
         {
-          $answer = '*Debe ingresar código, nombre y semestres de duración de carrera.';
+          $answer = $usuario->agregarCarrera($_POST['codigo'],$_POST['nombre'],$_POST['periodo'],$_POST['numero']);
         }
         else
         {
-          if($_POST['codigo'] == ''){
-            $codigoerror = '*Debe ingresar el código de la carrera.';}
-          else{
-            $codigoold = $_POST['codigo'];}  
-          if($_POST['nombre'] == ''){
-            $nombreerror = '*Debe ingresar el nombre de la carrera.';}
-          else{
-            $nombreold = $_POST['nombre'];}
-          if($_POST['periodo'] == ''){
-            $periodoerror = '*Debe ingresar el tipo de período de la carrera.';}
-          if($_POST['numero'] == ''){
-            $numeroerror = '*Debe ingresar el número de semestre o trimestres de la carrera.';}
-          else{
-            $numeroold = $_POST['numero'];}
+          if($_POST['codigo'] == '' && $_POST['nombre'] == '' && $_POST['periodo'] == 0 && $_POST['numero'] == '')
+          {
+            $answer = '*Debe ingresar código, nombre y semestres de duración de carrera.';
+          }
+          else
+          {
+            if($_POST['codigo'] == ''){
+              $codigoerror = '*Debe ingresar el código de la carrera.';}
+            else{
+              $codigoold = $_POST['codigo'];}  
+            if($_POST['nombre'] == ''){
+              $nombreerror = '*Debe ingresar el nombre de la carrera.';}
+            else{
+              $nombreold = $_POST['nombre'];}
+            if($_POST['periodo'] == 0){
+              $periodoerror = '*Debe ingresar el tipo de período de la carrera.';}
+            if($_POST['numero'] == ''){
+              $numeroerror = '*Debe ingresar el número de semestre o trimestres de la carrera.';}
+            else{
+              $numeroold = $_POST['numero'];}
+          }
         }
       }
     }
@@ -52,7 +57,7 @@ if(isset($_SESSION['usuario']))
   <meta name="keywords" content="website keywords, website keywords" />
   <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
   <link rel="stylesheet" type="text/css" href="../style/style.css" title="style" />
-  <link 
+  <script type="text/javascript" src="../js/js.js"></script>
 </head>
 
 <body>
@@ -78,28 +83,38 @@ if(isset($_SESSION['usuario']))
       </div>
     </div>
     <div id="site_content">
-      <div class="sidebar">
+      <!--<div class="sidebar">
         <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-      </div>
+      </div>-->
       <div id="content">
         <!-- insert the page content here -->
         <h1>Carreras</h1>
+
+        <h2>Agregar Carrera:</h2>
+        <?php if(isset($answer)) echo '<span class="error">'.$answer.'</span>';?>
+        <table>
+        <form method="post" name="agregar" target="_self">
+          <tr><td>Código</td><td>Nombre</td><td>Período</td><td>Número Sem/Trim</td></tr>
+          <tr><td><input type="text" name="codigo" value="<?php if(isset($codigoold)) echo $codigoold;?>" maxlength="9" onkeyup="buscarCodigoCarrera(this.value)" class="xl"></input></td>
+          <td><input type="text" name="nombre" value="<?php if(isset($nombreold)) echo $nombreold;?>" maxlength="100"></input></td>
+          <td><input type="radio" name="periodo" value="1">Semestral<br></input><input type="radio" name="periodo" value="2">Trimestral</input></td>
+          <td><input type="text" name="numero" value="<?php if(isset($numeroold)) echo $numeroold;?>" maxlength="2" class="xs"></input></td>
+          <td><?php if(isset($codigoold)) echo '<input id="btt" type="submit" name="agrega" value="Agregar">'; else echo '<input id="btt" type="submit" name="agrega" value="Agregar" disabled>';?></input></td></tr>
+          <tr><td><div id="existe"><?php if(isset($codigoerror)) echo '<td><span class="error">'.$codigoerror.'</span></td>';?></div></td>
+              <td><?php if(isset($nombreerror)) echo '<span class="error">'.$nombreerror.'</span>';?></td>
+              <td><?php if(isset($periodoerror)) echo '<span class="error">'.$periodoerror.'</span>';?></td>
+              <td><?php if(isset($numeroerror)) echo '<span class="error">'.$numeroerror.'</span>';?></td>
+              <td></td>
+          </tr>
+        </form>
+        </table>
+
         <h2>Lista de carreras y sus jefes:</h2><ul>
         <?php
           $usuario->verCarreras();
         ?>
         </ul>
 
-        <h2>Agregar Carrera:</h2>
-        <table>
-        <form method="post" name="agregar" target="_self">
-          <tr><td>Código: </td><td><input type="text" name="codigo" value="<?php if(isset($codigoold)) echo $codigoold;?>" maxlength="9"></input></td><?php if(isset($codigoerror)) echo '<td><span class="error">'.$codigoerror.'</span></td>';?></tr> 
-          <tr><td>Nombre: </td><td><input type="text" name="nombre" value="<?php if(isset($nombreold)) echo $nombreold;?>" maxlength="100"></input></td><?php if(isset($nombreerror)) echo '<td><span class="error">'.$nombreerror.'</span></td>';?></tr>
-          <tr><td>Período: </td><td><input type="radio" name="periodo" value="1"> Semestral </input><input type="radio" name="periodo" value="2"> Trimestral</input></td><?php if(isset($periodoerror)) echo '<td><span class="error">'.$periodoerror.'</span></td>';?></tr>
-          <tr><td>Número Sem/Trim: </td><td><input type="text" name="numero" value="<?php if(isset($numeroold)) echo $numeroold;?>" maxlength="2"></input></td><?php if(isset($numeroerror)) echo '<td><span class="error">'.$semestreerror.'</span></td>';?></tr>
-          <tr><td></td><td><input type="submit" name="agrega" value="Agregar"></input></td><?php if(isset($answer)) echo '<td><span class="error">'.$answer.'</span></td>';?></tr>
-        </form>
-        </table>
       </div>
     </div>
     <div id="content_footer"></div>
