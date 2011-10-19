@@ -368,6 +368,16 @@ span.title { margin: 0;
   color: #A4AA04;
   text-decoration: underline;}
 
+a.title { margin: 0;
+  padding: 0 0 5px 0;
+  font: normal 120% arial, sans-serif;
+  color: #A4AA04;
+  text-decoration: underline;}
+
+a.title {
+          text-decoration: underline;
+        }
+
 input.inp
 { outline: none;
   border: none;

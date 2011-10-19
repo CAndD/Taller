@@ -72,17 +72,17 @@ if(isset($_SESSION['usuario']))
         <?php
         if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && (is_string($_SESSION['carrera']) == true)) {?>
         <table><tr>
-        <td><div class="ramos_malla" style="overflow: scroll;"><span class="title">Ramos de malla</span>
+        <td><div class="ramos_malla" style="overflow: scroll;"><a href="user_jc/ramos.php" class="title">Ramos de malla</a>
           <?php
             $usuario->verMalla($_SESSION['carrera']);
           ?>
         </div></td>
-        <td><div class="ramos_piden" style="overflow: scroll;"><span class="title">Ramos que piden</span><br>
+        <td><div class="ramos_piden" style="overflow: scroll;"><a href="user_jc/solicitudes.php" class="title">Ramos que piden</a><br>
           <?php
             $usuario->verRamosQuePiden($_SESSION['carrera'],$_SESSION['codigoSemestre']);
           ?>
         </div></td>
-        <td><div class="ramos_pido" style="overflow: scroll;"><span class="title">Ramos que pido</span><br>
+        <td><div class="ramos_pido" style="overflow: scroll;"><a href="user_jc/solicitudes.php" class="title">Ramos que pido</a><br>
           <?php
             $usuario->verRamosQuePido($_SESSION['carrera'],$_SESSION['codigoSemestre']);
           ?>
