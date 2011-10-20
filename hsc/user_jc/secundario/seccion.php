@@ -1,5 +1,7 @@
 <?php
-include('../../class/class_lib.php');
+foreach (glob("../../class/*.php") as $filename) {
+   include_once($filename);
+}
 session_start();
 if(isset($_SESSION['usuario']))
 {
@@ -9,17 +11,21 @@ if(isset($_SESSION['usuario']))
     $_SESSION['usuario'] = serialize($usuario);
   }
 
-  if(isset($_GET['codigoRamo'])) 
-  {
-  }
 
   if(isset($_POST['submit']) && $_POST['submit'] == 'Solicitar')
   {
     if(isset($_POST['hiddenCarreraDuenha']) && isset($_POST['hiddenCodigoRamo']) && isset($_POST['numeroVacantes']))
     {
-      $msg2 = $usuario->solicitarVacantes($_POST['hiddenCodigoRamo'],$_POST['hiddenCarreraDuenha'],$_SESSION['carrera'],$_POST['numeroVacantes'],$_SESSION['codigoSemestre']);
-      $_GET['otros'] = 'si';
-      $_GET['codigoRamo'] = $_POST['hiddenCodigoRamo'];
+      if(ctype_digit($_POST['numeroVacantes']) && $_POST['numeroVacantes'] > 0) {
+        $msg2 = $usuario->solicitarVacantes($_POST['hiddenCodigoRamo'],$_POST['hiddenCarreraDuenha'],$_SESSION['carrera'],$_POST['numeroVacantes'],$_SESSION['codigoSemestre']);
+        $_GET['otros'] = 'si';
+        $_GET['codigoRamo'] = $_POST['hiddenCodigoRamo'];
+      }
+      else {
+        $msg2 = '*Debe al menos pedir 1 vacante.';
+        $_GET['otros'] = 'si';
+        $_GET['codigoRamo'] = $_POST['hiddenCodigoRamo'];
+      }
     }
   }
 

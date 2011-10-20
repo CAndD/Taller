@@ -1,5 +1,7 @@
 <?php
-include('class/class_lib.php');
+foreach (glob("class/*.php") as $filename) {
+   include_once($filename);
+}
 session_start();
 if(isset($_SESSION['usuario']))
 {
