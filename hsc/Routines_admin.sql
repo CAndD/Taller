@@ -277,7 +277,7 @@ END;//
 
 CREATE PROCEDURE verSolicitudesOtros(codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
-  SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera_Solicitante,s.Vacantes,s.Fecha_Envio,s.Estado
+  SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera_Solicitante,s.Vacantes,s.Vacantes_Asignadas,s.Fecha_Envio,s.Fecha_Respuesta,s.Estado
    FROM Solicitud AS s
    INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
   WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera = codigoCarrera ORDER BY s.Estado,s.Fecha_Envio,s.Carrera_Solicitante,s.Codigo_Ramo;
@@ -285,7 +285,7 @@ END;//
 
 CREATE PROCEDURE verSolicitudesMias(codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
-  SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera,s.Vacantes,s.Fecha_Envio,s.Estado
+  SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera,s.Vacantes,s.Vacantes_Asignadas,s.Fecha_Envio,s.Fecha_Respuesta,s.Estado
    FROM Solicitud AS s
    INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
   WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera_Solicitante = codigoCarrera ORDER BY s.Estado,s.Fecha_Envio,s.Carrera_Solicitante,s.Codigo_Ramo;
@@ -295,7 +295,7 @@ CREATE PROCEDURE comprobarSolicitudExiste(codigoCarreraSolicitante VARCHAR(9), c
 BEGIN
   SELECT s.Id
    FROM Solicitud AS s
-  WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera_Solicitante = codigoCarreraSolicitante AND s.Codigo_Ramo = codigoRamo AND s.Carrera = codigoCarreraDestinatario;
+  WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera_Solicitante = codigoCarreraSolicitante AND s.Codigo_Ramo = codigoRamo AND s.Carrera = codigoCarreraDestinatario AND s.Estado = 1;
 END;//
 
 CREATE PROCEDURE revisarSolicitud(idSolicitud INT)
@@ -305,7 +305,21 @@ BEGIN
   WHERE s.Id = idSolicitud;
 END;//
 
-CREATE PROCEDURE responderSolicitud(idSolicitud INT, respuesta INT)
+CREATE PROCEDURE responderSolicitud(idSolicitud INT, respuesta INT, vacantes INT, fecharespuesta DATETIME)
 BEGIN
-  UPDATE Solicitud SET estado = respuesta WHERE id = idSolicitud;
+  IF(respuesta = 2) THEN
+    UPDATE Solicitud SET estado = 2, vacantes_asignadas = vacantes, fecha_respuesta = fecharespuesta WHERE id = idSolicitud;
+  ELSE
+    UPDATE Solicitud SET estado = 3, vacantes_asignadas = 0, fecha_respuesta = fecharespuesta WHERE id = idSolicitud;
+  END IF;
+END;//
+
+CREATE PROCEDURE modificarSolicitud(idSolicitud INT, numeroVacantes INT)
+BEGIN
+  UPDATE Solicitud SET Vacantes = numeroVacantes WHERE Id = idSolicitud AND Estado = 1;
+END;//
+
+CREATE PROCEDURE eliminarSolicitud(idSolicitud INT)
+BEGIN
+  DELETE FROM Solicitud WHERE Id = idSolicitud;
 END;//

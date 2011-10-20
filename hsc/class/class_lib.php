@@ -479,15 +479,16 @@ class jefeDeCarrera extends usuario {
     $sql = "CALL verSolicitudesOtros('{$codigoCarrera}','{$codigoSemestre}')";
     $res = $mysqli->prepare($sql);
     $res->execute();
-    $res->bind_result($idSolicitud,$codigoRamo,$nombreRamo,$carreraSolicitante,$vacantes,$fecha_envio,$estado);
-    echo '<table><tr><td>Id Solicitud</td><td>Código ramo</td><td>Nombre ramo</td><td>Carrera solicitante</td><td># vacantes</td><td>Fecha envio</td><td>Estado</td><td>Responder</td></tr>';
+    $res->bind_result($idSolicitud,$codigoRamo,$nombreRamo,$carreraSolicitante,$vacantes,$vacantesAsignadas,$fecha_envio,$fechaRespuesta,$estado);
+    echo '<table><tr><td class="dc">Esperando</td></tr>';
+    echo '<tr><td class="dc">Id Solicitud</td><td class="dc">Código ramo</td><td class="dc">Nombre ramo</td><td class="dc">Carrera solicitante</td><td class="dc"># vacantes</td><td class="dc">Fecha envio</td><td class="dc">Estado</td><td class="dc">Responder</td></tr>';
     $flag = 0;
     $aceptadas = 0;
     $denegadas = 0;
     while($res->fetch())
     {
-      if($flag == 0)
-        $flag = 1;
+      if($flag == 0) {
+        $flag = 1;}
       if($estado == 1)
         echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraSolicitante.'</td><td class="mid">'.$vacantes.'</td><td>'.$fecha_envio.'</td><td>Esperando</td><td><a id="'.$idSolicitud.'" class="responderSolicitud" href="">Responder</a></td></tr>';
       elseif($estado == 2)
@@ -495,18 +496,22 @@ class jefeDeCarrera extends usuario {
         if($aceptadas == 0)
         {
           $aceptadas = 1;
-          echo '<tr><td>Aceptadas</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+          echo '<tr></tr>';
+          echo '<tr><td class="dc">Aceptadas</td></tr>';
+          echo '<tr><td class="dc">Id Solicitud</td><td class="dc">Código ramo</td><td class="dc">Nombre ramo</td><td class="dc">Carrera solicitante</td><td class="dc">Vacantes pedidas</td><td class="dc">Vacantes asignadas</td><td class="dc">Fecha envio</td><td class="dc">Fecha respuesta</td><td class="dc">Estado</td></tr>';
         }
-        echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraSolicitante.'</td><td class="mid">'.$vacantes.'</td><td>'.$fecha_envio.'</td><td>Aceptada</td><td></td></tr>';
+        echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraSolicitante.'</td><td class="mid">'.$vacantes.'</td><td class="mid">'.$vacantesAsignadas.'</td><td>'.$fecha_envio.'</td><td>'.$fechaRespuesta.'</td><td>Aceptada</td></tr>';
       }
       elseif($estado == 3)
       {
         if($denegadas == 0)
         {
           $denegadas = 1;
-          echo '<tr><td>Denegadas</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+          echo '<tr></tr>';
+          echo '<tr><td class="dc">Denegadas</td></tr>';
+          echo '<tr><td class="dc">Id Solicitud</td><td class="dc">Código ramo</td><td class="dc">Nombre ramo</td><td class="dc">Carrera solicitante</td><td class="dc">Vacantes pedidas</td><td class="dc">Vacantes asignadas</td><td class="dc">Fecha envio</td><td class="dc">Fecha respuesta</td><td class="dc">Estado</td></tr>';
         }
-        echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraSolicitante.'</td><td class="mid">'.$vacantes.'</td><td>'.$fecha_envio.'</td><td>Denegada</td><td></td></tr>';
+        echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraSolicitante.'</td><td class="mid">'.$vacantes.'</td><td class="mid">'.$vacantesAsignadas.'</td><td>'.$fecha_envio.'</td><td>'.$fechaRespuesta.'</td><td>Denegada</td></tr>';
       }
     }
     if($flag == 0)
@@ -521,34 +526,39 @@ class jefeDeCarrera extends usuario {
     $sql = "CALL verSolicitudesMias('{$codigoCarrera}','{$codigoSemestre}')";
     $res = $mysqli->prepare($sql);
     $res->execute();
-    $res->bind_result($idSolicitud,$codigoRamo,$nombreRamo,$carreraDestinataria,$vacantes,$fecha_envio,$estado);
-    echo '<table><tr><td>Id Solicitud</td><td>Código ramo</td><td>Nombre ramo</td><td>Carrera destinataria</td><td># vacantes</td><td>Fecha envio</td><td>Estado</td></tr>';
+    $res->bind_result($idSolicitud,$codigoRamo,$nombreRamo,$carreraDestinataria,$vacantes,$vacantesAsignadas,$fecha_envio,$fechaRespuesta,$estado);
+    echo '<table><tr><td class="dc">Esperando</td></tr>';
+    echo '<tr><td class="dc">Id Solicitud</td><td class="dc">Código ramo</td><td class="dc">Nombre ramo</td><td class="dc">Carrera destinataria</td><td class="dc"># vacantes</td><td class="dc">Fecha envio</td><td class="dc">Estado</td><td class="dc">Modificar</td><td class="dc">Eliminar</td></tr>';
     $flag = 0;
     $aceptadas = 0;
     $denegadas = 0;
     while($res->fetch())
     {
-      if($flag == 0)
-        $flag = 1;
+      if($flag == 0) {
+        $flag = 1;}
       if($estado == 1)
-        echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraDestinataria.'</td><td class="mid">'.$vacantes.'</td><td>'.$fecha_envio.'</td><td>Esperando</td></tr>';
+        echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraDestinataria.'</td><td class="mid">'.$vacantes.'</td><td>'.$fecha_envio.'</td><td>Esperando</td><td><form method="post" name="modificarSolicitud" target="_self"><input type="text" name="numeroVacantes" value="'.$vacantes.'" class="xs"></input><input type="hidden" name="hiddenSolicitudId" value="'.$idSolicitud.'"></input> <input type="submit" name="submit" value="Modificar"></input></form></td><td><form method="post" name="eliminarSolicitud" target="_self"><input type="hidden" name="hiddenSolicitudId" value="'.$idSolicitud.'"></input><input type="submit" name="submit" value="Eliminar"></input></form></td></tr>';
       elseif($estado == 2)
       {
         if($aceptadas == 0)
         {
           $aceptadas = 1;
-          echo '<tr><td>Aceptadas</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+          echo '<tr></tr>';
+          echo '<tr><td class="dc">Aceptadas</td></tr>';
+          echo '<tr><td class="dc">Id Solicitud</td><td class="dc">Código ramo</td><td class="dc">Nombre ramo</td><td class="dc">Carrera solicitante</td><td class="dc">Vacantes pedidas</td><td class="dc">Vacantes asignadas</td><td class="dc">Fecha envio</td><td class="dc">Fecha respuesta</td><td class="dc">Estado</td></tr>';
         }
-        echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraDestinataria.'</td><td class="mid">'.$vacantes.'</td><td>'.$fecha_envio.'</td><td>Aceptada</td></tr>';
+        echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraDestinataria.'</td><td class="mid">'.$vacantes.'</td><td class="mid">'.$vacantesAsignadas.'</td><td>'.$fecha_envio.'</td><td>'.$fechaRespuesta.'</td><td>Aceptada</td></tr>';
       }
       elseif($estado == 3)
       {
         if($denegadas == 0)
         {
           $denegadas = 1;
-          echo '<tr><td>Denegadas</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+          echo '<tr></tr>';
+          echo '<tr><td class="dc">Denegadas</td></tr>';
+          echo '<tr><td class="dc">Id Solicitud</td><td class="dc">Código ramo</td><td class="dc">Nombre ramo</td><td class="dc">Carrera solicitante</td><td class="dc">Vacantes pedidas</td><td class="dc">Vacantes asignadas</td><td class="dc">Fecha envio</td><td class="dc">Fecha respuesta</td><td class="dc">Estado</td></tr>';
         }
-        echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraDestinataria.'</td><td class="mid">'.$vacantes.'</td><td>'.$fecha_envio.'</td><td>Denegada</td></tr>';
+        echo '<tr><td>'.$idSolicitud.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$carreraDestinataria.'</td><td class="mid">'.$vacantes.'</td><td class="mid">'.$vacantesAsignadas.'</td><td>'.$fecha_envio.'</td><td>'.$fechaRespuesta.'</td><td>Denegada</td></tr>';
       }
     }
     if($flag == 0)
@@ -568,14 +578,16 @@ class jefeDeCarrera extends usuario {
     $res->bind_result($id,$codigoRamo,$carrera,$carreraSolicitante,$vacantes,$codigoSemestre,$fecha_envio,$fecha_termino,$estado);
     $res->fetch();
     echo '<table><h4>Solicitud número '.$id.'</h4></table>';
+    echo '<table><tr><td>Carrera solicitante: '.$carreraSolicitante.'</td></tr><tr><td>Número vacantes: '.$vacantes.'</td></tr></table>';
     $res->free_result();
+    return $vacantes;
   }
 
-  public function responderSolicitud($idSolicitud,$respuesta)
+  public function responderSolicitud($idSolicitud,$respuesta,$vacantes)
   {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL responderSolicitud('{$idSolicitud}','{$respuesta}')";
+    $sql = "CALL responderSolicitud('{$idSolicitud}','{$respuesta}','{$vacantes}',NOW())";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Solicitud respondida.';
@@ -583,6 +595,38 @@ class jefeDeCarrera extends usuario {
     else
     {
       $answer = '*Solicitud no respondida.';
+    }
+    return $answer;
+  }
+
+  public function modificarSolicitud($idSolicitud,$numeroVacantes)
+  {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "CALL modificarSolicitud('{$idSolicitud}','{$numeroVacantes}')";
+    if(($mysqli->query($sql)) == true)
+    {
+      $answer = '*Solicitud modificada.';
+    }
+    else
+    {
+      $answer = '*Solicitud no modificada.';
+    }
+    return $answer;
+  }
+
+  public function eliminarSolicitud($idSolicitud)
+  {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "CALL eliminarSolicitud('{$idSolicitud}')";
+    if(($mysqli->query($sql)) == true)
+    {
+      $answer = '*Solicitud eliminada.';
+    }
+    else
+    {
+      $answer = '*Solicitud no eliminada.';
     }
     return $answer;
   }

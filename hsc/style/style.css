@@ -187,7 +187,7 @@ ul#menu li a:hover, ul#menu li.selected a, ul#menu li.selected a:hover
 
 #content
 { text-align: left;
-  width: 800px;
+  width: 830px;
   padding: 0;}
 
 #content ul
@@ -418,3 +418,8 @@ input.xl {
        width: 550px;
        height: 500px;
      }
+
+.dc { 
+      background: #bacfff;
+      color: black;
+    }

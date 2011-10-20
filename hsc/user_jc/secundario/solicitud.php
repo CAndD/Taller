@@ -9,11 +9,36 @@ if(isset($_SESSION['usuario']))
     $_SESSION['usuario'] = serialize($usuario);
   }
 
-  if(isset($_POST['submit']) && $_POST['submit'] == 'Responder')
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Aceptar')
   {
-    if(isset($_POST['respuesta']))
+    if(isset($_POST['vacantes']) && isset($_POST['hiddenIdSolicitud']) && isset($_POST['hiddenVacantes']))
     {
-      $msg = $usuario->responderSolicitud($_POST['hiddenIdSolicitud'],$_POST['respuesta']);
+      if($_POST['vacantes'] == 0 || $_POST['vacantes'] == '')
+      {
+        $msg2 = "Debe elegir al menos 1 vacantes para aceptar.";
+        $_GET['idSolicitud'] = $_POST['hiddenIdSolicitud'];
+        $vacantes = $_POST['hiddenVacantes'];
+      }
+      elseif($_POST['vacantes'] >= 1 && $_POST['vacantes'] > $_POST['hiddenVacantes'])
+      {
+        $msg2 = "Debe elegir aceptar vacantes hasta ".$_POST['hiddenVacantes'];
+        $_GET['idSolicitud'] = $_POST['hiddenIdSolicitud'];
+        $vacantes = $_POST['hiddenVacantes'];
+      }
+      elseif($_POST['vacantes'] >= 1 && $_POST['vacantes'] <= $_POST['hiddenVacantes'])
+      {
+        $msg = $usuario->responderSolicitud($_POST['hiddenIdSolicitud'],2,$_POST['vacantes']);
+        $_GET['idSolicitud'] = null;
+        $vacantes = null;
+      }
+    }
+  }
+
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Denegar')
+  {
+    if(isset($_POST['hiddenIdSolicitud']))
+    {
+      $msg = $usuario->responderSolicitud($_POST['hiddenIdSolicitud'],3,0);
       $_GET['idSolicitud'] = null;
     }
   }
@@ -39,16 +64,20 @@ if(isset($_SESSION['usuario']))
   <?php
   if(isset($_GET['idSolicitud']) && $_GET['idSolicitud'] != null)
   {
-    $usuario->revisarSolicitud($_GET['idSolicitud']);
+    $vacantes = $usuario->revisarSolicitud($_GET['idSolicitud']);
   ?>
   <table><tr>
-    <form method="post" name="responderSolicitud" target="_self">
-      <td><input type="radio" name="respuesta" value="2">Aceptar</input></td></tr>
-      <tr><td><input type="radio" name="respuesta" value="3">Denegar</input></td>
-      <input type="hidden" name="hiddenIdSolicitud" value="<?php echo $_GET['idSolicitud'];?>"></input>
-      <td><input type="submit" name="submit" value="Responder"></input></td></tr>
+    <form method="post" name="aceptarSolicitud" target="_self">
+      <td><input type="text" name="vacantes" value="<?php echo $vacantes;?>" class="xs"></input></td><td><?php if(isset($msg2)) echo '<span class="error">'.$msg2.'</span>';?></td>
+          <input type="hidden" name="hiddenIdSolicitud" value="<?php echo $_GET['idSolicitud'];?>"></input>
+          <input type="hidden" name="hiddenVacantes" value="<?php echo $vacantes;?>"></input>
+      <td><input type="submit" name="submit" value="Aceptar"></input></td></tr>
     </form>
   </table>
+    <form method="post" name="denegarSolicitud" target="_self">
+      <input type="hidden" name="hiddenIdSolicitud" value="<?php echo $_GET['idSolicitud'];?>"></input>
+      <input type="submit" name="submit" value="Denegar"></input>
+    </form>
   <br>
   <a href="../solicitudes.php" target="_parent">Cancelar</a>
   <?php

@@ -17,6 +17,22 @@ if(isset($_SESSION['usuario']))
     }  
   }
 
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Eliminar')
+  {
+    if(isset($_POST['hiddenSolicitudId']))
+    {
+      $msg2 = $usuario->eliminarSolicitud($_POST['hiddenSolicitudId']);
+    }
+  }
+
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Modificar')
+  {
+    if(isset($_POST['hiddenSolicitudId']) && isset($_POST['numeroVacantes']))
+    {
+      $msg2 = $usuario->modificarSolicitud($_POST['hiddenSolicitudId'],$_POST['numeroVacantes']);
+    }
+  }
+
   if(isset($_POST['cambiarCarrera']) && $_POST['cambiarCarrera'] == 'CAMBIAR CARRERA') {
     $_SESSION['carrera'] = null;
     $_SESSION['codigoSemestre'] = null;
@@ -73,6 +89,8 @@ if(isset($_SESSION['usuario']))
         <p>Aquí puede ver las solicitudes y sus estados.</p>
 
         <?php
+          if(isset($msg2))
+            echo '<span class="error">'.$msg2.'</span><br><br>';
           $usuario->verSolicitudes($_SESSION['carrera'],$_SESSION['codigoSemestre']);
         ?>
  
