@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.5
+-- version 3.3.9
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 18, 2011 at 11:25 PM
--- Server version: 5.5.16
--- PHP Version: 5.3.8
+-- Generation Time: Oct 20, 2011 at 12:39 AM
+-- Server version: 5.1.53
+-- PHP Version: 5.3.4
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -19,6 +18,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `hsc`
 --
+DROP DATABASE `hsc`;
 CREATE DATABASE `hsc` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 USE `hsc`;
 
@@ -143,13 +143,19 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `comprobarSolicitudExiste`(codigoCar
 BEGIN
   SELECT s.Id
    FROM Solicitud AS s
-  WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera_Solicitante = codigoCarreraSolicitante AND s.Codigo_Ramo = codigoRamo AND s.Carrera = codigoCarreraDestinatario;
+  WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera_Solicitante = codigoCarreraSolicitante AND s.Codigo_Ramo = codigoRamo AND s.Carrera = codigoCarreraDestinatario AND s.Estado = 1;
 END$$
 
 DROP PROCEDURE IF EXISTS `crearSeccion`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `crearSeccion`(codigoRamo VARCHAR(6), codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
   INSERT INTO Seccion(Codigo_Ramo,Codigo_Carrera,RUT_Profesor,Codigo_Semestre) VALUES(codigoRamo,codigoCarrera,NULL,codigoSemestre);
+END$$
+
+DROP PROCEDURE IF EXISTS `eliminarSolicitud`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `eliminarSolicitud`(idSolicitud INT)
+BEGIN
+  DELETE FROM Solicitud WHERE Id = idSolicitud;
 END$$
 
 DROP PROCEDURE IF EXISTS `eliminar_jdc`$$
@@ -175,6 +181,12 @@ BEGIN
   SELECT c.Codigo,c.Nombre_Carrera,c.Periodo
    FROM Carrera AS c
   WHERE c.NombreUsuario_JC = nombreUsuario;
+END$$
+
+DROP PROCEDURE IF EXISTS `modificarSolicitud`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `modificarSolicitud`(idSolicitud INT, numeroVacantes INT)
+BEGIN
+  UPDATE Solicitud SET Vacantes = numeroVacantes WHERE Id = idSolicitud AND Estado = 1;
 END$$
 
 DROP PROCEDURE IF EXISTS `obtenerPeriodoCarrera`$$
@@ -244,9 +256,13 @@ BEGIN
 END$$
 
 DROP PROCEDURE IF EXISTS `responderSolicitud`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `responderSolicitud`(idSolicitud INT, respuesta INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `responderSolicitud`(idSolicitud INT, respuesta INT, vacantes INT, fecharespuesta DATETIME)
 BEGIN
-  UPDATE Solicitud SET estado = respuesta WHERE id = idSolicitud;
+  IF(respuesta = 2) THEN
+    UPDATE Solicitud SET estado = 2, vacantes_asignadas = vacantes, fecha_respuesta = fecharespuesta WHERE id = idSolicitud;
+  ELSE
+    UPDATE Solicitud SET estado = 3, vacantes_asignadas = 0, fecha_respuesta = fecharespuesta WHERE id = idSolicitud;
+  END IF;
 END$$
 
 DROP PROCEDURE IF EXISTS `revisarSolicitud`$$
@@ -429,7 +445,7 @@ END$$
 DROP PROCEDURE IF EXISTS `verSolicitudesMias`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `verSolicitudesMias`(codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
-  SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera,s.Vacantes,s.Fecha_Envio,s.Estado
+  SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera,s.Vacantes,s.Vacantes_Asignadas,s.Fecha_Envio,s.Fecha_Respuesta,s.Estado
    FROM Solicitud AS s
    INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
   WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera_Solicitante = codigoCarrera ORDER BY s.Estado,s.Fecha_Envio,s.Carrera_Solicitante,s.Codigo_Ramo;
@@ -438,7 +454,7 @@ END$$
 DROP PROCEDURE IF EXISTS `verSolicitudesOtros`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `verSolicitudesOtros`(codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
-  SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera_Solicitante,s.Vacantes,s.Fecha_Envio,s.Estado
+  SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera_Solicitante,s.Vacantes,s.Vacantes_Asignadas,s.Fecha_Envio,s.Fecha_Respuesta,s.Estado
    FROM Solicitud AS s
    INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
   WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera = codigoCarrera ORDER BY s.Estado,s.Fecha_Envio,s.Carrera_Solicitante,s.Codigo_Ramo;
@@ -556,6 +572,11 @@ CREATE TABLE IF NOT EXISTS `horario` (
   KEY `Codigo_Semestre` (`Codigo_Semestre`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `horario`
+--
+
+
 -- --------------------------------------------------------
 
 --
@@ -569,6 +590,11 @@ CREATE TABLE IF NOT EXISTS `horario_tiene_secciones` (
   KEY `Codigo_Horario` (`Codigo_Horario`),
   KEY `NRC_Seccion` (`NRC_Seccion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `horario_tiene_secciones`
+--
+
 
 -- --------------------------------------------------------
 
@@ -605,6 +631,7 @@ CREATE TABLE IF NOT EXISTS `ramo` (
   `Codigo` varchar(6) NOT NULL COMMENT 'Código identificador de cada ramo.',
   `Nombre` varchar(50) NOT NULL COMMENT 'Nombre del ramo.',
   `Teoria` int(2) NOT NULL COMMENT 'Horas teoricas.',
+  `Tipo` varchar(1) NOT NULL COMMENT 'Tipo del ramo, C = carrera, F = depto. física, Q = depto. química, M = depto. matemáticas, I = inglés, O = formación general y P = formación profesional. ',
   `Ayudantia` int(2) NOT NULL COMMENT 'Horas de ayudantia.',
   `Laboratorio` int(2) NOT NULL COMMENT 'Horas de laboratorio.',
   `Taller` int(2) NOT NULL COMMENT 'Horas de taller.',
@@ -616,24 +643,24 @@ CREATE TABLE IF NOT EXISTS `ramo` (
 -- Dumping data for table `ramo`
 --
 
-INSERT INTO `ramo` (`Codigo`, `Nombre`, `Teoria`, `Ayudantia`, `Laboratorio`, `Taller`, `Creditos`) VALUES
-('FIS110', 'FÃ­sica I', 4, 2, 0, 0, 6),
-('FIS115', 'EducaciÃ³n FÃ­sica', 2, 2, 2, 0, 6),
-('FIS116', 'EducaciÃ³n FÃ­sica II', 2, 2, 0, 0, 6),
-('FIS120', 'FÃ­sica II', 4, 2, 0, 0, 6),
-('FMM030', 'CÃ¡lculo I', 4, 2, 0, 0, 6),
-('FMM130', 'CÃ¡lculo II', 4, 2, 0, 0, 6),
-('FMM230', 'CÃ¡lculo III', 4, 2, 0, 0, 6),
-('IET090', 'Redes I', 0, 0, 0, 0, 0),
-('IET091', 'Redes II', 4, 2, 2, 0, 6),
-('IET100', 'Elementos de la ComputaciÃ³n', 4, 2, 2, 0, 6),
-('IET110', 'Elementos', 0, 0, 0, 0, 0),
-('IET120', 'Computacion', 0, 0, 0, 0, 0),
-('INF090', 'Historia de la computaciÃ³n', 4, 2, 0, 0, 6),
-('INF110', 'Levantar II', 4, 2, 0, 0, 6),
-('INF111', 'Levantar', 0, 0, 0, 0, 0),
-('INF112', 'Levantar III', 4, 2, 0, 0, 6),
-('INF114', 'Levantar IV', 6, 4, 2, 2, 10);
+INSERT INTO `ramo` (`Codigo`, `Nombre`, `Teoria`, `Tipo`, `Ayudantia`, `Laboratorio`, `Taller`, `Creditos`) VALUES
+('FIS110', 'FÃ­sica I', 4, 'F', 2, 0, 0, 6),
+('FIS115', 'EducaciÃ³n FÃ­sica', 2, 'F', 2, 2, 0, 6),
+('FIS116', 'EducaciÃ³n FÃ­sica II', 2, 'F', 2, 0, 0, 6),
+('FIS120', 'FÃ­sica II', 4, 'F', 2, 0, 0, 6),
+('FMM030', 'CÃ¡lculo I', 4, 'M', 2, 0, 0, 6),
+('FMM130', 'CÃ¡lculo II', 4, 'M', 2, 0, 0, 6),
+('FMM230', 'CÃ¡lculo III', 4, 'M', 2, 0, 0, 6),
+('IET090', 'Redes I', 0, 'C', 0, 0, 0, 0),
+('IET091', 'Redes II', 4, 'C', 2, 2, 0, 6),
+('IET100', 'Elementos de la ComputaciÃ³n', 4, 'C', 2, 2, 0, 6),
+('IET110', 'Elementos', 0, 'C', 0, 0, 0, 0),
+('IET120', 'Computacion', 0, 'C', 0, 0, 0, 0),
+('INF090', 'Historia de la computaciÃ³n', 4, 'C', 2, 0, 0, 6),
+('INF110', 'Levantar II', 4, 'C', 2, 0, 0, 6),
+('INF111', 'Levantar', 0, 'C', 0, 0, 0, 0),
+('INF112', 'Levantar III', 4, 'C', 2, 0, 0, 6),
+('INF114', 'Levantar IV', 6, 'C', 4, 2, 2, 10);
 
 -- --------------------------------------------------------
 
@@ -690,7 +717,9 @@ INSERT INTO `ramos_impartidos` (`Codigo_Carrera`, `Codigo_Ramo`, `Codigo_Semestr
 ('UNAB11550', 'FIS120', 201125),
 ('UNAB11550', 'IET091', 201125),
 ('UNAB11560', 'FIS110', 201125),
-('UNAB11500', 'FMM030', 201125);
+('UNAB11500', 'FMM030', 201125),
+('UNAB11500', 'FMM230', 201125),
+('UNAB11500', 'INF112', 201125);
 
 -- --------------------------------------------------------
 
@@ -777,12 +806,7 @@ INSERT INTO `semestre` (`Codigo_Semestre`, `Numero`, `Anho`, `Fecha_Inicio`, `Fe
 (201210, 1, 2012, '2011-10-09 23:04:36', '2011-10-09 23:04:38'),
 (201220, 2, 2012, '2011-10-09 23:04:39', '2011-10-09 23:04:42'),
 (201310, 1, 2013, '2011-10-09 23:04:43', '2011-10-09 23:04:50'),
-(201320, 2, 2013, '2011-10-09 23:04:58', '2011-10-09 23:24:31'),
-(201410, 1, 2014, '2011-10-10 12:20:43', '2011-10-10 13:43:55'),
-(201420, 2, 2014, '2011-10-10 13:45:33', '2011-10-18 12:01:33'),
-(201510, 1, 2015, '2011-10-18 12:01:41', '2011-10-18 12:01:54'),
-(201520, 2, 2015, '2011-10-18 12:02:03', '2011-10-18 12:02:05'),
-(201610, 1, 2016, '2011-10-18 12:02:06', '2011-10-18 12:03:30');
+(201320, 2, 2013, '2011-10-09 23:04:58', '2011-10-09 23:24:31');
 
 -- --------------------------------------------------------
 
@@ -797,25 +821,25 @@ CREATE TABLE IF NOT EXISTS `solicitud` (
   `Carrera` varchar(9) NOT NULL COMMENT 'Carrera dueña del ramo.',
   `Carrera_Solicitante` varchar(9) NOT NULL COMMENT 'Carrera solicitante de vacantes.',
   `Vacantes` int(11) NOT NULL COMMENT 'Número de vacantes solicitadas.',
+  `Vacantes_Asignadas` int(11) DEFAULT NULL COMMENT 'Cantidad de vacantes asignadas.',
   `Codigo_Semestre` int(11) NOT NULL COMMENT 'Código del semestre al cual pertenece esta solicitud.',
   `Fecha_Envio` datetime NOT NULL COMMENT 'Fecha en la que se envío esta solicitud.',
   `Fecha_Respuesta` datetime DEFAULT NULL COMMENT 'Fecha en la cual se respondio a la solicitud.',
   `Estado` int(11) NOT NULL COMMENT '1 = Esperando, 2 = Aceptada y 3 = Denegada.',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
 
 --
 -- Dumping data for table `solicitud`
 --
 
-INSERT INTO `solicitud` (`id`, `Codigo_Ramo`, `Carrera`, `Carrera_Solicitante`, `Vacantes`, `Codigo_Semestre`, `Fecha_Envio`, `Fecha_Respuesta`, `Estado`) VALUES
-(1, 'IET100', 'UNAB11550', 'UNAB11500', 10, 201125, '2011-10-10 22:52:47', NULL, 1),
-(2, 'FIS110', 'UNAB11500', 'UNAB11550', 20, 201125, '2011-10-10 23:06:53', NULL, 2),
-(3, 'FIS120', 'UNAB11500', 'UNAB11550', 10, 201125, '2011-10-10 23:59:20', NULL, 3),
-(4, 'FMM130', 'UNAB11500', 'UNAB11550', 5, 201125, '2011-10-10 23:59:24', NULL, 1),
-(5, 'IET091', 'UNAB11500', 'UNAB11550', 15, 201125, '2011-10-10 23:59:29', NULL, 3),
-(6, 'FIS110', 'UNAB11550', 'UNAB11500', 20, 201125, '2011-10-11 11:48:24', NULL, 1),
-(7, 'FIS110', 'UNAB11560', 'UNAB11500', 10, 201125, '2011-10-18 11:56:11', NULL, 2);
+INSERT INTO `solicitud` (`id`, `Codigo_Ramo`, `Carrera`, `Carrera_Solicitante`, `Vacantes`, `Vacantes_Asignadas`, `Codigo_Semestre`, `Fecha_Envio`, `Fecha_Respuesta`, `Estado`) VALUES
+(2, 'FIS110', 'UNAB11500', 'UNAB11550', 20, 15, 201125, '2011-10-10 23:06:53', '2011-10-19 23:33:14', 2),
+(3, 'FIS120', 'UNAB11500', 'UNAB11550', 10, 0, 201125, '2011-10-10 23:59:20', NULL, 3),
+(4, 'FMM130', 'UNAB11500', 'UNAB11550', 5, 0, 201125, '2011-10-10 23:59:24', NULL, 0),
+(5, 'IET091', 'UNAB11500', 'UNAB11550', 15, 0, 201125, '2011-10-10 23:59:29', NULL, 3),
+(7, 'FIS110', 'UNAB11560', 'UNAB11500', 10, 0, 201125, '2011-10-18 11:56:11', NULL, 2),
+(8, 'FIS110', 'UNAB11500', 'UNAB11550', 10, NULL, 201125, '2011-10-20 00:07:39', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -862,7 +886,7 @@ CREATE TABLE IF NOT EXISTS `trimestre` (
 INSERT INTO `trimestre` (`Codigo_Trimestre`, `Numero`, `Anho`, `Fecha_Inicio`, `Fecha_Termino`) VALUES
 (201105, 1, 2011, '2011-10-10 15:50:25', '2011-10-10 16:35:47'),
 (201115, 2, 2011, '2011-10-10 16:36:18', '2011-10-10 16:36:46'),
-(201125, 3, 2011, '2011-10-10 16:36:49', '2011-10-18 12:05:49');
+(201125, 3, 2011, '2011-10-10 16:36:49', NULL);
 
 -- --------------------------------------------------------
 
@@ -937,7 +961,3 @@ ALTER TABLE `ramos_impartidos`
 ALTER TABLE `seccion`
   ADD CONSTRAINT `seccion_ibfk_1` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`),
   ADD CONSTRAINT `seccion_ibfk_2` FOREIGN KEY (`RUT_Profesor`) REFERENCES `profesor` (`RUT_Profesor`);
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
