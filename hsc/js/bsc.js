@@ -24,37 +24,37 @@ jQuery(function ($) {
  
         $('a.asigna').click(function (e) {
           var carrera = $(this).attr("id");
-          $('<iframe name="" class="" src="asignar_jdc.php?hidden_car=' + carrera + '&asigna=1" scrolling="no" frameborder="0"></iframe>').modal();
+          $('<iframe name="" class="" src="secundario/asignar_jdc.php?hidden_car=' + carrera + '&asigna=1" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
 
         $('a.cambia').click(function (e) {
           var carrera = $(this).attr("id");
-          $('<iframe name="" class="" src="asignar_jdc.php?hidden_car=' + carrera + '&cambia=1" scrolling="no" frameborder="0"></iframe>').modal();
+          $('<iframe name="" class="" src="secundario/asignar_jdc.php?hidden_car=' + carrera + '&cambia=1" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
  
         $('a.eliminar').click(function (e) {
           var carrera = $(this).attr("id");
-          $('<iframe name="" class="" src="eliminar_jdc.php?hidden_jdc=' + carrera + '" scrolling="no" frameborder="0"></iframe>').modal();
+          $('<iframe name="" class="" src="secundario/eliminar_jdc.php?hidden_jdc=' + carrera + '" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
 
         $('a.eliminar').click(function (e) {
           var carrera = $(this).attr("id");
-          $('<iframe name="" class="" src="eliminar_jdc.php?hidden_jdc=' + carrera + '" scrolling="no" frameborder="0"></iframe>').modal();
+          $('<iframe name="" class="" src="secundario/eliminar_jdc.php?hidden_jdc=' + carrera + '" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
 
         $('a.relacionar').click(function (e) {
           var codigoRamo = $(this).attr("id");
-          $('<iframe name="" class="ifr" src="ramosRelacionar.php?codigoRamo=' + codigoRamo + '" scrolling="no" frameborder="0"></iframe>').modal();
+          $('<iframe name="" class="ifr" src="secundario/ramosRelacionar.php?codigoRamo=' + codigoRamo + '" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
 
         $('a.verMalla').click(function (e) {
           var codigoCarrera = $(this).attr("id");
-          $('<iframe name="" class="ifr" src="Malla.php?codigoCarrera=' + codigoCarrera + '" scrolling="no" frameborder="0"></iframe>').modal();
+          $('<iframe name="" class="ifr" src="secundario/Malla.php?codigoCarrera=' + codigoCarrera + '" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
 
