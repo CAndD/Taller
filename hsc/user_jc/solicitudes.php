@@ -42,7 +42,7 @@ if(isset($_SESSION['usuario']))
     exit();
   }
 
-  if($usuario->getTipo() == 1 || $usuario->getTipo() == 3)
+  if($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3)
   {
 ?>
 <!DOCTYPE HTML>
@@ -73,7 +73,7 @@ if(isset($_SESSION['usuario']))
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
           <li><a href="../home.php">Home</a></li>
           <?php
-          if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && (is_string($_SESSION['carrera']) == true)) {
+          if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && (is_string($_SESSION['carrera']) == true)) {
             echo '<li><a href="ramos.php">Ramos</a></li>';
             echo '<li><a href="secciones.php">Secciones y Vacantes</a></li>';
             echo '<li class="selected"><a href="solicitudes.php">Solicitudes</a></li>';
@@ -101,11 +101,11 @@ if(isset($_SESSION['usuario']))
     <div id="content_footer"></div>
     <div id="footer">
     <?php
-      if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && !is_null($_SESSION['carrera']) &&$_SESSION['nroCarrera'] > 1) {
+      if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && !is_null($_SESSION['carrera']) &&$_SESSION['nroCarrera'] > 1) {
         echo '<form method="post" name="cambiarCarrera" target="_self"><input type="submit" name="cambiarCarrera" value="CAMBIAR CARRERA" class="inp"></input></form>';
         $j = 1;
       }
-      if($usuario->getTipo() == 2 || $usuario->getTipo() == 3) {
+      if($_SESSION['tipoUsuario'] == 2 || $_SESSION['tipoUsuario'] == 3) {
         if(isset($j) && $j == 1)
           echo ' / ';
         echo '<a href="../user_admin/admin.php">Modo administrador</a>';

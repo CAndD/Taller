@@ -8,7 +8,7 @@ function buscarCodigoCarrera(codigoCarrera)
   var err = '<span class="error">*Código ya existe.</span>';
   var xmlhttp;
   xmlhttp=new XMLHttpRequest();
-  xmlhttp.open("GET","../user_admin/ajax.php?codigoCarrera="+codigoCarrera,true);
+  xmlhttp.open("GET","../user_admin/secundario/ajax.php?codigoCarrera="+codigoCarrera,true);
   xmlhttp.send();
   xmlhttp.onreadystatechange=function()
   {
@@ -38,7 +38,7 @@ function buscarNombreUsuario(nombreUsuario)
   var err = '<span class="error">*Nombre de usuario ya existe.</span>';
   var xmlhttp;
   xmlhttp=new XMLHttpRequest();
-  xmlhttp.open("GET","../user_admin/ajax.php?nombreUsuario="+nombreUsuario,true);
+  xmlhttp.open("GET","../user_admin/secundario/ajax.php?nombreUsuario="+nombreUsuario,true);
   xmlhttp.send();
   xmlhttp.onreadystatechange=function()
   {
@@ -68,7 +68,7 @@ function buscarCodigoRamo(codigoRamo)
   var err = '<span class="error">*Código ya existe.</span>';
   var xmlhttp;
   xmlhttp=new XMLHttpRequest();
-  xmlhttp.open("GET","../user_admin/ajax.php?codigoRamo="+codigoRamo,true);
+  xmlhttp.open("GET","../user_admin/secundario/ajax.php?codigoRamo="+codigoRamo,true);
   xmlhttp.send();
   xmlhttp.onreadystatechange=function()
   {

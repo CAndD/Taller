@@ -14,6 +14,19 @@ function comprobarSolicitudExiste($codigoCarreraSolicitante,$codigoCarreraDestin
   return $answer;
 }
 
+function obtenerTipoDeUsuario($nombreUsuario)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlf = "SELECT u.tipo FROM usuario AS u WHERE u.Nombre_Usuario = $nombreUsuario;";
+  $resf = $mysqlif->prepare($sqlf);
+  $resf->execute();
+  $resf->bind_result($answer);
+  $resf->fetch();
+  $resf->free_result();
+  return $tipoDeUsuario;
+}
+
 function obtenerPeriodoCarrera($codigoCarrera)
 {
   global $mysqli,$db_host,$db_user,$db_pass,$db_database;

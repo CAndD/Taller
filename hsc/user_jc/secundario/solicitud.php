@@ -45,7 +45,7 @@ if(isset($_SESSION['usuario']))
     }
   }
 
-  if($usuario->getTipo() == 1 || $usuario->getTipo() == 3)
+  if($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3)
   {
 ?>
 <!DOCTYPE HTML>

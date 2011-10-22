@@ -13,17 +13,19 @@ if(!isset($_SESSION['usuario']))
       {
         $password = md5($_POST['pass']);
         $usuario = new usuario($_POST['user'],$password);
-        $usuario->ingresarAlSistema();
-        if($usuario->getLogin() == true)
+        $login = $usuario->ingresarAlSistema();
+        if($login == true)
         {
           $usuario->__destruct();
           //setcookie('tzRemember',$_POST['rememberMe'],time() + 86400);
           $usuario = unserialize($_SESSION['usuario']);
-          if($usuario->getTipo() == 1 || $usuario->getTipo() == 3) {
+          if($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) 
+          {
             header("Location: home.php");
             exit();
           }
-          elseif($usuario->getTipo() == 2) {
+          elseif($_SESSION['tipoUsuario'] == 2) 
+          {
             header("Location: user_admin/admin.php");
             exit();
           }

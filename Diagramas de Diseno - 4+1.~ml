@@ -2488,10 +2488,14 @@
 <XPD:OBJ name="Operations[0]" type="UMLOperation" guid="BbGlNGBr60ShXPvsTkYjtgAA">
 <XPD:ATTR name="Name" type="string">modificarSeccion</XPD:ATTR>
 <XPD:REF name="Owner">uGJZ+QA9jkOHHfI7C7ix/gAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]">qrZjVSBOkUiWPR7EInb2bgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[1]" type="UMLOperation" guid="f6KEH8GuzUCLEh4MRrlvqAAA">
 <XPD:ATTR name="Name" type="string">eliminarSeccion</XPD:ATTR>
 <XPD:REF name="Owner">uGJZ+QA9jkOHHfI7C7ix/gAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]">CgaHIJ0aVEajui5W0Gl/ugAA</XPD:REF>
 </XPD:OBJ>
 <XPD:ATTR name="#Associations" type="integer">6</XPD:ATTR>
 <XPD:REF name="Associations[0]">tUVwX9WLNkmyNRoF2Tz1FQAA</XPD:REF>
@@ -2833,6 +2837,8 @@
 <XPD:OBJ name="Operations[0]" type="UMLOperation" guid="fL8EWIz2jkesSvPSEBvpBQAA">
 <XPD:ATTR name="Name" type="string">crearPedido</XPD:ATTR>
 <XPD:REF name="Owner">yC38h+fYAUCIwdjhfpyJCAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]">pPlIzx80e02W1eHS3z0/ZAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[1]" type="UMLOperation" guid="pijSIkgY9Ue3V1RC/AQQfQAA">
 <XPD:ATTR name="Name" type="string">modificarPedido</XPD:ATTR>
@@ -2841,6 +2847,8 @@
 <XPD:OBJ name="Operations[2]" type="UMLOperation" guid="sZLj/CpjAkOknsLc3CPqeAAA">
 <XPD:ATTR name="Name" type="string">responderPedido</XPD:ATTR>
 <XPD:REF name="Owner">yC38h+fYAUCIwdjhfpyJCAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]">JlSW196tg0qw2pACRergHAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[3]" type="UMLOperation" guid="4NvAX6/5SkCgaWzTlzKilAAA">
 <XPD:ATTR name="Name" type="string">eliminarPedido</XPD:ATTR>
@@ -4136,7 +4144,7 @@
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="2tu7nPelmUCEtnujhfdWLAAA">
 <XPD:ATTR name="Alpha" type="real">1,5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">1 : ModificarSeccion()</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">1 : modificarSeccion()</XPD:ATTR>
 <XPD:REF name="Model">eekXE1PiN0i2BYheiPf/dgAA</XPD:REF>
 <XPD:REF name="HostEdge">c/ogg3s7akSW/wNie3tqEQAA</XPD:REF>
 </XPD:OBJ>
@@ -4206,6 +4214,7 @@
 <XPD:REF name="Receiver">IusHgNNex0merzqMwXM/nwAA</XPD:REF>
 <XPD:OBJ name="Action" type="UMLCallAction" guid="qrZjVSBOkUiWPR7EInb2bgAA">
 <XPD:REF name="Stimulus">eekXE1PiN0i2BYheiPf/dgAA</XPD:REF>
+<XPD:REF name="Operation">BbGlNGBr60ShXPvsTkYjtgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:REF name="InteractionInstanceSet">Cz5jy48jh0SWxRRjU08qDAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
@@ -4323,7 +4332,7 @@
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="ov8J9iz77EGu1SVcq4lC/gAA">
 <XPD:ATTR name="Alpha" type="real">1,5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">1 : EliminarSeccion()</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">1 : eliminarSeccion()</XPD:ATTR>
 <XPD:REF name="Model">lRM0EhNvWUGYw2cNG5anXQAA</XPD:REF>
 <XPD:REF name="HostEdge">gce1m8dYAU2WjfiqqaiVyAAA</XPD:REF>
 </XPD:OBJ>
@@ -4357,6 +4366,7 @@
 <XPD:REF name="Receiver">V5qeDBjSFUyHR54JylknfQAA</XPD:REF>
 <XPD:OBJ name="Action" type="UMLCallAction" guid="CgaHIJ0aVEajui5W0Gl/ugAA">
 <XPD:REF name="Stimulus">lRM0EhNvWUGYw2cNG5anXQAA</XPD:REF>
+<XPD:REF name="Operation">f6KEH8GuzUCLEh4MRrlvqAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:REF name="InteractionInstanceSet">SCrMsCfAv0qi/6NLve3GQwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
@@ -4459,7 +4469,7 @@
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="0jGnjmKn2k+Ap8wBlBHZzgAA">
 <XPD:ATTR name="Alpha" type="real">1,5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">1 : crearSolicitud()</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">1 : crearPedido()</XPD:ATTR>
 <XPD:REF name="Model">v/1lA3eyqk+plUCiEe7BCwAA</XPD:REF>
 <XPD:REF name="HostEdge">Zgh47saySU+k8T2zkWOIUQAA</XPD:REF>
 </XPD:OBJ>
@@ -4488,11 +4498,12 @@
 </XPD:OBJ>
 <XPD:ATTR name="#ParticipatingStimuli" type="integer">1</XPD:ATTR>
 <XPD:OBJ name="ParticipatingStimuli[0]" type="UMLStimulus" guid="v/1lA3eyqk+plUCiEe7BCwAA">
-<XPD:ATTR name="Name" type="string">crearSolicitud</XPD:ATTR>
+<XPD:ATTR name="Name" type="string">crearPedidoDeVacantes</XPD:ATTR>
 <XPD:REF name="Sender">Vmcy9IESvU6LsExDHUAKGAAA</XPD:REF>
 <XPD:REF name="Receiver">+0OFPCmY2kmkgF07tspFNwAA</XPD:REF>
 <XPD:OBJ name="Action" type="UMLCallAction" guid="pPlIzx80e02W1eHS3z0/ZAAA">
 <XPD:REF name="Stimulus">v/1lA3eyqk+plUCiEe7BCwAA</XPD:REF>
+<XPD:REF name="Operation">fL8EWIz2jkesSvPSEBvpBQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:REF name="InteractionInstanceSet">aLfCfOEOzUKgAks/mBIzogAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
@@ -4579,7 +4590,7 @@
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="Z+UW1N6b8UeytFSLJtcGtgAA">
 <XPD:ATTR name="Alpha" type="real">1,5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">1 : responderPedidoDeVacantes()</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">1 : responderPedido()</XPD:ATTR>
 <XPD:REF name="Model">HgyBLtY+XEGnn2hUw3NZugAA</XPD:REF>
 <XPD:REF name="HostEdge">kVn3rmCBfEmkFxQSs4Q/4wAA</XPD:REF>
 </XPD:OBJ>
@@ -4613,6 +4624,7 @@
 <XPD:REF name="Receiver">+0OFPCmY2kmkgF07tspFNwAA</XPD:REF>
 <XPD:OBJ name="Action" type="UMLCallAction" guid="JlSW196tg0qw2pACRergHAAA">
 <XPD:REF name="Stimulus">HgyBLtY+XEGnn2hUw3NZugAA</XPD:REF>
+<XPD:REF name="Operation">sZLj/CpjAkOknsLc3CPqeAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:REF name="InteractionInstanceSet">2JkqmoNTCECeEHPFma1RTwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>

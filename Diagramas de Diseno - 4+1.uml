@@ -2446,8 +2446,8 @@
 <XPD:ATTR name="Name" type="string">aisgnarJefeDeCarreraACarrera</XPD:ATTR>
 <XPD:REF name="Owner">gq68JOJXPUex5BH5MylAMgAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Operations[2]" type="UMLOperation" guid="8jB6PHOoFU2qph0EVfDQkgAA">
-<XPD:ATTR name="Name" type="string">cambiarJefeDeCarrera</XPD:ATTR>
+<XPD:OBJ name="Operations[2]" type="UMLOperation" guid="iE9ETk3NUE2MFm91zWMJTwAA">
+<XPD:ATTR name="Name" type="string">verMalla</XPD:ATTR>
 <XPD:REF name="Owner">gq68JOJXPUex5BH5MylAMgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:ATTR name="#Associations" type="integer">7</XPD:ATTR>

@@ -5,10 +5,8 @@ include_once('db/funciones.php');
 class usuario {
   public $nombre;
   public $nombreUsuario;
-  public $tipo;
   public $rut;
   private $password;
-  private $login;
 
   function __construct($nombreUsuario,$password) {
     $this->nombreUsuario = $nombreUsuario;
@@ -19,8 +17,6 @@ class usuario {
   function __destruct() {
     unset($this->nombreUsuario);
     unset($this->password);
-    unset($this->login);
-    unset($this->tipo);
     unset($this);
   }
 
@@ -35,18 +31,18 @@ class usuario {
     $res->bind_result($rut,$nombre,$tipo);
     if($res->fetch())
     {
-      $this->setLogin(true);
-      $this->setTipo($tipo);
-      if($this->getTipo() == 1 || $this->getTipo() == 3) {
-        $jdc = new jefeDeCarrera($nombre,$this->getNombreUsuario(),$rut,$this->getTipo());
+      if($tipo == 1 || $tipo == 3) 
+      {
+        $jdc = new jefeDeCarrera($nombre,$nombreUsuario,$rut);
         $_SESSION['usuario'] = serialize($jdc);
         $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-        $sql2 = "CALL jdc_carreras('{$jdc->getNombreUsuario()}')";
+        $sql2 = "CALL jdc_carreras('{$nombreUsuario}')";
         $res2 = $mysqli2->prepare($sql2);
         $res2->execute();
-        $res2->bind_result($codigo,$nombre);
+        $res2->bind_result($codigo,$nombre,$periodo);
         $i = 0;
-        while($res2->fetch()) {
+        while($res2->fetch()) 
+        {
           $_SESSION['carrera'] = $codigo;
           $i++;
         }
@@ -56,13 +52,21 @@ class usuario {
           $_SESSION['carrera'] = null;
           $_SESSION['nroCarrera'] = $i;
         $res2->free_result();
+        $_SESSION['tipoUsuario'] = $tipo;
+        $login = true;
       }
-      elseif($this->getTipo() == 2) {
-        $admin = new administrador($nombre,$this->getNombreUsuario(),$rut,$this->getTipo());
+      elseif($tipo == 2) 
+      {
+        $admin = new administrador($nombre,$this->getNombreUsuario(),$rut,$tipo);
         $_SESSION['usuario'] = serialize($admin);
+        $_SESSION['tipoUsuario'] = $tipo;
+        $login = true;       
       }
     }
     $res->free_result();
+    if(!isset($login))
+      $login = false;
+    return $login;
   }
 
   public function visualizarPanelDeControl($nombreUsuario) {
@@ -79,25 +83,9 @@ class usuario {
   public function getPassword() {
     return $this->password;
   }
-  
-  public function getTipo() {
-    return $this->tipo;
-  }
-
-  public function setTipo($nuevoTipo) {
-    $this->tipo = $nuevoTipo;
-  }
 
   public function getRut() {
     return $this->rut;
-  }
-
-  public function getLogin() {
-    return $this->login;
-  }
-
-  public function setLogin($nuevoLogin) {
-    $this->login = $nuevoLogin;
   }
 
   public function cerrarSesion() {
@@ -109,11 +97,10 @@ class usuario {
 
 class administrador extends usuario {
   
-  function __construct($nombre,$nombreUsuario,$rut,$tipo) {
+  function __construct($nombre,$nombreUsuario,$rut) {
     $this->nombre = $nombre;
     $this->nombreUsuario = $nombreUsuario;
     $this->rut = $rut;
-    $this->tipo = $tipo;
   }
 
   public function verCarreras() {
@@ -386,18 +373,16 @@ class administrador extends usuario {
 
 class jefeDeCarrera extends usuario {
 
-  function __construct($nombre,$nombreUsuario,$rut,$tipo) {
+  function __construct($nombre,$nombreUsuario,$rut) {
     $this->nombre = $nombre;
     $this->nombreUsuario = $nombreUsuario;
     $this->rut = $rut;
-    $this->tipo = $tipo;
   }
 
   function __destruct() {
     unset($this->nombre);
     unset($this->nombreUsuario);
     unset($this->rut);
-    unset($this->tipo);
     unset($this);
   }
 

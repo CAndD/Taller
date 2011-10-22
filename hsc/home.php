@@ -7,7 +7,7 @@ if(isset($_SESSION['usuario']))
 {
   $usuario = unserialize($_SESSION['usuario']);
   if(get_class($usuario) == 'administrador') {
-    $usuario = new jefeDeCarrera($usuario->getNombre(),$usuario->getNombreUsuario(),$usuario->getRut(),$usuario->getTipo());
+    $usuario = new jefeDeCarrera($usuario->getNombre(),$usuario->getNombreUsuario(),$usuario->getRut());
     $_SESSION['usuario'] = serialize($usuario);
   }
 
@@ -26,7 +26,7 @@ if(isset($_SESSION['usuario']))
     $_SESSION['codigoSemestre'] = null;
   }
 
-  if($usuario->getTipo() == 1 || $usuario->getTipo() == 3)
+  if($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3)
   {
 ?>
 <!DOCTYPE HTML>
@@ -56,7 +56,7 @@ if(isset($_SESSION['usuario']))
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
           <li class="selected"><a href="home.php">Home</a></li>
           <?php
-          if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && (is_string($_SESSION['carrera']) == true)) {
+          if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && (is_string($_SESSION['carrera']) == true)) {
             echo '<li><a href="user_jc/ramos.php">Ramos</a></li>';
             echo '<li><a href="user_jc/secciones.php">Secciones y Vacantes</a></li>';
             echo '<li><a href="user_jc/solicitudes.php">Solicitudes</a></li>';
@@ -72,7 +72,7 @@ if(isset($_SESSION['usuario']))
         <!-- insert the page content here -->
         <h1>Bienvenido <?php echo $usuario->getNombre();?></h1>
         <?php
-        if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && (is_string($_SESSION['carrera']) == true)) {?>
+        if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && (is_string($_SESSION['carrera']) == true)) {?>
         <table><tr>
         <td><div class="ramos_malla" style="overflow: scroll;"><a href="user_jc/ramos.php" class="title">Ramos de malla</a>
           <?php
@@ -114,7 +114,7 @@ if(isset($_SESSION['usuario']))
         </tr></table>
         <?php
         }
-        elseif(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && is_null($_SESSION['carrera'])) {
+        elseif(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && is_null($_SESSION['carrera'])) {
           $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
           $sql = "CALL obtenerSemestre()";
           $res = $mysqli->prepare($sql);
@@ -157,7 +157,7 @@ if(isset($_SESSION['usuario']))
           echo '</table>';
           $res->free_result();
         }
-        elseif(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && $_SESSION['carrera'] == 0) {
+        elseif(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && $_SESSION['carrera'] == 0) {
           echo 'Aún no se le ha asignado una carrera.';
         }
         ?>
@@ -166,11 +166,11 @@ if(isset($_SESSION['usuario']))
     <div id="content_footer"></div>
     <div id="footer">
     <?php
-      if(($usuario->getTipo() == 1 || $usuario->getTipo() == 3) && !is_null($_SESSION['carrera']) &&$_SESSION['nroCarrera'] > 1) {
+      if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && !is_null($_SESSION['carrera']) &&$_SESSION['nroCarrera'] > 1) {
         echo '<form method="post" name="cambiarCarrera" target="_self"><input type="submit" name="cambiarCarrera" value="CAMBIAR CARRERA" class="inp"></input></form>';
         $j = 1;
       }
-      if($usuario->getTipo() == 2 || $usuario->getTipo() == 3) {
+      if($_SESSION['tipoUsuario'] == 2 || $_SESSION['tipoUsuario'] == 3) {
         if(isset($j) && $j == 1)
           echo ' / ';
         echo '<a href="user_admin/admin.php">Modo administrador</a>';

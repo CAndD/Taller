@@ -10,7 +10,7 @@ if(isset($_SESSION['usuario']))
     $usuario = new administrador($usuario->getNombre(),$usuario->getNombreUsuario(),$usuario->getRut(),$usuario->getTipo());
     $_SESSION['usuario'] = serialize($usuario);
   }
-  if($usuario->getTipo() == 2 || $usuario->getTipo() == 3)
+  if($_SESSION['tipoUsuario'] == 2 || $_SESSION['tipoUsuario'] == 3)
   {
     if(isset($_POST['agrega']) && $_POST['agrega'] == 'Agregar')
     {
@@ -122,7 +122,7 @@ if(isset($_SESSION['usuario']))
     <div id="content_footer"></div>
     <div id="footer">
       <?php
-      if($usuario->getTipo() == 3) {
+      if($_SESSION['tipoUsuario'] == 3) {
         echo '<a href="../home.php">Modo Jefe de Carrera</a>';
       }
       ?>

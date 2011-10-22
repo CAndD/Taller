@@ -7,12 +7,12 @@ if(isset($_SESSION['usuario']))
 {
   $usuario = unserialize($_SESSION['usuario']);
   if(get_class($usuario) == 'jefeDeCarrera') {
-    $usuario = new administrador($usuario->getNombre(),$usuario->getNombreUsuario(),$usuario->getRut(),$usuario->getTipo());
+    $usuario = new administrador($usuario->getNombre(),$usuario->getNombreUsuario(),$usuario->getRut());
     $_SESSION['usuario'] = serialize($usuario);
     $_SESSION['carrera'] = NULL;
     $_SESSION['codigoSemestre'] = NULL;
   }
-  if($usuario->getTipo() == 2 || $usuario->getTipo() == 3)
+  if($_SESSION['tipoUsuario'] == 2 || $_SESSION['tipoUsuario'] == 3)
   {
     if(isset($_POST['submit']) && $_POST['submit'] == 'Cerrar semestre')
     {
@@ -196,7 +196,7 @@ if(isset($_SESSION['usuario']))
     <div id="content_footer"></div>
     <div id="footer">
     <?php
-      if($usuario->getTipo() == 3) {
+      if($_SESSION['tipoUsuario'] == 3) {
         echo '<a href="../home.php">Modo Jefe de Carrera</a>';
       }
     ?>
