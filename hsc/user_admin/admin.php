@@ -112,7 +112,17 @@ if(isset($_SESSION['usuario']))
         <h2>Semestre</h2>
         <?php
           if(isset($msg))
-            echo '<span class="error">'.$msg.'</span><br>';
+          {
+            if(is_array($msg)) {
+              foreach($msg as $value)
+              {
+                echo $value.'<br>';
+              }
+              echo '<span class="error">No se puede cerrar semestre.</span><br><br>';
+            }
+            else
+              echo '<span class="error">'.$msg.'</span><br>';
+          }
           $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
           $sql = "CALL obtenerSemestre()";
           $res = $mysqli->prepare($sql);
@@ -150,7 +160,17 @@ if(isset($_SESSION['usuario']))
         <h2>Trimestre</h2>
         <?php
           if(isset($msg2))
-            echo '<span class="error">'.$msg2.'</span><br>';
+          {
+            if(is_array($msg2)) {
+              foreach($msg2 as $value)
+              {
+                echo $value.'<br>';
+              }
+              echo '<span class="error">No se puede cerrar trimestre.</span><br><br>';
+            }
+            else
+              echo '<span class="error">'.$msg2.'</span><br>';
+          }
           $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
           $sql = "CALL obtenerTrimestre()";
           $res = $mysqli->prepare($sql);

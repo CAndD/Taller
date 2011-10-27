@@ -218,7 +218,7 @@ BEGIN
    INNER JOIN ramo AS r ON r.Codigo = ri.Codigo_Ramo
    INNER JOIN carrera_tiene_ramos AS ctr ON ctr.Codigo_Carrera = ri.Codigo_Carrera AND ctr.Codigo_Ramo = ri.Codigo_Ramo
    INNER JOIN carrera AS c ON c.Codigo = ctr.Codigo_Carrera
-  WHERE ri.Codigo_Carrera = codigoCarrera AND ri.Codigo_Semestre = codigoSemestre ORDER BY ctr.Semestre,r.Codigo;
+  WHERE ri.Codigo_Carrera = codigoCarrera AND ri.Codigo_Semestre = codigoSemestre AND ri.Impartido = 1 ORDER BY ctr.Semestre,r.Codigo;
 END;//
 
 CREATE PROCEDURE crearSeccion(codigoRamo VARCHAR(6), codigoCarrera VARCHAR(9), codigoSemestre INT)

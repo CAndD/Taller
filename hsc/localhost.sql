@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.5
+-- version 3.3.9
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 27, 2011 at 07:04 PM
--- Server version: 5.5.16
--- PHP Version: 5.3.8
+-- Generation Time: Oct 27, 2011 at 07:51 PM
+-- Server version: 5.1.53
+-- PHP Version: 5.3.4
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -413,12 +412,19 @@ END$$
 DROP PROCEDURE IF EXISTS `verRamosImpartidos`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `verRamosImpartidos`(codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
+
   SELECT r.Codigo,r.Nombre,ctr.Semestre,c.Periodo
+
    FROM ramos_impartidos AS ri
+
    INNER JOIN ramo AS r ON r.Codigo = ri.Codigo_Ramo
+
    INNER JOIN carrera_tiene_ramos AS ctr ON ctr.Codigo_Carrera = ri.Codigo_Carrera AND ctr.Codigo_Ramo = ri.Codigo_Ramo
+
    INNER JOIN carrera AS c ON c.Codigo = ctr.Codigo_Carrera
-  WHERE ri.Codigo_Carrera = codigoCarrera AND ri.Codigo_Semestre = codigoSemestre ORDER BY ctr.Semestre,r.Codigo;
+
+  WHERE ri.Codigo_Carrera = codigoCarrera AND ri.Codigo_Semestre = codigoSemestre AND ri.Impartido = 1 ORDER BY ctr.Semestre,r.Codigo;
+
 END$$
 
 DROP PROCEDURE IF EXISTS `verSeccionesCreadas`$$
@@ -580,6 +586,11 @@ CREATE TABLE IF NOT EXISTS `horario` (
   KEY `Codigo_Semestre` (`Codigo_Semestre`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `horario`
+--
+
+
 -- --------------------------------------------------------
 
 --
@@ -593,6 +604,11 @@ CREATE TABLE IF NOT EXISTS `horario_tiene_secciones` (
   KEY `Codigo_Horario` (`Codigo_Horario`),
   KEY `NRC_Seccion` (`NRC_Seccion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `horario_tiene_secciones`
+--
+
 
 -- --------------------------------------------------------
 
@@ -671,7 +687,7 @@ CREATE TABLE IF NOT EXISTS `ramos_impartidos` (
   `Codigo_Carrera` varchar(9) NOT NULL COMMENT 'Código de la carrera en la cual se imparte el ramo.',
   `Codigo_Ramo` varchar(6) NOT NULL COMMENT 'Codigo del ramo impartido.',
   `Codigo_Semestre` int(11) NOT NULL COMMENT 'Semestre o trimestre en el cual se imparte.',
-  `Impartido` int(1) DEFAULT NULL COMMENT '1 = Impartido, 2 = No impartido.',
+  `Impartido` int(1) NOT NULL COMMENT '1 = Impartido, 2 = No impartido.',
   KEY `Codigo_Ramo` (`Codigo_Ramo`),
   KEY `Codigo_Semestre` (`Codigo_Semestre`),
   KEY `Codigo_Carrera` (`Codigo_Carrera`)
@@ -697,29 +713,34 @@ INSERT INTO `ramos_impartidos` (`Codigo_Carrera`, `Codigo_Ramo`, `Codigo_Semestr
 ('UNAB11500', 'FMM030', 201420, 1),
 ('UNAB11500', 'IET100', 201420, 1),
 ('UNAB11500', 'INF110', 201420, 1),
-('UNAB11500', 'IET100', 201125, 1),
+('UNAB11500', 'IET100', 201125, 2),
 ('UNAB11500', 'FMM130', 201125, 1),
 ('UNAB11500', 'IET091', 201125, 1),
 ('UNAB11500', 'INF111', 201125, 1),
 ('UNAB11500', 'INF110', 201125, 1),
 ('UNAB11500', 'FIS110', 201125, 1),
 ('UNAB11500', 'IET090', 201125, 1),
-('UNAB11550', 'FIS110', 201125, 1),
-('UNAB11550', 'IET100', 201125, 1),
+('UNAB11550', 'IET100', 201125, 2),
 ('UNAB11500', 'FIS120', 201125, 1),
 ('UNAB11560', 'IET120', 201125, 1),
 ('UNAB11560', 'FIS115', 201125, 1),
 ('UNAB11560', 'FIS116', 201125, 1),
 ('UNAB65000', 'FIS110', 201420, 1),
-('UNAB11550', 'FMM130', 201125, 1),
 ('UNAB11550', 'FMM230', 201125, 1),
-('UNAB11550', 'FIS120', 201125, 1),
+('UNAB11550', 'FIS120', 201125, 2),
 ('UNAB11550', 'IET091', 201125, 1),
 ('UNAB11560', 'FIS110', 201125, 1),
 ('UNAB11500', 'FMM030', 201125, 1),
 ('UNAB11500', 'FMM230', 201125, 1),
 ('UNAB11500', 'INF112', 201125, 1),
-('UNAB11500', 'INF090', 201125, 1);
+('UNAB11500', 'INF090', 201125, 1),
+('DER1000', 'FMM030', 201410, 1),
+('UNAB11550', 'FMM030', 201125, 2),
+('UNAB11550', 'INF090', 201125, 1),
+('UNAB11550', 'IET090', 201125, 2),
+('UNAB11550', 'FIS110', 201125, 1),
+('DER1000', 'IET100', 201410, 1),
+('DER1000', 'FMM130', 201410, 1);
 
 -- --------------------------------------------------------
 
@@ -960,9 +981,6 @@ ALTER TABLE `ramos_impartidos`
 -- Constraints for table `seccion`
 --
 ALTER TABLE `seccion`
+  ADD CONSTRAINT `seccion_ibfk_3` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`),
   ADD CONSTRAINT `seccion_ibfk_1` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`),
   ADD CONSTRAINT `seccion_ibfk_2` FOREIGN KEY (`RUT_Profesor`) REFERENCES `profesor` (`RUT_Profesor`);
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

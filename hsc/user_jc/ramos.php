@@ -26,7 +26,10 @@ if(isset($_SESSION['usuario']))
   {
     if(isset($_POST['codigoCarrera']) && isset($_POST['codigoRamo']) && isset($_POST['codigoSemestre']))
     {
-      $msg = $usuario->impartirRamo($_POST['codigoCarrera'],$_POST['codigoRamo'],$_POST['codigoSemestre'],1);
+      if(isset($_POST['primera']))
+        $msg = $usuario->impartirRamo($_POST['codigoCarrera'],$_POST['codigoRamo'],$_POST['codigoSemestre'],1);
+      else
+        $msg = $usuario->impartirRamo($_POST['codigoCarrera'],$_POST['codigoRamo'],$_POST['codigoSemestre'],0);
     }
   }
 
@@ -34,7 +37,10 @@ if(isset($_SESSION['usuario']))
   {
     if(isset($_POST['codigoCarrera']) && isset($_POST['codigoRamo']) && isset($_POST['codigoSemestre']))
     {
-      $msg = $usuario->noImpartirRamo($_POST['codigoCarrera'],$_POST['codigoRamo'],$_POST['codigoSemestre'],2);
+      if(isset($_POST['primera']))
+        $msg = $usuario->noImpartirRamo($_POST['codigoCarrera'],$_POST['codigoRamo'],$_POST['codigoSemestre'],1);
+      else
+        $msg = $usuario->noImpartirRamo($_POST['codigoCarrera'],$_POST['codigoRamo'],$_POST['codigoSemestre'],0);
     }
   }
 
