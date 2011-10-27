@@ -26,9 +26,18 @@ if(isset($_SESSION['usuario']))
   {
     if(isset($_POST['codigoCarrera']) && isset($_POST['codigoRamo']) && isset($_POST['codigoSemestre']))
     {
-      $msg = $usuario->impartirRamo($_POST['codigoCarrera'],$_POST['codigoRamo'],$_POST['codigoSemestre']);
+      $msg = $usuario->impartirRamo($_POST['codigoCarrera'],$_POST['codigoRamo'],$_POST['codigoSemestre'],1);
     }
   }
+
+  if(isset($_POST['submit']) && $_POST['submit'] == 'No dictar')
+  {
+    if(isset($_POST['codigoCarrera']) && isset($_POST['codigoRamo']) && isset($_POST['codigoSemestre']))
+    {
+      $msg = $usuario->noImpartirRamo($_POST['codigoCarrera'],$_POST['codigoRamo'],$_POST['codigoSemestre'],2);
+    }
+  }
+
 
   if($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3)
   {

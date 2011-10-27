@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 3.3.9
+-- version 3.4.5
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 20, 2011 at 12:39 AM
--- Server version: 5.1.53
--- PHP Version: 5.3.4
+-- Generation Time: Oct 27, 2011 at 07:04 PM
+-- Server version: 5.5.16
+-- PHP Version: 5.3.8
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -170,9 +171,11 @@ BEGIN
 END$$
 
 DROP PROCEDURE IF EXISTS `impartirRamo`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `impartirRamo`(codigoCarrera VARCHAR(9), codigoRamo VARCHAR(6), codigoSemestre INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `impartirRamo`(codigoCarrera VARCHAR(9), codigoRamo VARCHAR(6), codigoSemestre INT, impartir INT)
 BEGIN
-  INSERT INTO ramos_impartidos(codigo_carrera,codigo_ramo,codigo_semestre) VALUES(codigoCarrera,codigoRamo,codigoSemestre);
+
+  INSERT INTO ramos_impartidos(codigo_carrera,codigo_ramo,codigo_semestre,impartido) VALUES(codigoCarrera,codigoRamo,codigoSemestre,impartir);
+
 END$$
 
 DROP PROCEDURE IF EXISTS `jdc_carreras`$$
@@ -239,9 +242,13 @@ END$$
 DROP PROCEDURE IF EXISTS `ramoDictado`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `ramoDictado`(codigoCarrera VARCHAR(9), codigoRamo VARCHAR(6), codigoSemestre INT)
 BEGIN
-  SELECT ri.Codigo_Ramo
+
+  SELECT ri.Codigo_Ramo,ri.Impartido
+
    FROM ramos_impartidos AS ri
+
   WHERE ri.Codigo_Carrera = codigoCarrera AND ri.Codigo_Ramo = codigoRamo AND ri.Codigo_Semestre = codigoSemestre;
+
 END$$
 
 DROP PROCEDURE IF EXISTS `relacionar_cramos`$$
@@ -554,7 +561,8 @@ INSERT INTO `carrera_tiene_ramos` (`Codigo_Carrera`, `Codigo_Ramo`, `Semestre`) 
 ('UNAB11550', 'IET091', 5),
 ('UNAB11550', 'IET100', 1),
 ('UNAB11550', 'INF090', 1),
-('UNAB11560', 'FIS110', 1);
+('UNAB11560', 'FIS110', 1),
+('UNAB11500', 'INF090', 1);
 
 -- --------------------------------------------------------
 
@@ -572,11 +580,6 @@ CREATE TABLE IF NOT EXISTS `horario` (
   KEY `Codigo_Semestre` (`Codigo_Semestre`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `horario`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -590,11 +593,6 @@ CREATE TABLE IF NOT EXISTS `horario_tiene_secciones` (
   KEY `Codigo_Horario` (`Codigo_Horario`),
   KEY `NRC_Seccion` (`NRC_Seccion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `horario_tiene_secciones`
---
-
 
 -- --------------------------------------------------------
 
@@ -673,6 +671,7 @@ CREATE TABLE IF NOT EXISTS `ramos_impartidos` (
   `Codigo_Carrera` varchar(9) NOT NULL COMMENT 'Código de la carrera en la cual se imparte el ramo.',
   `Codigo_Ramo` varchar(6) NOT NULL COMMENT 'Codigo del ramo impartido.',
   `Codigo_Semestre` int(11) NOT NULL COMMENT 'Semestre o trimestre en el cual se imparte.',
+  `Impartido` int(1) DEFAULT NULL COMMENT '1 = Impartido, 2 = No impartido.',
   KEY `Codigo_Ramo` (`Codigo_Ramo`),
   KEY `Codigo_Semestre` (`Codigo_Semestre`),
   KEY `Codigo_Carrera` (`Codigo_Carrera`)
@@ -682,44 +681,45 @@ CREATE TABLE IF NOT EXISTS `ramos_impartidos` (
 -- Dumping data for table `ramos_impartidos`
 --
 
-INSERT INTO `ramos_impartidos` (`Codigo_Carrera`, `Codigo_Ramo`, `Codigo_Semestre`) VALUES
-('DER1000', 'INF111', 201410),
-('DER1000', 'INF111', 201420),
-('DER1000', 'IET100', 201420),
-('DER1000', 'FIS110', 201420),
-('DER1000', 'FMM230', 201420),
-('DER1000', 'IET120', 201420),
-('DER1000', 'FMM130', 201420),
-('DER1000', 'FMM030', 201420),
-('UNAB11500', 'IET091', 201420),
-('UNAB11500', 'FMM230', 201420),
-('UNAB11500', 'FMM130', 201420),
-('UNAB11500', 'FIS110', 201420),
-('UNAB11500', 'FMM030', 201420),
-('UNAB11500', 'IET100', 201420),
-('UNAB11500', 'INF110', 201420),
-('UNAB11500', 'IET100', 201125),
-('UNAB11500', 'FMM130', 201125),
-('UNAB11500', 'IET091', 201125),
-('UNAB11500', 'INF111', 201125),
-('UNAB11500', 'INF110', 201125),
-('UNAB11500', 'FIS110', 201125),
-('UNAB11500', 'IET090', 201125),
-('UNAB11550', 'FIS110', 201125),
-('UNAB11550', 'IET100', 201125),
-('UNAB11500', 'FIS120', 201125),
-('UNAB11560', 'IET120', 201125),
-('UNAB11560', 'FIS115', 201125),
-('UNAB11560', 'FIS116', 201125),
-('UNAB65000', 'FIS110', 201420),
-('UNAB11550', 'FMM130', 201125),
-('UNAB11550', 'FMM230', 201125),
-('UNAB11550', 'FIS120', 201125),
-('UNAB11550', 'IET091', 201125),
-('UNAB11560', 'FIS110', 201125),
-('UNAB11500', 'FMM030', 201125),
-('UNAB11500', 'FMM230', 201125),
-('UNAB11500', 'INF112', 201125);
+INSERT INTO `ramos_impartidos` (`Codigo_Carrera`, `Codigo_Ramo`, `Codigo_Semestre`, `Impartido`) VALUES
+('DER1000', 'INF111', 201410, 1),
+('DER1000', 'INF111', 201420, 1),
+('DER1000', 'IET100', 201420, 1),
+('DER1000', 'FIS110', 201420, 1),
+('DER1000', 'FMM230', 201420, 1),
+('DER1000', 'IET120', 201420, 1),
+('DER1000', 'FMM130', 201420, 1),
+('DER1000', 'FMM030', 201420, 1),
+('UNAB11500', 'IET091', 201420, 1),
+('UNAB11500', 'FMM230', 201420, 1),
+('UNAB11500', 'FMM130', 201420, 1),
+('UNAB11500', 'FIS110', 201420, 1),
+('UNAB11500', 'FMM030', 201420, 1),
+('UNAB11500', 'IET100', 201420, 1),
+('UNAB11500', 'INF110', 201420, 1),
+('UNAB11500', 'IET100', 201125, 1),
+('UNAB11500', 'FMM130', 201125, 1),
+('UNAB11500', 'IET091', 201125, 1),
+('UNAB11500', 'INF111', 201125, 1),
+('UNAB11500', 'INF110', 201125, 1),
+('UNAB11500', 'FIS110', 201125, 1),
+('UNAB11500', 'IET090', 201125, 1),
+('UNAB11550', 'FIS110', 201125, 1),
+('UNAB11550', 'IET100', 201125, 1),
+('UNAB11500', 'FIS120', 201125, 1),
+('UNAB11560', 'IET120', 201125, 1),
+('UNAB11560', 'FIS115', 201125, 1),
+('UNAB11560', 'FIS116', 201125, 1),
+('UNAB65000', 'FIS110', 201420, 1),
+('UNAB11550', 'FMM130', 201125, 1),
+('UNAB11550', 'FMM230', 201125, 1),
+('UNAB11550', 'FIS120', 201125, 1),
+('UNAB11550', 'IET091', 201125, 1),
+('UNAB11560', 'FIS110', 201125, 1),
+('UNAB11500', 'FMM030', 201125, 1),
+('UNAB11500', 'FMM230', 201125, 1),
+('UNAB11500', 'INF112', 201125, 1),
+('UNAB11500', 'INF090', 201125, 1);
 
 -- --------------------------------------------------------
 
@@ -806,7 +806,8 @@ INSERT INTO `semestre` (`Codigo_Semestre`, `Numero`, `Anho`, `Fecha_Inicio`, `Fe
 (201210, 1, 2012, '2011-10-09 23:04:36', '2011-10-09 23:04:38'),
 (201220, 2, 2012, '2011-10-09 23:04:39', '2011-10-09 23:04:42'),
 (201310, 1, 2013, '2011-10-09 23:04:43', '2011-10-09 23:04:50'),
-(201320, 2, 2013, '2011-10-09 23:04:58', '2011-10-09 23:24:31');
+(201320, 2, 2013, '2011-10-09 23:04:58', '2011-10-09 23:24:31'),
+(201410, 1, 2014, '2011-10-27 15:09:40', NULL);
 
 -- --------------------------------------------------------
 
@@ -961,3 +962,7 @@ ALTER TABLE `ramos_impartidos`
 ALTER TABLE `seccion`
   ADD CONSTRAINT `seccion_ibfk_1` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`),
   ADD CONSTRAINT `seccion_ibfk_2` FOREIGN KEY (`RUT_Profesor`) REFERENCES `profesor` (`RUT_Profesor`);
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

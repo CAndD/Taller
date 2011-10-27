@@ -199,14 +199,14 @@ BEGIN
   WHERE t.Codigo_Trimestre = (SELECT MAX(t.Codigo_Trimestre) FROM Trimestre AS t);
 END;//
 
-CREATE PROCEDURE impartirRamo(codigoCarrera VARCHAR(9), codigoRamo VARCHAR(6), codigoSemestre INT)
+CREATE PROCEDURE impartirRamo(codigoCarrera VARCHAR(9), codigoRamo VARCHAR(6), codigoSemestre INT, impartir INT)
 BEGIN
-  INSERT INTO ramos_impartidos(codigo_carrera,codigo_ramo,codigo_semestre) VALUES(codigoCarrera,codigoRamo,codigoSemestre);
+  INSERT INTO ramos_impartidos(codigo_carrera,codigo_ramo,codigo_semestre,impartido) VALUES(codigoCarrera,codigoRamo,codigoSemestre,impartir);
 END;//
 
 CREATE PROCEDURE ramoDictado(codigoCarrera VARCHAR(9), codigoRamo VARCHAR(6), codigoSemestre INT)
 BEGIN
-  SELECT ri.Codigo_Ramo
+  SELECT ri.Codigo_Ramo,ri.Impartido
    FROM ramos_impartidos AS ri
   WHERE ri.Codigo_Carrera = codigoCarrera AND ri.Codigo_Ramo = codigoRamo AND ri.Codigo_Semestre = codigoSemestre;
 END;//

@@ -102,6 +102,36 @@ class administrador extends usuario {
     $this->rut = $rut;
   }
 
+  public function verCarreras() {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "CALL select_carreras()";
+    $res = $mysqli->prepare($sql);
+    $res->execute();
+    $res->bind_result($codigo,$nombre_carrera,$nombreUsuarioJC,$periodo,$numero,$nombreJC,$rutJC);
+    $car = 0;
+    echo '<table>';
+    while($res->fetch())
+    {
+      if($car == 0){
+        echo '<tr><td>Nombre Carrera</td><td>Código</td><td>Nombre Jefe Carrera</td><td>RUT Jefe Carrera</td><td>Periodo</td><td>#Sem/Trim</td><td>Malla</td><td>Eliminar</td></tr>';
+        $car = 1;}
+      if($nombreJC == 'No asignado'){
+        $nombreJC = '<a id="'.$codigo.'" class="asigna" href="">Asignar Jefe Carrera</a>';
+        $rutJC = '';}
+      else
+      {
+        $nombreJC = $nombreJC.'<br><a id="'.$codigo.'" class="cambia" href="">Cambiar</a>';
+      }
+      if($periodo == 1) $periodo = 'Semestral'; else $periodo = 'Trimestral';
+      echo '<tr><td>'.$nombre_carrera.'</td><td>'.$codigo.'</td><td>'.$nombreJC.'</td><td>'.$rutJC.'</td><td>'.$periodo.'</td><td class="mid">'.$numero.'</td><td class="mid"><a id="'.$codigo.'" class="verMalla" href="">Ver malla</td><td class="mid"><a href="">X</a></td></tr>';
+    }
+    if(!isset($codigo))
+      echo '<tr><td>No hay carreras.</td></tr>';
+    echo '</table>';
+    $res->free_result();
+  }
+
   public function agregarCarrera($codigo,$nombre,$periodo,$nro) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
@@ -266,9 +296,34 @@ class administrador extends usuario {
 
   public function cerrarSemestre($codigoSemestre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $array = array();
+    $i = 0;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL cerrarSemestre('{$codigoSemestre}',NOW())";
-    if(($mysqli->query($sql)) == true)
+    $sql = "SELECT Codigo FROM carrera;";
+    $res = $mysqli->prepare($sql);
+    $res->execute();
+    $res->bind_result($codigoCarrera);
+    while($res->fetch())
+    {
+      $array[$i] = $codigoCarrera;
+      $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+      $sql2 = "SELECT Codigo_Ramo FROM carrera_tiene_ramos WHERE Codigo_Carrera = '{$array[$i]}';";
+      $res2 = $mysqli2->prepare($sql2);
+      $res2->execute();
+      $res2->bind_result($codigoCarrera);
+      while($res2->fetch())
+      {
+        $j = 0;
+        $array[$i][$j] = $codigoRamo;
+        $j++;
+      }
+      $i++;
+      $res2->free_result();
+    }
+    $res->free_result();
+    $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql3 = "CALL cerrarSemestre('{$codigoSemestre}',NOW())";
+    if(($mysqli3->query($sql3)) == true)
     {
       $answer = '*Semestre cerrado.';
     }
@@ -525,13 +580,25 @@ class jefeDeCarrera extends usuario {
       $sql2 = "CALL ramoDictado('{$codigoCarrera}','{$codigoRamo}','{$codigoSemestre}')";
       $res2 = $mysqli2->prepare($sql2);
       $res2->execute();
-      $res2->bind_result($codigoRamoRes);
-      $res2->fetch();
+      $res2->bind_result($codigoRamoRes,$impartido);
       $semestreRamo = anhoSemestre($periodo,$semestreRamo);
-      if(isset($codigoRamoRes))
-        echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>Si</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="No dictar"></input></form></td></tr>';
+      if($res2->fetch())
+      {
+        if($impartido == null)
+        {
+          echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="Dictar"></input></form></td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="No dictar"></input></form></td><td><span class="error">*Debe elegir si impartir o no el ramo.</span></td></tr>';
+        }
+        if($impartido == 1)
+        {
+          echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>Si</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="No dictar"></input></form></td></tr>';
+        }
+        elseif($impartido == 2)
+        {
+          echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="Dictar"></input></form></td><td></td></tr>';
+        }
+      }
       else
-        echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="Dictar"></input></form></td><td></td></tr>';
+        echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="Dictar"></input></form></td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="No dictar"></input></form></td><td><span class="error">*Debe elegir si impartir o no el ramo.</span></td></tr>';
       $res2->free_result();
     }
     if($flag == 0)
@@ -543,7 +610,7 @@ class jefeDeCarrera extends usuario {
   public function impartirRamo($codigoCarrera,$codigoRamo,$codigoSemestre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL impartirRamo('{$codigoCarrera}','{$codigoRamo}','{$codigoSemestre}')";
+    $sql = "CALL impartirRamo('{$codigoCarrera}','{$codigoRamo}','{$codigoSemestre}',1)";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Ramo impartido.';
@@ -558,7 +625,7 @@ class jefeDeCarrera extends usuario {
   public function noImpartirRamo($codigoCarrera,$codigoRamo,$codigoSemestre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL noImpartirRamo('{$codigoCarrera}','{$codigoRamo}','{$codigoSemestre}')";
+    $sql = "CALL noImpartirRamo('{$codigoCarrera}','{$codigoRamo}','{$codigoSemestre}',2)";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Ramo no impartido.';
@@ -604,7 +671,7 @@ class jefeDeCarrera extends usuario {
       $res3->bind_result($seccionesCreadasOtroNumero);
       $res3->fetch();
       if($seccionesCreadasOtroNumero > 0)
-        $seccionesCreadasOtroNumero = '<a id="'.$codigoRamo.'" class="seccionesCreadasOtros" href="">'.$seccionesCreadasOtroNumero.'</a>';
+        $seccionesCreadasOtroNumero = $seccionesCreadasOtroNumero.'<br><a id="'.$codigoRamo.'" class="seccionesCreadasOtros" href="">Pedir vacantes</a>';
       $res3->free_result();
 
       echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td class="mid"><form method="post" name="crearSeccion" target="_self"><input type="hidden" name="hiddenCodigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="hiddenCodigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="hiddenCodigoCarrera" value="'.$codigoCarrera.'"></input><input type="submit" name="submit" value="Crear"></input></form></td><td class="mid">'.$seccionesCreadasNumero.'</td><td class="mid">0</td><td class="mid">'.$seccionesCreadasOtroNumero.'</td></tr>';
