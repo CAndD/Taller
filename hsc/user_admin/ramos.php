@@ -92,7 +92,8 @@ if(isset($_SESSION['usuario']))
           <li><a href="carreras.php">Carreras</a></li>
           <li><a href="jdc.php">Jefes de carrera</a></li>
           <li class="selected"><a href="ramos.php">Ramos</a></li>
-          <li><a href="contacto.php">Contacto</a></li>
+          <li><a href="profesores.php">Profesores</a></li>
+          <!--<li><a href="contacto.php">Contacto</a></li>-->
           <li><a href="../logout.php">Logout</a></li>
         </ul>
       </div>

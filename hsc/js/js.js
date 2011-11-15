@@ -87,3 +87,33 @@ function buscarCodigoRamo(codigoRamo)
     }
   }
 }
+
+function buscarRutProfesor(rutProfesor)
+{
+  if(rutProfesor.length <= 7)
+  {
+    document.getElementById("btt").disabled=true;
+    return;
+  }
+  var err = '<span class="error">*Código ya existe.</span>';
+  var xmlhttp;
+  xmlhttp=new XMLHttpRequest();
+  xmlhttp.open("GET","../user_admin/secundario/ajax.php?rutProfesor="+rutProfesor,true);
+  xmlhttp.send();
+  xmlhttp.onreadystatechange=function()
+  {
+    if(xmlhttp.status==200 && xmlhttp.readyState==4)
+    {
+      if(xmlhttp.responseText)
+      {
+        document.getElementById("btt").disabled=true;
+        document.getElementById("existe").innerHTML=err;
+      }
+      else
+      {
+        document.getElementById("btt").disabled=false;
+        document.getElementById("existe").innerHTML="";
+      }
+    }
+  }
+}

@@ -213,7 +213,7 @@ END;//
 
 CREATE PROCEDURE verRamosImpartidos(codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
-  SELECT r.Codigo,r.Nombre,ctr.Semestre,c.Periodo
+  SELECT r.Codigo,r.Nombre,r.Tipo,ctr.Semestre,c.Periodo
    FROM ramos_impartidos AS ri
    INNER JOIN ramo AS r ON r.Codigo = ri.Codigo_Ramo
    INNER JOIN carrera_tiene_ramos AS ctr ON ctr.Codigo_Carrera = ri.Codigo_Carrera AND ctr.Codigo_Ramo = ri.Codigo_Ramo
@@ -242,7 +242,7 @@ END;//
 
 CREATE PROCEDURE verSeccionesCreadas(codigoRamo VARCHAR(6), codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
-  SELECT s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.RUT_Profesor,s.Codigo_Semestre
+  SELECT s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.RUT_Profesor,s.Horario_Inicio,s.Horario_Termino,s.Codigo_Semestre
    FROM Seccion AS s
    INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
   WHERE s.Codigo_Ramo = codigoRamo AND s.Codigo_Carrera = codigoCarrera AND s.Codigo_Semestre = codigoSemestre ORDER BY s.NRC;
@@ -323,3 +323,52 @@ CREATE PROCEDURE eliminarSolicitud(idSolicitud INT)
 BEGIN
   DELETE FROM Solicitud WHERE Id = idSolicitud;
 END;//
+CREATE PROCEDURE buscarRutProfesor(rutProfesor VARCHAR(10))
+BEGIN
+  SELECT p.Rut_Profesor 
+   FROM Profesor AS p 
+  WHERE p.Rut_Profesor = rutProfesor;
+END;//
+
+CREATE PROCEDURE agregarProfesor(rutProfesor INT, nombreProfesor VARCHAR(50))
+BEGIN
+  INSERT INTO Profesor(Rut_Profesor,Nombre) VALUES (rutProfesor,nombreProfesor);
+END;//
+
+CREATE PROCEDURE obtenerHorarios(codigoCarrera VARCHAR(9))
+BEGIN
+  SELECT h.Modulo,h.Regimen,h.Inicio,h.Termino 
+   FROM Horario AS h 
+   INNER JOIN Carrera AS c ON c.Codigo = codigoCarrera 
+  WHERE h.Regimen = c.Regimen;
+END;//
+
+CREATE PROCEDURE obtenerHorarioActual(codigoSeccion INT)
+BEGIN
+  SELECT s.Horario_Inicio,s.Horario_Termino
+   FROM Seccion AS s
+  WHERE s.NRC = codigoSeccion;
+END;//
+
+CREATE PROCEDURE semestreRamo(codigoCarrera VARCHAR(10), codigoRamo VARCHAR(6))
+BEGIN
+  SELECT ctr.Semestre
+   FROM Carrera_Tiene_Ramos AS ctr
+  WHERE ctr.Codigo_Carrera = codigoCarrera AND ctr.Codigo_Ramo = codigoRamo;
+END;//
+
+CREATE PROCEDURE ramosSemestre(codigoCarrera VARCHAR(10), codigoRamo VARCHAR(6), codigoSemestre INT, semestreRamo INT)
+BEGIN
+  SELECT ri.Codigo_Ramo
+   FROM Carrera_Tiene_Ramos AS ctr
+   INNER JOIN Ramos_Impartidos AS ri ON ri.Codigo_Carrera = codigoCarrera AND ri.Codigo_Ramo = ctr.Codigo_Ramo AND ri.Codigo_Semestre = codigoSemestre AND ri.Impartido = 1
+  WHERE ctr.Codigo_Carrera = codigoCarrera AND ctr.Semestre = semestreRamo AND ctr.Codigo_Ramo != codigoRamo;
+END;//
+
+CREATE PROCEDURE horarioSeccion(codigoCarrera VARCHAR(10), codigoRamo VARCHAR(6), codigoSemestre INT)
+BEGIN
+  SELECT s.Horario_Inicio,s.Horario_Termino
+   FROM Seccion AS s
+  WHERE s.Codigo_Carrera = codigoCarrera AND s.Codigo_Ramo = codigoRamo AND s.Codigo_Semestre = codigoSemestre;
+END;//
+

@@ -40,6 +40,22 @@ function obtenerPeriodoCarrera($codigoCarrera)
   return $periodo;
 }
 
+function obtenerSemestre($periodo)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  if($periodo == 1)
+    $sqlf = "SELECT s.Codigo_Semestre FROM Semestre AS s WHERE s.Fecha_Termino = NULL";
+  elseif($periodo == 2)
+    $sqlf = "SELECT t.Codigo_Trimestre FROM Trimestre AS t WHERE t.Fecha_Termino = NULL";
+  $resf = $mysqlif->prepare($sqlf);
+  $resf->execute();
+  $resf->bind_result($codigoSemestre);
+  $resf->fetch();
+  $resf->free_result();
+  return $codigoSemestre;
+}
+
 function anhoSemestre($periodoCarrera,$semestreRamo)
 {
   if($periodoCarrera == 1)
@@ -87,4 +103,79 @@ function anhoSemestre($periodoCarrera,$semestreRamo)
   return $semestreRamo;
 }
 
+function obtenerHorarios($codigoCarrera)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlf = "CALL obtenerHorarios('{$codigoCarrera}')";
+  $resf = $mysqlif->prepare($sqlf);
+  $resf->execute();
+  $resf->bind_result($modulo,$regimen,$inicio,$termino);
+  while($resf->fetch())
+  {
+    echo '<option value="'.$modulo.'">'.$modulo.'. '.substr($inicio,0,5).' - '.substr($termino,0,5).'</option>';
+  }
+  $resf->free_result();
+}
+
+function obtenerHorariosSegunRamo($codigoCarrera,$codigoRamo)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database,$flag;
+  $mysqli1 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sql1 = "CALL semestreRamo('{$codigoCarrera}','{$codigoRamo}')";
+  $res1 = $mysqli1->prepare($sql1);
+  $res1->execute();
+  $res1->bind_result($semestreRamo);
+  $res1->fetch();
+  $res1->free_result();
+  
+  $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlf = "CALL obtenerHorarios('{$codigoCarrera}')";
+  $resf = $mysqlif->prepare($sqlf);
+  $resf->execute();
+  $resf->bind_result($modulo,$regimen,$inicio,$termino);
+  while($resf->fetch())
+  {
+    $flag = 0;
+    $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql2 = "CALL ramosSemestre('{$codigoCarrera}','{$codigoRamo}','{$_SESSION['codigoSemestre']}','{$semestreRamo}')";
+    $res2 = $mysqli2->prepare($sql2);
+    $res2->execute();
+    $res2->bind_result($codigoRamo2);
+    while($res2->fetch())
+    {
+      $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+      $sql3 = "CALL horarioSeccion('{$codigoCarrera}','{$codigoRamo2}','{$_SESSION['codigoSemestre']}')";
+      $res3 = $mysqli3->prepare($sql3);
+      $res3->execute();
+      $res3->bind_result($horarioInicio,$horarioTermino);
+      $res3->fetch();
+      if($modulo == $horarioInicio || $modulo == $horarioTermino)
+      {
+        $flag = 1;
+        break;
+      }
+      $res3->free_result();
+    }  
+    $res2->free_result();
+    if($flag == 0)
+      echo '<option value="'.$modulo.'">'.$modulo.'. '.substr($inicio,0,5).' - '.substr($termino,0,5).'</option>';
+    else
+      echo '<option value="'.$modulo.'" style="background-color: red;">'.$modulo.'. '.substr($inicio,0,5).' - '.substr($termino,0,5).'</option>';
+  }
+  $resf->free_result();
+}
+
+function obtenerHorarioActual($codigoSeccion)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlf = "CALL obtenerHorarioActual('{$codigoSeccion}')";
+  $resf = $mysqlif->prepare($sqlf);
+  $resf->execute();
+  $resf->bind_result($horarioInicio,$horarioTermino);
+  $resf->fetch();
+  $resf->free_result();
+  return $horarioInicio.$horarioTermino;
+}
 ?>

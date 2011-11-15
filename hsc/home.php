@@ -166,7 +166,7 @@ if(isset($_SESSION['usuario']))
     <div id="content_footer"></div>
     <div id="footer">
     <?php
-      if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && !is_null($_SESSION['carrera']) &&$_SESSION['nroCarrera'] > 1) {
+      if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && !is_null($_SESSION['carrera']) && $_SESSION['nroCarrera'] > 1) {
         echo '<form method="post" name="cambiarCarrera" target="_self"><input type="submit" name="cambiarCarrera" value="CAMBIAR CARRERA" class="inp"></input></form>';
         $j = 1;
       }

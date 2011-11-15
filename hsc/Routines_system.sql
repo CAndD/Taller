@@ -30,7 +30,7 @@ END;//
 -- 1) Ramos de una carrera
 CREATE PROCEDURE ver_malla(codigoCarrera VARCHAR(9))
 BEGIN
-  SELECT ctr.Codigo_Ramo,r.Nombre,ctr.Semestre
+  SELECT ctr.Codigo_Ramo,r.Nombre,r.Tipo,ctr.Semestre
    FROM carrera_tiene_ramos AS ctr
    INNER JOIN Ramo AS r ON ctr.Codigo_Ramo = r.Codigo
   WHERE ctr.Codigo_Carrera = codigoCarrera ORDER BY ctr.Semestre;

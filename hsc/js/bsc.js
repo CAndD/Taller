@@ -75,4 +75,5 @@ jQuery(function ($) {
           $('<iframe name="" class="ifr" src="secundario/solicitud.php?idSolicitud=' + idSolicitud + '" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
+  
 });
