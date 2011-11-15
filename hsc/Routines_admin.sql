@@ -337,10 +337,10 @@ END;//
 
 CREATE PROCEDURE obtenerHorarios(codigoCarrera VARCHAR(9))
 BEGIN
-  SELECT h.Modulo,h.Regimen,h.Inicio,h.Termino 
-   FROM Horario AS h 
+  SELECT m.Modulo,m.Regimen,m.Inicio,m.Termino 
+   FROM Modulo AS m 
    INNER JOIN Carrera AS c ON c.Codigo = codigoCarrera 
-  WHERE h.Regimen = c.Regimen;
+  WHERE m.Regimen = c.Regimen;
 END;//
 
 CREATE PROCEDURE obtenerHorarioActual(codigoSeccion INT)
