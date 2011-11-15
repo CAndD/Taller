@@ -4556,7 +4556,7 @@
 <XPD:REF name="Namespace">vv5Jx5f1B0a6m93HCcG7UwAA</XPD:REF>
 <XPD:ATTR name="#OwnedDiagrams" type="integer">1</XPD:ATTR>
 <XPD:OBJ name="OwnedDiagrams[0]" type="UMLClassDiagram" guid="I2zA3sv8oU+Qp+SJlhJPwAAA">
-<XPD:ATTR name="Name" type="string">Main</XPD:ATTR>
+<XPD:ATTR name="Name" type="string">Diagrama de clases</XPD:ATTR>
 <XPD:ATTR name="DefaultDiagram" type="boolean">True</XPD:ATTR>
 <XPD:REF name="DiagramOwner">GZO8XoBHNkuQ4HxyfBjj9wAA</XPD:REF>
 <XPD:OBJ name="DiagramView" type="UMLClassDiagramView" guid="DqYvt0+Pt02KHuxWjpacfgAA">

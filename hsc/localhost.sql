@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 27, 2011 at 07:51 PM
+-- Generation Time: Nov 15, 2011 at 01:34 PM
 -- Server version: 5.1.53
 -- PHP Version: 5.3.4
 
@@ -48,6 +48,12 @@ BEGIN
   SELECT u.Nombre_Usuario,u.Nombre
    FROM Usuario AS u
   WHERE u.Nombre_Usuario = username AND u.Password = password AND u.Id_tipo = 2;
+END$$
+
+DROP PROCEDURE IF EXISTS `agregarProfesor`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `agregarProfesor`(rutProfesor INT, nombreProfesor VARCHAR(50))
+BEGIN
+  INSERT INTO Profesor(Rut_Profesor,Nombre) VALUES (rutProfesor,nombreProfesor);
 END$$
 
 DROP PROCEDURE IF EXISTS `agregar_carrera`$$
@@ -102,6 +108,14 @@ BEGIN
   SELECT Nombre_Usuario
    FROM Usuario
   WHERE Nombre_Usuario = nombreUsuario;
+END$$
+
+DROP PROCEDURE IF EXISTS `buscarRutProfesor`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `buscarRutProfesor`(rutProfesor VARCHAR(10))
+BEGIN
+  SELECT p.Rut_Profesor 
+   FROM Profesor AS p 
+  WHERE p.Rut_Profesor = rutProfesor;
 END$$
 
 DROP PROCEDURE IF EXISTS `cambiar_jdc`$$
@@ -169,6 +183,14 @@ BEGIN
   END IF;
 END$$
 
+DROP PROCEDURE IF EXISTS `horarioSeccion`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `horarioSeccion`(codigoCarrera VARCHAR(10), codigoRamo VARCHAR(6), codigoSemestre INT)
+BEGIN
+  SELECT s.Horario_Inicio,s.Horario_Termino
+   FROM Seccion AS s
+  WHERE s.Codigo_Carrera = codigoCarrera AND s.Codigo_Ramo = codigoRamo AND s.Codigo_Semestre = codigoSemestre;
+END$$
+
 DROP PROCEDURE IF EXISTS `impartirRamo`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `impartirRamo`(codigoCarrera VARCHAR(9), codigoRamo VARCHAR(6), codigoSemestre INT, impartir INT)
 BEGIN
@@ -189,6 +211,23 @@ DROP PROCEDURE IF EXISTS `modificarSolicitud`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `modificarSolicitud`(idSolicitud INT, numeroVacantes INT)
 BEGIN
   UPDATE Solicitud SET Vacantes = numeroVacantes WHERE Id = idSolicitud AND Estado = 1;
+END$$
+
+DROP PROCEDURE IF EXISTS `obtenerHorarioActual`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `obtenerHorarioActual`(codigoSeccion INT)
+BEGIN
+  SELECT s.Horario_Inicio,s.Horario_Termino
+   FROM Seccion AS s
+  WHERE s.NRC = codigoSeccion;
+END$$
+
+DROP PROCEDURE IF EXISTS `obtenerHorarios`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `obtenerHorarios`(codigoCarrera VARCHAR(9))
+BEGIN
+  SELECT m.Modulo,m.Regimen,m.Inicio,m.Termino 
+   FROM Modulo AS m 
+   INNER JOIN Carrera AS c ON c.Codigo = codigoCarrera 
+  WHERE m.Regimen = c.Regimen;
 END$$
 
 DROP PROCEDURE IF EXISTS `obtenerPeriodoCarrera`$$
@@ -248,6 +287,15 @@ BEGIN
 
   WHERE ri.Codigo_Carrera = codigoCarrera AND ri.Codigo_Ramo = codigoRamo AND ri.Codigo_Semestre = codigoSemestre;
 
+END$$
+
+DROP PROCEDURE IF EXISTS `ramosSemestre`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ramosSemestre`(codigoCarrera VARCHAR(10), codigoRamo VARCHAR(6), codigoSemestre INT, semestreRamo INT)
+BEGIN
+  SELECT ri.Codigo_Ramo
+   FROM Carrera_Tiene_Ramos AS ctr
+   INNER JOIN Ramos_Impartidos AS ri ON ri.Codigo_Carrera = codigoCarrera AND ri.Codigo_Ramo = ctr.Codigo_Ramo AND ri.Codigo_Semestre = codigoSemestre AND ri.Impartido = 1
+  WHERE ctr.Codigo_Carrera = codigoCarrera AND ctr.Semestre = semestreRamo AND ctr.Codigo_Ramo != codigoRamo;
 END$$
 
 DROP PROCEDURE IF EXISTS `relacionar_cramos`$$
@@ -377,6 +425,14 @@ BEGIN
   WHERE ctr.Codigo_Carrera = codigoCarrera ORDER BY ctr.Semestre,r.Codigo;
 END$$
 
+DROP PROCEDURE IF EXISTS `semestreRamo`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `semestreRamo`(codigoCarrera VARCHAR(10), codigoRamo VARCHAR(6))
+BEGIN
+  SELECT ctr.Semestre
+   FROM Carrera_Tiene_Ramos AS ctr
+  WHERE ctr.Codigo_Carrera = codigoCarrera AND ctr.Codigo_Ramo = codigoRamo;
+END$$
+
 DROP PROCEDURE IF EXISTS `solicitarVacantes`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `solicitarVacantes`(codigoRamo VARCHAR(6), codigoCarrera VARCHAR(9), codigoCarreraSolicitante VARCHAR(9), numeroVacantes INT, codigoSemestre INT, fechaEnvio DATETIME)
 BEGIN
@@ -413,7 +469,7 @@ DROP PROCEDURE IF EXISTS `verRamosImpartidos`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `verRamosImpartidos`(codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
 
-  SELECT r.Codigo,r.Nombre,ctr.Semestre,c.Periodo
+  SELECT r.Codigo,r.Nombre,r.Tipo,ctr.Semestre,c.Periodo
 
    FROM ramos_impartidos AS ri
 
@@ -430,10 +486,15 @@ END$$
 DROP PROCEDURE IF EXISTS `verSeccionesCreadas`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `verSeccionesCreadas`(codigoRamo VARCHAR(6), codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
-  SELECT s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.RUT_Profesor,s.Codigo_Semestre
+
+  SELECT s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.RUT_Profesor,s.Horario_Inicio,s.Horario_Termino,s.Codigo_Semestre
+
    FROM Seccion AS s
+
    INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
+
   WHERE s.Codigo_Ramo = codigoRamo AND s.Codigo_Carrera = codigoCarrera AND s.Codigo_Semestre = codigoSemestre ORDER BY s.NRC;
+
 END$$
 
 DROP PROCEDURE IF EXISTS `verSeccionesCreadasOtro`$$
@@ -476,7 +537,7 @@ END$$
 DROP PROCEDURE IF EXISTS `ver_malla`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `ver_malla`(codigoCarrera VARCHAR(9))
 BEGIN
-  SELECT ctr.Codigo_Ramo,r.Nombre,ctr.Semestre
+  SELECT ctr.Codigo_Ramo,r.Nombre,r.Tipo,ctr.Semestre
    FROM carrera_tiene_ramos AS ctr
    INNER JOIN Ramo AS r ON ctr.Codigo_Ramo = r.Codigo
   WHERE ctr.Codigo_Carrera = codigoCarrera ORDER BY ctr.Semestre;
@@ -496,6 +557,7 @@ CREATE TABLE IF NOT EXISTS `carrera` (
   `NombreUsuario_JC` varchar(40) DEFAULT NULL COMMENT 'Nombre de usuario del jefe de carrera.',
   `Nombre_Carrera` varchar(100) NOT NULL COMMENT 'Nombre de la carrera.',
   `Periodo` int(1) NOT NULL COMMENT '1 = Semestral, 2 = Trimestral.',
+  `Regimen` varchar(1) NOT NULL COMMENT 'D = Diurno, V = Vespertino.',
   `Numero` int(2) NOT NULL COMMENT 'Duración de la carrera en semestres o trimestres.',
   PRIMARY KEY (`Codigo`),
   KEY `NombreUsuario_JC` (`NombreUsuario_JC`)
@@ -505,15 +567,15 @@ CREATE TABLE IF NOT EXISTS `carrera` (
 -- Dumping data for table `carrera`
 --
 
-INSERT INTO `carrera` (`Codigo`, `NombreUsuario_JC`, `Nombre_Carrera`, `Periodo`, `Numero`) VALUES
-('DER1000', 'david', 'Derecho', 1, 10),
-('INF1000', NULL, 'Redes', 1, 0),
-('INF1200', 'cri.flores', 'Ingenieria', 2, 0),
-('UNAB11500', 'david', 'IngenierÃ­a en ComputaciÃ³n e InformÃ¡tica ', 2, 8),
-('UNAB11550', 'david', 'IngenierÃ­a en Telecomunicaciones', 2, 8),
-('UNAB11560', 'dav2', 'EnfermerÃ­a', 2, 10),
-('UNAB15000', NULL, 'Periodismo', 1, 8),
-('UNAB65000', 'dav', 'Medicina', 1, 18);
+INSERT INTO `carrera` (`Codigo`, `NombreUsuario_JC`, `Nombre_Carrera`, `Periodo`, `Regimen`, `Numero`) VALUES
+('DER1000', 'david', 'Derecho', 1, 'D', 10),
+('INF1000', NULL, 'Redes', 1, 'D', 0),
+('INF1200', 'cri.flores', 'Ingenieria', 2, 'D', 0),
+('UNAB11500', 'david', 'IngenierÃ­a en ComputaciÃ³n e InformÃ¡tica ', 2, 'D', 8),
+('UNAB11550', 'david', 'IngenierÃ­a en Telecomunicaciones', 2, 'D', 8),
+('UNAB11560', 'dav2', 'EnfermerÃ­a', 2, 'D', 10),
+('UNAB15000', NULL, 'Periodismo', 1, 'D', 8),
+('UNAB65000', 'dav', 'Medicina', 1, 'D', 18);
 
 -- --------------------------------------------------------
 
@@ -578,12 +640,13 @@ INSERT INTO `carrera_tiene_ramos` (`Codigo_Carrera`, `Codigo_Ramo`, `Semestre`) 
 
 DROP TABLE IF EXISTS `horario`;
 CREATE TABLE IF NOT EXISTS `horario` (
-  `Codigo_Horario` int(4) NOT NULL COMMENT 'Identificador de horario.',
-  `Codigo_Carrera` varchar(7) NOT NULL COMMENT 'Código de la carrera a la cual pertenece el horario.',
-  `Codigo_Semestre` int(4) NOT NULL COMMENT 'Código del semestre al cual pertenece este horario.',
-  PRIMARY KEY (`Codigo_Horario`),
-  KEY `Codigo_Carrera` (`Codigo_Carrera`),
-  KEY `Codigo_Semestre` (`Codigo_Semestre`)
+  `Modulo` int(2) DEFAULT NULL COMMENT 'Modulo del horario de la asignatura.',
+  `Regimen` varchar(1) NOT NULL COMMENT 'D = Diurno, V = Vespertino.',
+  `NRC_Seccion` int(11) NOT NULL,
+  `Dia` int(1) DEFAULT NULL COMMENT '1 = Lunes, 2 = Martes, 3 = Miércoles, 4 = Jueves, 5 = Viernes y 6 = Sábado.',
+  `Tipo_Clases` int(1) NOT NULL COMMENT '1 = Teoría, 2 = Ayudantía, 3 = Laboratorio y 3 = Taller.',
+  `Codigo_Semestre` int(11) NOT NULL COMMENT 'Código del semestre actual.',
+  KEY `NRC_Seccion` (`NRC_Seccion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -594,21 +657,42 @@ CREATE TABLE IF NOT EXISTS `horario` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `horario_tiene_secciones`
+-- Table structure for table `modulo`
 --
 
-DROP TABLE IF EXISTS `horario_tiene_secciones`;
-CREATE TABLE IF NOT EXISTS `horario_tiene_secciones` (
-  `Codigo_Horario` int(4) NOT NULL COMMENT 'Codigo del horario al cual pertenece la sección.',
-  `NRC_Seccion` int(4) NOT NULL COMMENT 'Sección que pertenece al horario.',
-  KEY `Codigo_Horario` (`Codigo_Horario`),
-  KEY `NRC_Seccion` (`NRC_Seccion`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+DROP TABLE IF EXISTS `modulo`;
+CREATE TABLE IF NOT EXISTS `modulo` (
+  `Modulo` int(11) NOT NULL COMMENT 'Número de módulo.',
+  `Regimen` varchar(1) NOT NULL COMMENT 'D = Diurno, V = Vespertino.',
+  `Inicio` time NOT NULL COMMENT 'Hora de inicio de módulo.',
+  `Termino` time NOT NULL COMMENT 'Hora de término de módulo.'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `horario_tiene_secciones`
+-- Dumping data for table `modulo`
 --
 
+INSERT INTO `modulo` (`Modulo`, `Regimen`, `Inicio`, `Termino`) VALUES
+(1, 'D', '08:30:00', '09:15:00'),
+(2, 'D', '09:25:00', '10:10:00'),
+(3, 'D', '10:20:00', '11:05:00'),
+(4, 'D', '11:15:00', '12:00:00'),
+(5, 'D', '12:10:00', '12:55:00'),
+(6, 'D', '13:05:00', '13:50:00'),
+(7, 'D', '14:00:00', '14:45:00'),
+(8, 'D', '14:55:00', '15:40:00'),
+(9, 'D', '15:50:00', '16:35:00'),
+(10, 'D', '16:45:00', '17:30:00'),
+(11, 'D', '17:40:00', '18:25:00'),
+(12, 'D', '18:35:00', '19:20:00'),
+(13, 'D', '19:30:00', '20:15:00'),
+(14, 'D', '20:25:00', '21:10:00'),
+(1, 'V', '19:00:00', '19:45:00'),
+(2, 'V', '19:46:00', '20:30:00'),
+(3, 'V', '20:40:00', '21:25:00'),
+(4, 'V', '21:26:00', '22:10:00'),
+(5, 'V', '22:20:00', '23:05:00'),
+(6, 'V', '23:06:00', '23:50:00');
 
 -- --------------------------------------------------------
 
@@ -618,21 +702,37 @@ CREATE TABLE IF NOT EXISTS `horario_tiene_secciones` (
 
 DROP TABLE IF EXISTS `profesor`;
 CREATE TABLE IF NOT EXISTS `profesor` (
-  `RUT_Profesor` varchar(10) NOT NULL COMMENT 'Rut del profesor.',
+  `RUT_Profesor` int(10) NOT NULL COMMENT 'Rut del profesor.',
   `Nombre` varchar(50) NOT NULL COMMENT 'Nombre del profesor.',
-  `Codigo_Carrera` varchar(9) NOT NULL COMMENT 'Código de la carrera a la que pertenece el profesor.',
-  PRIMARY KEY (`RUT_Profesor`),
-  KEY `Codigo_Carrera` (`Codigo_Carrera`)
+  PRIMARY KEY (`RUT_Profesor`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `profesor`
 --
 
-INSERT INTO `profesor` (`RUT_Profesor`, `Nombre`, `Codigo_Carrera`) VALUES
-('16482760-7', 'Cristian Olivares', 'INF1200'),
-('16482760-8', 'Oscar Pinto', 'INF1200'),
-('8545216-8', 'Otto Pettersen', 'UNAB11500');
+INSERT INTO `profesor` (`RUT_Profesor`, `Nombre`) VALUES
+(164827607, 'David Miranda A.'),
+(164827609, 'David');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `profesor_tiene_ramos`
+--
+
+DROP TABLE IF EXISTS `profesor_tiene_ramos`;
+CREATE TABLE IF NOT EXISTS `profesor_tiene_ramos` (
+  `RUT_Profesor` int(10) NOT NULL COMMENT 'Rut profesor que dicta ramo.',
+  `Codigo_Ramo` varchar(6) NOT NULL COMMENT 'Ramo dictado por el profesor.',
+  PRIMARY KEY (`RUT_Profesor`),
+  KEY `Codigo_Ramo` (`Codigo_Ramo`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `profesor_tiene_ramos`
+--
+
 
 -- --------------------------------------------------------
 
@@ -753,54 +853,58 @@ CREATE TABLE IF NOT EXISTS `seccion` (
   `NRC` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Código identificador de cada sección.',
   `Codigo_Ramo` varchar(6) NOT NULL COMMENT 'Código del ramo al cual pertenece la sección.',
   `Codigo_Carrera` varchar(9) NOT NULL COMMENT 'Código de la carrera a la cual le pertenece esta sección.',
-  `RUT_Profesor` varchar(10) DEFAULT NULL COMMENT 'RUT del profesor que dicta la sección.',
+  `RUT_Profesor` int(10) DEFAULT NULL COMMENT 'RUT del profesor que dicta la sección.',
+  `Horario_Inicio` int(11) DEFAULT NULL COMMENT 'Horario de inicio de la sección.',
+  `Horario_Termino` int(11) DEFAULT NULL COMMENT 'Horario de termino de la sección.',
   `Codigo_Semestre` int(11) NOT NULL COMMENT 'Semestre al que pertenece la sección.',
   PRIMARY KEY (`NRC`),
   KEY `Codigo_Ramo` (`Codigo_Ramo`),
-  KEY `RUT_Profesor` (`RUT_Profesor`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1574 ;
+  KEY `RUT_Profesor` (`RUT_Profesor`),
+  KEY `Horario` (`Horario_Inicio`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1576 ;
 
 --
 -- Dumping data for table `seccion`
 --
 
-INSERT INTO `seccion` (`NRC`, `Codigo_Ramo`, `Codigo_Carrera`, `RUT_Profesor`, `Codigo_Semestre`) VALUES
-(1523, 'IET100', '', NULL, 0),
-(1524, 'IET090', '', NULL, 0),
-(1540, 'IET120', '', '16482760-8', 0),
-(1541, 'IET110', '', NULL, 0),
-(1542, 'IET120', '', NULL, 0),
-(1543, 'FIS110', 'DER1000', NULL, 201420),
-(1544, 'FIS110', 'DER1000', NULL, 201420),
-(1545, 'INF111', 'DER1000', NULL, 201420),
-(1546, 'IET120', 'DER1000', NULL, 201420),
-(1547, 'IET120', 'DER1000', NULL, 201420),
-(1548, 'FMM230', 'DER1000', NULL, 201420),
-(1549, 'FMM230', 'DER1000', NULL, 201420),
-(1550, 'FIS110', 'UNAB11550', NULL, 201125),
-(1551, 'FIS110', 'UNAB11500', NULL, 201125),
-(1552, 'FIS110', 'UNAB11500', NULL, 201125),
-(1553, 'FIS110', 'UNAB11500', NULL, 201125),
-(1554, 'IET100', 'UNAB11550', NULL, 201125),
-(1555, 'IET100', 'UNAB11550', NULL, 201125),
-(1556, 'IET100', 'UNAB11550', NULL, 201125),
-(1557, 'FMM030', 'DER1000', NULL, 201420),
-(1558, 'IET100', 'DER1000', NULL, 201420),
-(1559, 'FMM230', 'DER1000', NULL, 201420),
-(1560, 'IET091', 'UNAB11500', NULL, 201125),
-(1561, 'IET091', 'UNAB11500', NULL, 201125),
-(1562, 'IET091', 'UNAB11500', NULL, 201125),
-(1563, 'FIS110', 'UNAB11500', NULL, 201125),
-(1564, 'IET090', 'UNAB11500', NULL, 201125),
-(1565, 'FIS120', 'UNAB11500', NULL, 201125),
-(1566, 'FMM130', 'UNAB11500', NULL, 201125),
-(1567, 'FIS120', 'UNAB11500', NULL, 201125),
-(1568, 'FIS110', 'UNAB11550', NULL, 201125),
-(1569, 'FIS110', 'UNAB11560', NULL, 201125),
-(1570, 'FIS110', 'UNAB11560', NULL, 201125),
-(1571, 'FIS110', 'UNAB11560', NULL, 201125),
-(1572, 'FIS110', 'UNAB11500', NULL, 201125),
-(1573, 'FIS110', 'UNAB11500', NULL, 201125);
+INSERT INTO `seccion` (`NRC`, `Codigo_Ramo`, `Codigo_Carrera`, `RUT_Profesor`, `Horario_Inicio`, `Horario_Termino`, `Codigo_Semestre`) VALUES
+(1523, 'IET100', '', NULL, NULL, NULL, 0),
+(1524, 'IET090', '', NULL, NULL, NULL, 0),
+(1541, 'IET110', '', NULL, NULL, NULL, 0),
+(1542, 'IET120', '', NULL, NULL, NULL, 0),
+(1543, 'FIS110', 'DER1000', NULL, NULL, NULL, 201420),
+(1544, 'FIS110', 'DER1000', NULL, NULL, NULL, 201420),
+(1545, 'INF111', 'DER1000', NULL, NULL, NULL, 201420),
+(1546, 'IET120', 'DER1000', NULL, NULL, NULL, 201420),
+(1547, 'IET120', 'DER1000', NULL, NULL, NULL, 201420),
+(1548, 'FMM230', 'DER1000', NULL, NULL, NULL, 201420),
+(1549, 'FMM230', 'DER1000', NULL, NULL, NULL, 201420),
+(1550, 'FIS110', 'UNAB11550', NULL, NULL, NULL, 201125),
+(1551, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1552, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1553, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1554, 'IET100', 'UNAB11550', NULL, NULL, NULL, 201125),
+(1555, 'IET100', 'UNAB11550', NULL, NULL, NULL, 201125),
+(1556, 'IET100', 'UNAB11550', NULL, NULL, NULL, 201125),
+(1557, 'FMM030', 'DER1000', NULL, NULL, NULL, 201420),
+(1558, 'IET100', 'DER1000', NULL, NULL, NULL, 201420),
+(1559, 'FMM230', 'DER1000', NULL, NULL, NULL, 201420),
+(1560, 'IET091', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1561, 'IET091', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1562, 'IET091', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1563, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1564, 'IET090', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1565, 'FIS120', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1566, 'FMM130', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1567, 'FIS120', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1568, 'FIS110', 'UNAB11550', NULL, NULL, NULL, 201125),
+(1569, 'FIS110', 'UNAB11560', NULL, NULL, NULL, 201125),
+(1570, 'FIS110', 'UNAB11560', NULL, NULL, NULL, 201125),
+(1571, 'FIS110', 'UNAB11560', NULL, NULL, NULL, 201125),
+(1572, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1573, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
+(1574, 'INF090', 'UNAB11550', NULL, NULL, NULL, 201125),
+(1575, 'INF090', 'UNAB11500', NULL, 1, 2, 201125);
 
 -- --------------------------------------------------------
 
@@ -883,7 +987,8 @@ CREATE TABLE IF NOT EXISTS `tipo_usuario` (
 INSERT INTO `tipo_usuario` (`Id`, `Tipo`) VALUES
 (1, 'Jefe de carrera'),
 (2, 'Administrador'),
-(3, 'Jefe de carrera + administrador');
+(3, 'Jefe de carrera + administrador'),
+(4, 'Usuario departamento');
 
 -- --------------------------------------------------------
 
@@ -958,19 +1063,6 @@ ALTER TABLE `carrera_tiene_ramos`
   ADD CONSTRAINT `carrera_tiene_ramos_ibfk_2` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`);
 
 --
--- Constraints for table `horario_tiene_secciones`
---
-ALTER TABLE `horario_tiene_secciones`
-  ADD CONSTRAINT `horario_tiene_secciones_ibfk_1` FOREIGN KEY (`Codigo_Horario`) REFERENCES `horario` (`Codigo_Horario`),
-  ADD CONSTRAINT `horario_tiene_secciones_ibfk_2` FOREIGN KEY (`NRC_Seccion`) REFERENCES `seccion` (`NRC`);
-
---
--- Constraints for table `profesor`
---
-ALTER TABLE `profesor`
-  ADD CONSTRAINT `profesor_ibfk_1` FOREIGN KEY (`Codigo_Carrera`) REFERENCES `carrera` (`Codigo`);
-
---
 -- Constraints for table `ramos_impartidos`
 --
 ALTER TABLE `ramos_impartidos`
@@ -981,6 +1073,6 @@ ALTER TABLE `ramos_impartidos`
 -- Constraints for table `seccion`
 --
 ALTER TABLE `seccion`
-  ADD CONSTRAINT `seccion_ibfk_3` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`),
   ADD CONSTRAINT `seccion_ibfk_1` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`),
-  ADD CONSTRAINT `seccion_ibfk_2` FOREIGN KEY (`RUT_Profesor`) REFERENCES `profesor` (`RUT_Profesor`);
+  ADD CONSTRAINT `seccion_ibfk_2` FOREIGN KEY (`RUT_Profesor`) REFERENCES `profesor` (`RUT_Profesor`),
+  ADD CONSTRAINT `seccion_ibfk_3` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`);
