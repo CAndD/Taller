@@ -4782,8 +4782,8 @@
 <XPD:OBJ name="OwnedViews[7]" type="UMLClassView" guid="kk52Azwf50+KjT1rmvUImwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">920</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">232</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">956</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">184</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">90</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">82</XPD:ATTR>
 <XPD:REF name="Model">X9pgnkNZjU2Wkh56J3jI+AAA</XPD:REF>
@@ -5117,7 +5117,7 @@
 <XPD:OBJ name="OwnedViews[13]" type="UMLAssociationView" guid="aUUalPNb+U67F4PvAWUaPgAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">920,283;832,304</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">956,242;832,292</XPD:ATTR>
 <XPD:REF name="Model">XjfpndCY0kiN0AECsfwaGgAA</XPD:REF>
 <XPD:REF name="Head">zO4GmofoqkShxgWhR6xcoAAA</XPD:REF>
 <XPD:REF name="Tail">kk52Azwf50+KjT1rmvUImwAA</XPD:REF>
@@ -6001,12 +6001,12 @@
 <XPD:REF name="Associations[0]">JP9UKyK6Z0q1UXX+y5xAnQAA</XPD:REF>
 <XPD:REF name="Associations[1]">8lB8b09rA0idf0FySEIvGQAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">3</XPD:ATTR>
-<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="GRTaJuIEoUSV8psQ11TxBAAA">
-<XPD:ATTR name="Name" type="string">Código</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="sdIWEBlnok+L6pac6TBz8AAA">
+<XPD:ATTR name="Name" type="string">Módulo</XPD:ATTR>
 <XPD:REF name="Owner">X9pgnkNZjU2Wkh56J3jI+AAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="sdIWEBlnok+L6pac6TBz8AAA">
-<XPD:ATTR name="Name" type="string">Módulo</XPD:ATTR>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="Nm3JJRWMR0iOAgEkX07O6AAA">
+<XPD:ATTR name="Name" type="string">Regimen</XPD:ATTR>
 <XPD:REF name="Owner">X9pgnkNZjU2Wkh56J3jI+AAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="5OvMsHs4bUm9JkS1uAI2bQAA">
