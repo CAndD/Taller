@@ -208,4 +208,64 @@ function obtenerTiposRamo()
   }
   $resf->free_result();
 }
+
+//Funciones de usuario Jefe de carrera
+function verSeccionesCreadas($codigoRamo,$codigoSemestre,$codigoCarrera) {
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sql = "SELECT s.Id,s.Numero_Seccion,s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.Codigo_Semestre,s.Vacantes
+           FROM Seccion AS s
+           INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
+          WHERE s.Codigo_Ramo = '{$codigoRamo}' AND s.Codigo_Carrera = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}' ORDER BY s.Numero_Seccion;";
+  $res = $mysqli->prepare($sql);
+  $res->execute();
+  $res->bind_result($id,$numeroSeccion,$NRC,$codigoRamo,$nombre,$codigoCarrera,$codigoSemestre,$vacantes);
+  $flag = 0;
+  echo '<table><tr><td>Sección</td><td>NRC</td><td>Nombre</td><td>Semestre</td></tr>';
+  while($res->fetch())
+  {
+    if($flag == 0)
+      $flag = 1;
+    echo '<tr><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombre.'</td><td>'.$codigoSemestre.'</td></tr>';
+  }
+  if($flag == 0)
+    echo '<tr><td>No hay secciones para este ramo.</td><td></td></tr>';
+  echo '</table>';
+  $res->free_result();
+}
+
+function verSeccionesCreadasOtros($codigoRamo,$codigoSemestre,$codigoCarreraMia) {
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sql = "SELECT s.Id,s.Numero_Seccion,s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.Codigo_Semestre,s.Vacantes
+           FROM Seccion AS s
+           INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
+          WHERE s.Codigo_Ramo = '{$codigoRamo}' AND s.Codigo_Carrera != '{$codigoCarreraMia}' AND s.Codigo_Semestre = '{$codigoSemestre}' ORDER BY s.Codigo_Carrera,s.NRC;";
+  $res = $mysqli->prepare($sql);
+  $res->execute();
+  $res->bind_result($id,$numeroSeccion,$NRC,$codigoRamo,$nombreRamo,$codigoCarrera,$codigoSemestre,$vacantes);
+  $flag = 0;
+  $codigoCarreraAnterior = 'carrera';
+  echo '<table><tr><td>Sección</td><td>NRC</td><td>Nombre</td><td>Carrera</td><td>Semestre</td><td>Solicitar vacantes</td></tr>';
+  while($res->fetch())
+  {
+    if($flag == 0)
+      $flag = 1;
+    if($codigoCarreraAnterior != $codigoCarrera)
+    {
+      $codigoCarreraAnterior = $codigoCarrera;
+      $lol = comprobarSolicitudExiste($codigoCarreraMia,$codigoCarrera,$codigoSemestre,$codigoRamo);
+      if(!$lol)
+        echo '<tr><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombreRamo.'</td><td>'.$codigoCarrera.'</td><td>'.$codigoSemestre.'</td><td><form method="post" name="solicitar" target="_self"><input type="hidden" name="hiddenCarreraDuenha" value="'.$codigoCarrera.'"></input><input type="hidden" name="hiddenCodigoRamo" value="'.$codigoRamo.'"></input><input type="text" class="xs" name="numeroVacantes" maxlength="2"></input> <input type="submit" name="submit" value="Solicitar"></input></form></td></tr>';
+      else
+        echo '<tr><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombreRamo.'</td><td>'.$codigoCarrera.'</td><td>'.$codigoSemestre.'</td><td>Solicitud enviada: ID '.$lol.'</td></tr>';
+    }
+    elseif($codigoCarreraAnterior == $codigoCarrera)
+      echo '<tr><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombreRamo.'</td><td>'.$codigoCarrera.'</td><td>'.$codigoSemestre.'</td><td></td></tr>';
+  }
+  if($flag == 0)
+    echo '<tr><td>No hay secciones de otras carreras para este ramo.</td><td></td></tr>';
+  echo '</table>';
+  $res->free_result();
+}
 ?>

@@ -50,14 +50,14 @@ if(isset($_SESSION['usuario']))
     if(isset($_GET['otros']) && $_GET['otros'] == 'no')
     {
       echo '<h2>Secciones</h2>';
-      $usuario->verSeccionesCreadas($_GET['codigoRamo'],$_SESSION['codigoSemestre'],$_SESSION['carrera']);
+      verSeccionesCreadas($_GET['codigoRamo'],$_SESSION['codigoSemestre'],$_SESSION['carrera']);
     }
     elseif(isset($_GET['otros']) && $_GET['otros'] == 'si')
     {
       echo '<h2>Secciones de otras carreras</h2>';
       if(isset($msg2))
         echo '<span class="error">'.$msg2.'</span>';
-      $usuario->verSeccionesCreadasOtros($_GET['codigoRamo'],$_SESSION['codigoSemestre'],$_SESSION['carrera']);
+      verSeccionesCreadasOtros($_GET['codigoRamo'],$_SESSION['codigoSemestre'],$_SESSION['carrera']);
     }
     else
       echo 'Malo';
