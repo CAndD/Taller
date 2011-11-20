@@ -98,12 +98,12 @@ if(isset($_SESSION['usuario']))
         <tr>
         <td><div class="prof_asig"><span class="title">Profesores asignados</span><br>
           <?php
-            $usuario->verProfesoresAsignados($_SESSION['carrera']);
+            //$usuario->verProfesoresAsignados($_SESSION['carrera']);
           ?>
         </div></td>
         <td><div class="prof_asig_scarga"><span class="title">Profesores sin carga académica</span><br>
           <?php 
-            $usuario->verProfesoresSinCargaAcademica($_SESSION['carrera']);
+            //$usuario->verProfesoresSinCargaAcademica($_SESSION['carrera']);
           ?>
         </div></td>
         <td><div class="seccion_sprof" style="overflow: scroll;"><span class="title">Secciones sin profesor</span><br>

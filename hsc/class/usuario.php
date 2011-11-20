@@ -228,24 +228,29 @@ class administrador extends usuario {
   public function verRamos() {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL select_ramos()";
+    $sql = "SELECT r.Codigo,r.Nombre,r.Teoria,rt.Abreviacion,r.Ayudantia,r.Laboratorio,r.Taller,r.Creditos
+             FROM Ramo AS r 
+             INNER JOIN Ramo_Tipo AS rt ON rt.Id = r.Tipo
+            ORDER by r.Codigo;";
+    //$sql = "CALL select_ramos()";
     $res = $mysqli->prepare($sql);
     $res->execute();
-    $res->bind_result($codigo,$nombre,$teoria,$ayudantia,$laboratorio,$taller,$creditos);
+    $res->bind_result($codigo,$nombre,$teoria,$tipo,$ayudantia,$laboratorio,$taller,$creditos);
     $car = 0;
     while($res->fetch())
     {
-      echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a id="'.$codigo.'" class="relacionar" href="">Relacionar</a></td><td class="mid"><a href="">X</a></td></tr>';
+      echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a id="'.$codigo.'" class="relacionar" href="">Relacionar</a></td><td class="mid"><a href="">X</a></td></tr>';
     }
     if(!isset($codigo))
       echo '<tr><td>No hay carreras.</td></tr>';
     $res->free_result();
   }
 
-  public function agregarRamo($codigo,$nombre,$teo,$ayu,$lab,$tall,$cre) {
+  public function agregarRamo($codigo,$nombre,$tipo,$teo,$ayu,$lab,$tall,$cre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL agregar_ramo('{$codigo}','{$nombre}','{$teo}','{$ayu}','{$lab}','{$tall}','{$cre}')";
+    $sql = "INSERT INTO Ramo(Codigo,Nombre,Teoria,Tipo,Ayudantia,Laboratorio,Taller,Creditos) VALUES('{$codigo}','{$nombre}','{$teo}','{$tipo}','{$ayu}','{$lab}','{$tall}','{$cre}')";
+    //$sql = "CALL agregar_ramo('{$codigo}','{$nombre}','{$teo}','{$ayu}','{$lab}','{$tall}','{$cre}')";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Ramo agregado con éxito.';
@@ -451,10 +456,10 @@ class administrador extends usuario {
     return $answer;
   }
 
-  public function agregarProfesor($rutProfesor,$nombreProfesor) {
+  public function agregarProfesor($rutProfesor,$nombreProfesor,$gradoProfesor) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL agregarProfesor('{$rutProfesor}','{$nombreProfesor}')";
+    $sql = "INSERT INTO Profesor(Rut_Profesor,Nombre,Profesor_Grado) VALUES ('{$rutProfesor}','{$nombreProfesor}','{$gradoProfesor}');";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Profesor agregado.';
@@ -773,7 +778,7 @@ class jefeDeCarrera extends usuario {
         $seccionesCreadasOtroNumero = $seccionesCreadasOtroNumero.'<br><a id="'.$codigoRamo.'" class="seccionesCreadasOtros" href="">Pedir vacantes</a>';
       $res3->free_result();
 
-      if($tipo == 'C')
+      if($tipo == '1')
       {
         echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td class="mid"><form method="post" name="crearSeccion" target="_self"><input type="hidden" name="hiddenCodigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="hiddenCodigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="hiddenCodigoCarrera" value="'.$codigoCarrera.'"></input><input type="submit" name="submit" value="Crear"></input></form></td><td class="mid">'.$seccionesCreadasNumero.'</td><td class="mid">0</td><td class="mid">'.$seccionesCreadasOtroNumero.'</td></tr>';
       }
@@ -791,8 +796,37 @@ class jefeDeCarrera extends usuario {
   public function crearSeccion($codigoRamo,$codigoSemestre,$codigoCarrera) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL crearSeccion('{$codigoRamo}','{$codigoCarrera}','{$codigoSemestre}')";
-    if(($mysqli->query($sql)) == true)
+    $sql = "SELECT c.Regimen
+             FROM Carrera AS c
+            WHERE c.Codigo = '{$codigoCarrera}';";
+    $res = $mysqli->prepare($sql);
+    $res->execute();
+    $res->bind_result($regimen);
+    $res->fetch();
+    $res->free_result();
+
+    $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql2 = "SELECT MAX(s.Numero_Seccion)
+              FROM Seccion AS s
+              INNER JOIN Carrera AS c ON c.Codigo = s.Codigo_Carrera AND c.Regimen = '{$regimen}'
+             WHERE s.Codigo_Ramo = '{$codigoRamo}' AND s.Codigo_Semestre = '{$codigoSemestre}';";
+    $res2 = $mysqli2->prepare($sql2);
+    $res2->execute();
+    $res2->bind_result($numeroSeccion);
+    $res2->fetch();
+    $res2->free_result();
+ 
+    $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    if($numeroSeccion == 0) {
+      if($regimen == 'D')
+        $numeroSeccion = 1;
+      elseif($regimen == 'V')
+        $numeroSeccion = 100;
+    }
+    else
+      $numeroSeccion++;
+    $sql3 = "INSERT INTO Seccion(Numero_Seccion,NRC,Codigo_Ramo,Codigo_Carrera,RUT_Profesor,Codigo_Semestre,Vacantes) VALUES('{$numeroSeccion}',1524,'{$codigoRamo}','{$codigoCarrera}',164827607,'{$codigoSemestre}',60);";
+    if(($mysqli3->query($sql3)) == true)
     {
       $answer = '*Sección creada.';
     }
@@ -806,23 +840,21 @@ class jefeDeCarrera extends usuario {
   public function verSeccionesCreadas($codigoRamo,$codigoSemestre,$codigoCarrera) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL verSeccionesCreadas('{$codigoRamo}','{$codigoCarrera}','{$codigoSemestre}')";
+    $sql = "SELECT s.Id,s.Numero_Seccion,s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.Codigo_Semestre,s.Vacantes
+             FROM Seccion AS s
+             INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
+            WHERE s.Codigo_Ramo = '{$codigoRamo}' AND s.Codigo_Carrera = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}' ORDER BY s.NRC;";
     $res = $mysqli->prepare($sql);
     $res->execute();
-    $res->bind_result($NRC,$codigoRamo,$nombreRamo,$codigoCarrera,$rutProfesor,$horarioInicio,$horarioTermino,$codigoSemestre);
+    $res->bind_result($id,$numeroSeccion,$NRC,$codigoRamo,$nombre,$codigoCarrera,$codigoSemestre,$vacantes);
     $flag = 0;
-    echo '<table><tr><td>NRC</td><td>Nombre</td><td>Profesor</td><td>Semestre</td><td>Horario</td></tr>';
+    echo '<table><tr><td>NRC</td><td># Sección</td><td>Nombre</td><td>Semestre</td></tr>';
     while($res->fetch())
     {
       if($flag == 0)
         $flag = 1;
-      if($rutProfesor == NULL)
-        $rutProfesor = 'S/Profesor<br><a href="asignar.php?codigoRamo='.$_GET['codigoRamo'].'&id=profe">Asignar profesor</a>';
-      if($horarioInicio == NULL)
-        $horarioInicio = 'S/Horario<br><a href="asignar.php?codigoRamo='.$NRC.'&id=horario">Asignar horario</a>';
       else
-        $horarioInicio = $horarioInicio.' - '.$horarioTermino.'<br><a href="asignar.php?codigoRamo='.$NRC.'&id=horario">Asignar horario</a>';
-      echo '<tr><td>'.$NRC.'</td><td>'.$nombreRamo.'</td><td>'.$rutProfesor.'</td><td>'.$codigoSemestre.'</td><td>'.$horarioInicio.'</td></tr>';
+      echo '<tr><td>'.$NRC.'</td><td>'.$numeroSeccion.'</td><td>'.$nombre.'</td><td>'.$codigoSemestre.'</td></tr>';
     }
     if($flag == 0)
       echo '<tr><td>No hay secciones para este ramo.</td><td></td></tr>';

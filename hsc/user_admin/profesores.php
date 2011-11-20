@@ -13,9 +13,9 @@ if(isset($_SESSION['usuario']))
 
   if(isset($_POST['agrega']) && $_POST['agrega'] == 'Agregar profesor')
   {
-    if(isset($_POST['rut']) && ctype_digit($_POST['rut']) && $_POST['nombre'] != '')
+    if(isset($_POST['rut']) && ctype_digit($_POST['rut']) && $_POST['nombre'] != '' && $_POST['grado'] != 0)
     {
-      $answer = $usuario->agregarProfesor($_POST['rut'],$_POST['nombre']);
+      $answer = $usuario->agregarProfesor($_POST['rut'],$_POST['nombre'],$_POST['grado']);
     }
     else
     {
@@ -25,6 +25,8 @@ if(isset($_SESSION['usuario']))
         $nombreerror = '*Debe ingresar un nombre.';
       else
         $nombreold = $_POST['nombre'];
+      if($_POST['grado'] == 0)
+        $gradoerror = '*Debe seleccionar el grado del profesor.';
     }
   }
 
@@ -81,12 +83,15 @@ if(isset($_SESSION['usuario']))
         <?php if(isset($answer)) echo '<span class="error">'.$answer.'</span>';?>
         <table>
         <form method="post" name="agregar" target="_self">
-          <tr><td>Rut (sin puntos ni guiones)</td><td>Nombre</td></tr>
+          <tr><td>Rut (sin puntos ni guiones)</td><td>Nombre</td><td>Grado</td></tr>
           <tr><td><input type="text" name="rut" value="" maxlength="9" onkeyup="buscarRutProfesor(this.value)" class="xl"></input></td>
           <td><input type="text" name="nombre" value="<?php if(isset($nombreold)) echo $nombreold;?>" maxlength="50"></input></td>
+          <td><select name="grado"><option value="0">Escoger grado</option>
+              <?php obtenerGrados();?></select></td>
           <td><?php if(isset($codigoold)) echo '<input id="btt" type="submit" name="agrega" value="Agregar profesor">'; else echo '<input id="btt" type="submit" name="agrega" value="Agregar profesor" disabled>';?></input></td></tr>
           <tr><td><?php if(isset($ruterror)) echo '<span class="error">'.$ruterror.'</span>';?></td>
               <td><?php if(isset($nombreerror)) echo '<span class="error">'.$nombreerror.'</span>';?></td>
+              <td><?php if(isset($gradoerror)) echo '<span class="error">'.$gradoerror.'</span>';?></td>
           </tr>
         </form>
         </table>

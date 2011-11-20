@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Nov 15, 2011 at 01:34 PM
+-- Generation Time: Nov 19, 2011 at 10:16 PM
 -- Server version: 5.1.53
 -- PHP Version: 5.3.4
 
@@ -635,22 +635,41 @@ INSERT INTO `carrera_tiene_ramos` (`Codigo_Carrera`, `Codigo_Ramo`, `Semestre`) 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `horario`
+-- Table structure for table `clase`
 --
 
-DROP TABLE IF EXISTS `horario`;
-CREATE TABLE IF NOT EXISTS `horario` (
-  `Modulo` int(2) DEFAULT NULL COMMENT 'Modulo del horario de la asignatura.',
-  `Regimen` varchar(1) NOT NULL COMMENT 'D = Diurno, V = Vespertino.',
-  `NRC_Seccion` int(11) NOT NULL,
-  `Dia` int(1) DEFAULT NULL COMMENT '1 = Lunes, 2 = Martes, 3 = Miércoles, 4 = Jueves, 5 = Viernes y 6 = Sábado.',
-  `Tipo_Clases` int(1) NOT NULL COMMENT '1 = Teoría, 2 = Ayudantía, 3 = Laboratorio y 3 = Taller.',
-  `Codigo_Semestre` int(11) NOT NULL COMMENT 'Código del semestre actual.',
-  KEY `NRC_Seccion` (`NRC_Seccion`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+DROP TABLE IF EXISTS `clase`;
+CREATE TABLE IF NOT EXISTS `clase` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Clase_Tipo` int(11) NOT NULL COMMENT 'Tipo de la clase.',
+  `Seccion_Id` int(11) NOT NULL COMMENT 'Id de la sección a la cual pertenece la clase.',
+  `RUT_Profesor` int(10) DEFAULT NULL COMMENT 'Rut del profesor que dicta la clase.',
+  `Modulo_Inicio` int(11) DEFAULT NULL COMMENT 'Módulo de inicio de la clase.',
+  `Modulo_Termino` int(11) DEFAULT NULL COMMENT 'Módulo de término de la clase.',
+  `Codigo_Semestre` int(11) NOT NULL COMMENT 'Codigo del semestre al cual pertenece la clase.',
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 --
--- Dumping data for table `horario`
+-- Dumping data for table `clase`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `clase_tipo`
+--
+
+DROP TABLE IF EXISTS `clase_tipo`;
+CREATE TABLE IF NOT EXISTS `clase_tipo` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del tipo de clase.',
+  `Tipo` varchar(50) NOT NULL COMMENT 'Tipo del profesor.',
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+--
+-- Dumping data for table `clase_tipo`
 --
 
 
@@ -704,6 +723,7 @@ DROP TABLE IF EXISTS `profesor`;
 CREATE TABLE IF NOT EXISTS `profesor` (
   `RUT_Profesor` int(10) NOT NULL COMMENT 'Rut del profesor.',
   `Nombre` varchar(50) NOT NULL COMMENT 'Nombre del profesor.',
+  `Profesor_Grado` int(11) NOT NULL COMMENT 'Grado del profesor.',
   PRIMARY KEY (`RUT_Profesor`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -711,9 +731,29 @@ CREATE TABLE IF NOT EXISTS `profesor` (
 -- Dumping data for table `profesor`
 --
 
-INSERT INTO `profesor` (`RUT_Profesor`, `Nombre`) VALUES
-(164827607, 'David Miranda A.'),
-(164827609, 'David');
+INSERT INTO `profesor` (`RUT_Profesor`, `Nombre`, `Profesor_Grado`) VALUES
+(164827607, 'David Miranda', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `profesor_grado`
+--
+
+DROP TABLE IF EXISTS `profesor_grado`;
+CREATE TABLE IF NOT EXISTS `profesor_grado` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del grado.',
+  `Grado` varchar(40) NOT NULL COMMENT 'Grado.',
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+
+--
+-- Dumping data for table `profesor_grado`
+--
+
+INSERT INTO `profesor_grado` (`Id`, `Grado`) VALUES
+(1, 'Ayudante'),
+(2, 'Profesor');
 
 -- --------------------------------------------------------
 
@@ -745,7 +785,7 @@ CREATE TABLE IF NOT EXISTS `ramo` (
   `Codigo` varchar(6) NOT NULL COMMENT 'Código identificador de cada ramo.',
   `Nombre` varchar(50) NOT NULL COMMENT 'Nombre del ramo.',
   `Teoria` int(2) NOT NULL COMMENT 'Horas teoricas.',
-  `Tipo` varchar(1) NOT NULL COMMENT 'Tipo del ramo, C = carrera, F = depto. física, Q = depto. química, M = depto. matemáticas, I = inglés, O = formación general y P = formación profesional. ',
+  `Tipo` int(1) NOT NULL COMMENT 'Tipo del ramo, C = carrera, F = depto. física, Q = depto. química, M = depto. matemáticas, I = inglés, O = formación general y P = formación profesional. ',
   `Ayudantia` int(2) NOT NULL COMMENT 'Horas de ayudantia.',
   `Laboratorio` int(2) NOT NULL COMMENT 'Horas de laboratorio.',
   `Taller` int(2) NOT NULL COMMENT 'Horas de taller.',
@@ -758,23 +798,51 @@ CREATE TABLE IF NOT EXISTS `ramo` (
 --
 
 INSERT INTO `ramo` (`Codigo`, `Nombre`, `Teoria`, `Tipo`, `Ayudantia`, `Laboratorio`, `Taller`, `Creditos`) VALUES
-('FIS110', 'FÃ­sica I', 4, 'F', 2, 0, 0, 6),
-('FIS115', 'EducaciÃ³n FÃ­sica', 2, 'F', 2, 2, 0, 6),
-('FIS116', 'EducaciÃ³n FÃ­sica II', 2, 'F', 2, 0, 0, 6),
-('FIS120', 'FÃ­sica II', 4, 'F', 2, 0, 0, 6),
-('FMM030', 'CÃ¡lculo I', 4, 'M', 2, 0, 0, 6),
-('FMM130', 'CÃ¡lculo II', 4, 'M', 2, 0, 0, 6),
-('FMM230', 'CÃ¡lculo III', 4, 'M', 2, 0, 0, 6),
-('IET090', 'Redes I', 0, 'C', 0, 0, 0, 0),
-('IET091', 'Redes II', 4, 'C', 2, 2, 0, 6),
-('IET100', 'Elementos de la ComputaciÃ³n', 4, 'C', 2, 2, 0, 6),
-('IET110', 'Elementos', 0, 'C', 0, 0, 0, 0),
-('IET120', 'Computacion', 0, 'C', 0, 0, 0, 0),
-('INF090', 'Historia de la computaciÃ³n', 4, 'C', 2, 0, 0, 6),
-('INF110', 'Levantar II', 4, 'C', 2, 0, 0, 6),
-('INF111', 'Levantar', 0, 'C', 0, 0, 0, 0),
-('INF112', 'Levantar III', 4, 'C', 2, 0, 0, 6),
-('INF114', 'Levantar IV', 6, 'C', 4, 2, 2, 10);
+('FIS110', 'FÃ­sica I', 4, 2, 2, 0, 0, 6),
+('FIS115', 'EducaciÃ³n FÃ­sica', 2, 2, 2, 2, 0, 6),
+('FIS116', 'EducaciÃ³n FÃ­sica II', 2, 2, 2, 0, 0, 6),
+('FIS120', 'FÃ­sica II', 4, 2, 2, 0, 0, 6),
+('FMM020', 'Algebra Nuclear I', 4, 1, 4, 2, 20, 0),
+('FMM021', 'Algebral Nuclear II', 10, 6, 4, 4, 2, 20),
+('FMM030', 'CÃ¡lculo I', 4, 6, 2, 0, 0, 6),
+('FMM130', 'CÃ¡lculo II', 4, 6, 2, 0, 0, 6),
+('FMM230', 'CÃ¡lculo III', 4, 6, 2, 0, 0, 6),
+('IET090', 'Redes I', 0, 1, 0, 0, 0, 0),
+('IET091', 'Redes II', 4, 1, 2, 2, 0, 6),
+('IET100', 'Elementos de la ComputaciÃ³n', 4, 1, 2, 2, 0, 6),
+('IET110', 'Elementos', 0, 1, 0, 0, 0, 0),
+('IET120', 'Computacion', 0, 1, 0, 0, 0, 0),
+('INF090', 'Historia de la computaciÃ³n', 4, 1, 2, 0, 0, 6),
+('INF110', 'Levantar II', 4, 1, 2, 0, 0, 6),
+('INF111', 'Levantar', 0, 1, 0, 0, 0, 0),
+('INF112', 'Levantar III', 4, 1, 2, 0, 0, 6),
+('INF114', 'Levantar IV', 6, 1, 4, 2, 2, 10);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ramo_tipo`
+--
+
+DROP TABLE IF EXISTS `ramo_tipo`;
+CREATE TABLE IF NOT EXISTS `ramo_tipo` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id del tipo.',
+  `Tipo` varchar(50) NOT NULL COMMENT 'Tipo del ramo.',
+  `Abreviacion` varchar(3) NOT NULL COMMENT 'Abreviación del tipo de ramo.',
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+
+--
+-- Dumping data for table `ramo_tipo`
+--
+
+INSERT INTO `ramo_tipo` (`Id`, `Tipo`, `Abreviacion`) VALUES
+(1, 'Carrera', 'C'),
+(2, 'Fisica', 'F'),
+(3, 'Ingles', 'I'),
+(4, 'Formacion general', 'O'),
+(5, 'Formacion profesional', 'P'),
+(6, 'Matematicas', 'M');
 
 -- --------------------------------------------------------
 
@@ -837,7 +905,7 @@ INSERT INTO `ramos_impartidos` (`Codigo_Carrera`, `Codigo_Ramo`, `Codigo_Semestr
 ('DER1000', 'FMM030', 201410, 1),
 ('UNAB11550', 'FMM030', 201125, 2),
 ('UNAB11550', 'INF090', 201125, 1),
-('UNAB11550', 'IET090', 201125, 2),
+('UNAB11550', 'IET090', 201125, 1),
 ('UNAB11550', 'FIS110', 201125, 1),
 ('DER1000', 'IET100', 201410, 1),
 ('DER1000', 'FMM130', 201410, 1);
@@ -850,61 +918,29 @@ INSERT INTO `ramos_impartidos` (`Codigo_Carrera`, `Codigo_Ramo`, `Codigo_Semestr
 
 DROP TABLE IF EXISTS `seccion`;
 CREATE TABLE IF NOT EXISTS `seccion` (
-  `NRC` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Código identificador de cada sección.',
+  `Id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id de la sección.',
+  `Numero_Seccion` int(11) NOT NULL COMMENT 'Número de la sección.',
+  `NRC` int(11) NOT NULL COMMENT 'Código identificador de cada sección.',
   `Codigo_Ramo` varchar(6) NOT NULL COMMENT 'Código del ramo al cual pertenece la sección.',
   `Codigo_Carrera` varchar(9) NOT NULL COMMENT 'Código de la carrera a la cual le pertenece esta sección.',
-  `RUT_Profesor` int(10) DEFAULT NULL COMMENT 'RUT del profesor que dicta la sección.',
-  `Horario_Inicio` int(11) DEFAULT NULL COMMENT 'Horario de inicio de la sección.',
-  `Horario_Termino` int(11) DEFAULT NULL COMMENT 'Horario de termino de la sección.',
   `Codigo_Semestre` int(11) NOT NULL COMMENT 'Semestre al que pertenece la sección.',
-  PRIMARY KEY (`NRC`),
+  `Vacantes` int(11) NOT NULL COMMENT 'Vacantes de la sección.',
+  PRIMARY KEY (`Id`),
   KEY `Codigo_Ramo` (`Codigo_Ramo`),
-  KEY `RUT_Profesor` (`RUT_Profesor`),
-  KEY `Horario` (`Horario_Inicio`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1576 ;
+  KEY `Numero_Seccion` (`Numero_Seccion`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
 
 --
 -- Dumping data for table `seccion`
 --
 
-INSERT INTO `seccion` (`NRC`, `Codigo_Ramo`, `Codigo_Carrera`, `RUT_Profesor`, `Horario_Inicio`, `Horario_Termino`, `Codigo_Semestre`) VALUES
-(1523, 'IET100', '', NULL, NULL, NULL, 0),
-(1524, 'IET090', '', NULL, NULL, NULL, 0),
-(1541, 'IET110', '', NULL, NULL, NULL, 0),
-(1542, 'IET120', '', NULL, NULL, NULL, 0),
-(1543, 'FIS110', 'DER1000', NULL, NULL, NULL, 201420),
-(1544, 'FIS110', 'DER1000', NULL, NULL, NULL, 201420),
-(1545, 'INF111', 'DER1000', NULL, NULL, NULL, 201420),
-(1546, 'IET120', 'DER1000', NULL, NULL, NULL, 201420),
-(1547, 'IET120', 'DER1000', NULL, NULL, NULL, 201420),
-(1548, 'FMM230', 'DER1000', NULL, NULL, NULL, 201420),
-(1549, 'FMM230', 'DER1000', NULL, NULL, NULL, 201420),
-(1550, 'FIS110', 'UNAB11550', NULL, NULL, NULL, 201125),
-(1551, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1552, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1553, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1554, 'IET100', 'UNAB11550', NULL, NULL, NULL, 201125),
-(1555, 'IET100', 'UNAB11550', NULL, NULL, NULL, 201125),
-(1556, 'IET100', 'UNAB11550', NULL, NULL, NULL, 201125),
-(1557, 'FMM030', 'DER1000', NULL, NULL, NULL, 201420),
-(1558, 'IET100', 'DER1000', NULL, NULL, NULL, 201420),
-(1559, 'FMM230', 'DER1000', NULL, NULL, NULL, 201420),
-(1560, 'IET091', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1561, 'IET091', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1562, 'IET091', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1563, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1564, 'IET090', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1565, 'FIS120', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1566, 'FMM130', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1567, 'FIS120', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1568, 'FIS110', 'UNAB11550', NULL, NULL, NULL, 201125),
-(1569, 'FIS110', 'UNAB11560', NULL, NULL, NULL, 201125),
-(1570, 'FIS110', 'UNAB11560', NULL, NULL, NULL, 201125),
-(1571, 'FIS110', 'UNAB11560', NULL, NULL, NULL, 201125),
-(1572, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1573, 'FIS110', 'UNAB11500', NULL, NULL, NULL, 201125),
-(1574, 'INF090', 'UNAB11550', NULL, NULL, NULL, 201125),
-(1575, 'INF090', 'UNAB11500', NULL, 1, 2, 201125);
+INSERT INTO `seccion` (`Id`, `Numero_Seccion`, `NRC`, `Codigo_Ramo`, `Codigo_Carrera`, `Codigo_Semestre`, `Vacantes`) VALUES
+(7, 1, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(8, 1, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(9, 1, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(10, 2, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(11, 3, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(12, 4, 1524, 'IET090', 'UNAB11550', 201125, 60);
 
 -- --------------------------------------------------------
 
@@ -944,6 +980,7 @@ DROP TABLE IF EXISTS `solicitud`;
 CREATE TABLE IF NOT EXISTS `solicitud` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `Codigo_Ramo` varchar(6) NOT NULL COMMENT 'Código del ramo pedido.',
+  `Seccion_asignada` int(11) DEFAULT NULL COMMENT 'Sección a la cual se le asignó la cantidad de vacantes.',
   `Carrera` varchar(9) NOT NULL COMMENT 'Carrera dueña del ramo.',
   `Carrera_Solicitante` varchar(9) NOT NULL COMMENT 'Carrera solicitante de vacantes.',
   `Vacantes` int(11) NOT NULL COMMENT 'Número de vacantes solicitadas.',
@@ -959,13 +996,13 @@ CREATE TABLE IF NOT EXISTS `solicitud` (
 -- Dumping data for table `solicitud`
 --
 
-INSERT INTO `solicitud` (`id`, `Codigo_Ramo`, `Carrera`, `Carrera_Solicitante`, `Vacantes`, `Vacantes_Asignadas`, `Codigo_Semestre`, `Fecha_Envio`, `Fecha_Respuesta`, `Estado`) VALUES
-(2, 'FIS110', 'UNAB11500', 'UNAB11550', 20, 15, 201125, '2011-10-10 23:06:53', '2011-10-19 23:33:14', 2),
-(3, 'FIS120', 'UNAB11500', 'UNAB11550', 10, 0, 201125, '2011-10-10 23:59:20', NULL, 3),
-(4, 'FMM130', 'UNAB11500', 'UNAB11550', 5, 0, 201125, '2011-10-10 23:59:24', NULL, 0),
-(5, 'IET091', 'UNAB11500', 'UNAB11550', 15, 0, 201125, '2011-10-10 23:59:29', NULL, 3),
-(7, 'FIS110', 'UNAB11560', 'UNAB11500', 10, 0, 201125, '2011-10-18 11:56:11', NULL, 2),
-(8, 'FIS110', 'UNAB11500', 'UNAB11550', 10, NULL, 201125, '2011-10-20 00:07:39', NULL, 1);
+INSERT INTO `solicitud` (`id`, `Codigo_Ramo`, `Seccion_asignada`, `Carrera`, `Carrera_Solicitante`, `Vacantes`, `Vacantes_Asignadas`, `Codigo_Semestre`, `Fecha_Envio`, `Fecha_Respuesta`, `Estado`) VALUES
+(2, 'FIS110', NULL, 'UNAB11500', 'UNAB11550', 20, 15, 201125, '2011-10-10 23:06:53', '2011-10-19 23:33:14', 2),
+(3, 'FIS120', NULL, 'UNAB11500', 'UNAB11550', 10, 0, 201125, '2011-10-10 23:59:20', NULL, 3),
+(4, 'FMM130', NULL, 'UNAB11500', 'UNAB11550', 5, 0, 201125, '2011-10-10 23:59:24', NULL, 0),
+(5, 'IET091', NULL, 'UNAB11500', 'UNAB11550', 15, 0, 201125, '2011-10-10 23:59:29', NULL, 3),
+(7, 'FIS110', NULL, 'UNAB11560', 'UNAB11500', 10, 0, 201125, '2011-10-18 11:56:11', NULL, 2),
+(8, 'FIS110', NULL, 'UNAB11500', 'UNAB11550', 10, NULL, 201125, '2011-10-20 00:07:39', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -1074,5 +1111,4 @@ ALTER TABLE `ramos_impartidos`
 --
 ALTER TABLE `seccion`
   ADD CONSTRAINT `seccion_ibfk_1` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`),
-  ADD CONSTRAINT `seccion_ibfk_2` FOREIGN KEY (`RUT_Profesor`) REFERENCES `profesor` (`RUT_Profesor`),
   ADD CONSTRAINT `seccion_ibfk_3` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`);

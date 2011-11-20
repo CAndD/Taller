@@ -80,15 +80,7 @@ BEGIN
   SELECT r.Codigo,r.Nombre
    FROM Ramo AS r
   WHERE r.Codigo = codigoRamo;
-END;//
-
-CREATE PROCEDURE select_ramos()
-BEGIN
-  SELECT r.Codigo,r.Nombre,r.Teoria,r.Ayudantia,r.Laboratorio,r.Taller,r.Creditos
-   FROM Ramo AS r
-  ORDER by r.Codigo;
-END;//
-
+END;//
 CREATE PROCEDURE asignar_jdc(codigoCarrera VARCHAR(9),nombreUsuario VARCHAR(40))
 BEGIN
   UPDATE Carrera AS c SET c.NombreUsuario_JC = nombreUsuario WHERE c.Codigo = codigoCarrera;
@@ -221,11 +213,6 @@ BEGIN
   WHERE ri.Codigo_Carrera = codigoCarrera AND ri.Codigo_Semestre = codigoSemestre AND ri.Impartido = 1 ORDER BY ctr.Semestre,r.Codigo;
 END;//
 
-CREATE PROCEDURE crearSeccion(codigoRamo VARCHAR(6), codigoCarrera VARCHAR(9), codigoSemestre INT)
-BEGIN
-  INSERT INTO Seccion(Codigo_Ramo,Codigo_Carrera,RUT_Profesor,Codigo_Semestre) VALUES(codigoRamo,codigoCarrera,NULL,codigoSemestre);
-END;//
-
 CREATE PROCEDURE seccionesCreadasNumero(codigoRamo VARCHAR(6), codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
   SELECT COUNT(s.NRC)
@@ -240,13 +227,6 @@ BEGIN
   WHERE s.Codigo_Ramo = codigoRamo AND s.Codigo_Carrera = codigoCarrera AND s.Codigo_Semestre = codigoSemestre;
 END;//
 
-CREATE PROCEDURE verSeccionesCreadas(codigoRamo VARCHAR(6), codigoCarrera VARCHAR(9), codigoSemestre INT)
-BEGIN
-  SELECT s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.RUT_Profesor,s.Horario_Inicio,s.Horario_Termino,s.Codigo_Semestre
-   FROM Seccion AS s
-   INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
-  WHERE s.Codigo_Ramo = codigoRamo AND s.Codigo_Carrera = codigoCarrera AND s.Codigo_Semestre = codigoSemestre ORDER BY s.NRC;
-END;//
 
 CREATE PROCEDURE seccionesCreadasOtroNumero(codigoRamo VARCHAR(6), codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN

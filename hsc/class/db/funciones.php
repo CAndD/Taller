@@ -178,4 +178,34 @@ function obtenerHorarioActual($codigoSeccion)
   $resf->free_result();
   return $horarioInicio.$horarioTermino;
 }
+
+function obtenerGrados()
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlf = "SELECT gp.id,gp.grado FROM Profesor_Grado AS gp;";
+  $resf = $mysqlif->prepare($sqlf);
+  $resf->execute();
+  $resf->bind_result($id,$grado);
+  while($resf->fetch())
+  {
+    echo '<option value="'.$id.'">'.$grado.'</option>';
+  }
+  $resf->free_result();
+}
+
+function obtenerTiposRamo()
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlf = "SELECT rt.id,rt.tipo FROM Ramo_Tipo AS rt;";
+  $resf = $mysqlif->prepare($sqlf);
+  $resf->execute();
+  $resf->bind_result($id,$tipo);
+  while($resf->fetch())
+  {
+    echo '<option value="'.$id.'">'.$tipo.'</option>';
+  }
+  $resf->free_result();
+}
 ?>

@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="yes" ?>
 <DBMODEL Version="4.0">
 <SETTINGS>
-<GLOBALSETTINGS ModelName="Modelo de datos" IDModel="0" IDVersion="0" VersionStr="1.0.0.0" Comments="" UseVersionHistroy="1" AutoIncVersion="1" DatabaseType="MySQL" ZoomFac="100.00" XPos="241" YPos="96" DefaultDataType="5" DefaultTablePrefix="0" DefSaveDBConn="" DefSyncDBConn="" DefQueryDBConn="" Printer="" HPageCount="4.0" PageAspectRatio="1.440892512336408" PageOrientation="1" PageFormat="A4 (210x297 mm, 8.26x11.7 inches)" SelectedPages="" UsePositionGrid="0" PositionGridX="20" PositionGridY="20" TableNameInRefs="1" DefaultTableType="0" ActivateRefDefForNewRelations="1" FKPrefix="" FKPostfix="" CreateFKRefDefIndex="1" DBQuoteCharacter="`" CreateSQLforLinkedObjects="0" DefModelFont="Tahoma" CanvasWidth="4096" CanvasHeight="2842" />
+<GLOBALSETTINGS ModelName="Modelo de datos" IDModel="0" IDVersion="0" VersionStr="1.0.0.0" Comments="" UseVersionHistroy="1" AutoIncVersion="1" DatabaseType="MySQL" ZoomFac="100.00" XPos="267" YPos="288" DefaultDataType="5" DefaultTablePrefix="0" DefSaveDBConn="" DefSyncDBConn="" DefQueryDBConn="" Printer="" HPageCount="4.0" PageAspectRatio="1.440892512336408" PageOrientation="1" PageFormat="A4 (210x297 mm, 8.26x11.7 inches)" SelectedPages="" UsePositionGrid="0" PositionGridX="20" PositionGridY="20" TableNameInRefs="1" DefaultTableType="0" ActivateRefDefForNewRelations="1" FKPrefix="" FKPostfix="" CreateFKRefDefIndex="1" DBQuoteCharacter="`" CreateSQLforLinkedObjects="0" DefModelFont="Tahoma" CanvasWidth="4096" CanvasHeight="2842" />
 <DATATYPEGROUPS>
 <DATATYPEGROUP Name="Numeric Types" Icon="1" />
 <DATATYPEGROUP Name="Date and Time Types" Icon="2" />
@@ -475,6 +475,12 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
+<COLUMN ID="1243" ColName="Ramo_Tipo_Id" PrevColName="" Pos="1" idDatatype="5" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="1" DefaultValue="" Comments="">
+<OPTIONSELECTED>
+<OPTIONSELECT Value="1" />
+<OPTIONSELECT Value="0" />
+</OPTIONSELECTED>
+</COLUMN>
 <COLUMN ID="1076" ColName="Nombre" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 <OPTIONSELECT Value="0" />
@@ -517,10 +523,18 @@
 <RELATION_START ID="1128" />
 <RELATION_START ID="1137" />
 </RELATIONS_START>
+<RELATIONS_END>
+<RELATION_END ID="1242" />
+</RELATIONS_END>
 <INDICES>
 <INDEX ID="1075" IndexName="PRIMARY" IndexKind="0" FKRefDef_Obj_id="-1">
 <INDEXCOLUMNS>
 <INDEXCOLUMN idColumn="1074" LengthParam="0" />
+</INDEXCOLUMNS>
+</INDEX>
+<INDEX ID="1244" IndexName="Ramo_FKIndex1" IndexKind="1" FKRefDef_Obj_id="1242">
+<INDEXCOLUMNS>
+<INDEXCOLUMN idColumn="1243" LengthParam="0" />
 </INDEXCOLUMNS>
 </INDEX>
 </INDICES>
@@ -642,12 +656,13 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="1116" ColName="Nombre_Profesor" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<COLUMN ID="1232" ColName="Profesor_Grado_id" PrevColName="" Pos="1" idDatatype="5" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="1" DefaultValue="" Comments="">
 <OPTIONSELECTED>
+<OPTIONSELECT Value="1" />
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="1212" ColName="Grado" PrevColName="" Pos="2" idDatatype="20" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<COLUMN ID="1116" ColName="Nombre_Profesor" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
@@ -657,10 +672,18 @@
 <RELATION_START ID="1127" />
 <RELATION_START ID="1190" />
 </RELATIONS_START>
+<RELATIONS_END>
+<RELATION_END ID="1231" />
+</RELATIONS_END>
 <INDICES>
 <INDEX ID="1115" IndexName="PRIMARY" IndexKind="0" FKRefDef_Obj_id="-1">
 <INDEXCOLUMNS>
 <INDEXCOLUMN idColumn="1114" LengthParam="0" />
+</INDEXCOLUMNS>
+</INDEX>
+<INDEX ID="1233" IndexName="Profesor_FKIndex1" IndexKind="1" FKRefDef_Obj_id="1231">
+<INDEXCOLUMNS>
+<INDEXCOLUMN idColumn="1232" LengthParam="0" />
 </INDEXCOLUMNS>
 </INDEX>
 </INDICES>
@@ -750,7 +773,7 @@
 </INDEX>
 </INDICES>
 </TABLE>
-<TABLE ID="1147" Tablename="Modulo" PrevTableName="Table_14" XPos="734" YPos="849" TableType="0" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="25" >
+<TABLE ID="1147" Tablename="Modulo" PrevTableName="Table_14" XPos="754" YPos="930" TableType="0" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="25" >
 <COLUMNS>
 <COLUMN ID="1149" ColName="Modulo" PrevColName="" Pos="0" idDatatype="5" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="1" NotNull="1" AutoInc="1" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
@@ -763,11 +786,11 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="1152" ColName="Inicio" PrevColName="" Pos="2" idDatatype="17" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<COLUMN ID="1152" ColName="Hora_Inicio" PrevColName="Inicio" Pos="2" idDatatype="17" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="1153" ColName="Termino" PrevColName="" Pos="3" idDatatype="17" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<COLUMN ID="1153" ColName="Hora_Termino" PrevColName="Termino" Pos="3" idDatatype="17" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 </OPTIONSELECTED>
 </COLUMN>
@@ -889,9 +912,20 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
+<COLUMN ID="1222" ColName="Modulo_Termino" PrevColName="" Pos="6" idDatatype="5" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<OPTIONSELECTED>
+<OPTIONSELECT Value="1" />
+<OPTIONSELECT Value="0" />
+</OPTIONSELECTED>
+</COLUMN>
 <COLUMN ID="1182" ColName="Codigo_Semestre" PrevColName="" Pos="4" idDatatype="5" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 <OPTIONSELECT Value="1" />
+<OPTIONSELECT Value="0" />
+</OPTIONSELECTED>
+</COLUMN>
+<COLUMN ID="1249" ColName="Dia" PrevColName="" Pos="7" idDatatype="20" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<OPTIONSELECTED>
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
@@ -938,9 +972,8 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="1202" ColName="Tipo" PrevColName="" Pos="1" idDatatype="5" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<COLUMN ID="1202" ColName="Tipo" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
-<OPTIONSELECT Value="1" />
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
@@ -952,6 +985,61 @@
 <INDEX ID="1201" IndexName="PRIMARY" IndexKind="0" FKRefDef_Obj_id="-1">
 <INDEXCOLUMNS>
 <INDEXCOLUMN idColumn="1200" LengthParam="0" />
+</INDEXCOLUMNS>
+</INDEX>
+</INDICES>
+</TABLE>
+<TABLE ID="1226" Tablename="Profesor_Grado" PrevTableName="Table_16" XPos="1392" YPos="1099" TableType="0" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="32" >
+<COLUMNS>
+<COLUMN ID="1228" ColName="id" PrevColName="" Pos="0" idDatatype="5" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="1" NotNull="1" AutoInc="1" IsForeignKey="0" DefaultValue="" Comments="">
+<OPTIONSELECTED>
+<OPTIONSELECT Value="1" />
+<OPTIONSELECT Value="0" />
+</OPTIONSELECTED>
+</COLUMN>
+<COLUMN ID="1230" ColName="Grado" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<OPTIONSELECTED>
+<OPTIONSELECT Value="0" />
+</OPTIONSELECTED>
+</COLUMN>
+</COLUMNS>
+<RELATIONS_START>
+<RELATION_START ID="1231" />
+</RELATIONS_START>
+<INDICES>
+<INDEX ID="1229" IndexName="PRIMARY" IndexKind="0" FKRefDef_Obj_id="-1">
+<INDEXCOLUMNS>
+<INDEXCOLUMN idColumn="1228" LengthParam="0" />
+</INDEXCOLUMNS>
+</INDEX>
+</INDICES>
+</TABLE>
+<TABLE ID="1237" Tablename="Ramo_Tipo" PrevTableName="Table_17" XPos="1681" YPos="269" TableType="0" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="34" >
+<COLUMNS>
+<COLUMN ID="1239" ColName="Id" PrevColName="" Pos="0" idDatatype="5" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="1" NotNull="1" AutoInc="1" IsForeignKey="0" DefaultValue="" Comments="">
+<OPTIONSELECTED>
+<OPTIONSELECT Value="1" />
+<OPTIONSELECT Value="0" />
+</OPTIONSELECTED>
+</COLUMN>
+<COLUMN ID="1241" ColName="Tipo" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<OPTIONSELECTED>
+<OPTIONSELECT Value="0" />
+</OPTIONSELECTED>
+</COLUMN>
+<COLUMN ID="1247" ColName="Abreviacion" PrevColName="" Pos="2" idDatatype="20" DatatypeParams="" Width="-1" Prec="-1" PrimaryKey="0" NotNull="0" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<OPTIONSELECTED>
+<OPTIONSELECT Value="0" />
+</OPTIONSELECTED>
+</COLUMN>
+</COLUMNS>
+<RELATIONS_START>
+<RELATION_START ID="1242" />
+</RELATIONS_START>
+<INDICES>
+<INDEX ID="1240" IndexName="PRIMARY" IndexKind="0" FKRefDef_Obj_id="-1">
+<INDEXCOLUMNS>
+<INDEXCOLUMN idColumn="1239" LengthParam="0" />
 </INDEXCOLUMNS>
 </INDEX>
 </INDICES>
@@ -973,6 +1061,8 @@
 <RELATION ID="1207" RelationName="Define" Kind="2" SrcTable="1198" DestTable="1175" FKFields="id=Clase_Tipo_id\n" FKFieldsComments="\n" relDirection="1" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1209" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="30" />
 <RELATION ID="1214" RelationName="Realiza" Kind="2" SrcTable="1060" DestTable="1044" FKFields="Codigo=Carrera_Codigo\n" FKFieldsComments="\n" relDirection="4" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1216" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="30" />
 <RELATION ID="1218" RelationName="Pertenece" Kind="2" SrcTable="1093" DestTable="1044" FKFields="Id=Seccion_Id\n" FKFieldsComments="\n" relDirection="4" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1220" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="31" />
+<RELATION ID="1231" RelationName="Define" Kind="2" SrcTable="1226" DestTable="1112" FKFields="id=Profesor_Grado_id\n" FKFieldsComments="\n" relDirection="1" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1233" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="33" />
+<RELATION ID="1242" RelationName="Define" Kind="2" SrcTable="1237" DestTable="1072" FKFields="Id=Ramo_Tipo_Id\n" FKFieldsComments="\n" relDirection="4" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1244" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="35" />
 </RELATIONS>
 <NOTES>
 </NOTES>
