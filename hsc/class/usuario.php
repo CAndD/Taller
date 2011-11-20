@@ -746,63 +746,6 @@ class jefeDeCarrera extends usuario {
     return $answer;
   }
 
-  public function verRamosImpartidos($codigoCarrera,$codigoSemestre) {
-    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
-    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "SELECT r.Codigo,r.Nombre,r.Tipo,rt.Abreviacion,ctr.Semestre,c.Periodo
-             FROM Ramos_Impartidos AS ri
-             INNER JOIN Ramo AS r ON r.Codigo = ri.Codigo_Ramo
-             INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Carrera = ri.Codigo_Carrera AND ctr.Codigo_Ramo = ri.Codigo_Ramo
-             INNER JOIN Carrera AS c ON c.Codigo = ctr.Codigo_Carrera
-             INNER JOIN Ramo_Tipo AS rt ON rt.Id = r.Tipo
-            WHERE ri.Codigo_Carrera = '{$codigoCarrera}' AND ri.Codigo_Semestre = '{$codigoSemestre}' AND ri.Impartido = 1 ORDER BY ctr.Semestre,r.Codigo;";
-    $res = $mysqli->prepare($sql);
-    $res->execute();
-    $res->bind_result($codigoRamo,$nombreRamo,$tipo,$tipoAbreviacion,$semestreRamo,$periodo);
-    $flag = 0;
-    if($periodo == 1)
-      echo '<table><tr><td>Año / Semestre</td><td>Código</td><td>Nombre</td><td>Crear sección</td><td>Secciones creadas</td><td>Secciones pedidas</td><td>Secciones creadas por otros</td></tr>';
-    else
-      echo '<table><tr><td>Año / Trimestre</td><td>Código</td><td>Nombre</td><td>Crear sección</td><td>Secciones creadas</td><td>Secciones pedidas</td><td>Secciones creadas por otros</td></tr>';
-    while($res->fetch())
-    {
-      if($flag == 0)
-        $flag = 1;
-      $semestreRamo = anhoSemestre($periodo,$semestreRamo);
-      $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-      $sql2 = "CALL seccionesCreadasNumero('{$codigoRamo}','{$codigoCarrera}','{$codigoSemestre}')";
-      $res2 = $mysqli2->prepare($sql2);
-      $res2->execute();
-      $res2->bind_result($seccionesCreadasNumero);
-      $res2->fetch();
-      if($seccionesCreadasNumero > 0)
-        $seccionesCreadasNumero = '<a id="'.$codigoRamo.'" class="seccionesCreadas" href="">'.$seccionesCreadasNumero.'</a>';
-      $res2->free_result();
-
-      $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-      $sql3 = "CALL seccionesCreadasOtroNumero('{$codigoRamo}','{$codigoCarrera}','{$codigoSemestre}')";
-      $res3 = $mysqli3->prepare($sql3);
-      $res3->execute();
-      $res3->bind_result($seccionesCreadasOtroNumero);
-      $res3->fetch();
-      if($seccionesCreadasOtroNumero > 0)
-        $seccionesCreadasOtroNumero = $seccionesCreadasOtroNumero.'<br><a id="'.$codigoRamo.'" class="seccionesCreadasOtros" href="">Pedir vacantes</a>';
-      $res3->free_result();
-
-      if($tipo == '1')
-      {
-        echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td class="mid"><form method="post" name="crearSeccion" target="_self"><input type="hidden" name="hiddenCodigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="hiddenCodigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="hiddenCodigoCarrera" value="'.$codigoCarrera.'"></input><input type="submit" name="submit" value="Crear"></input></form></td><td class="mid">'.$seccionesCreadasNumero.'</td><td class="mid">0</td><td class="mid">'.$seccionesCreadasOtroNumero.'</td></tr>';
-      }
-      else
-      {
-        echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td class="mid"></td><td class="mid">'.$seccionesCreadasNumero.'</td><td class="mid">0</td><td class="mid">'.$seccionesCreadasOtroNumero.'</td></tr>';
-      }
-    }
-    if($flag == 0)
-      echo '<tr><td>No hay ramos asociados a la carrera.</td><td></td><td></td><td></td></tr>';
-    echo '</table>';
-    $res->free_result();
-  }
 
   public function crearSeccion($codigoRamo,$codigoSemestre,$codigoCarrera) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
@@ -1083,6 +1026,22 @@ class jefeDeCarrera extends usuario {
     else
     {
       $answer = '*Solicitud no eliminada.';
+    }
+    return $answer;
+  }
+
+  public function asignarSeccion($idClase,$rutProfesor)
+  {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "UPDATE Clase SET RUT_Profesor = '{$rutProfesor}' WHERE Id = '{$idClase}';";
+    if(($mysqli->query($sql)) == true)
+    {
+      $answer = '*Profesor asignado.';
+    }
+    else
+    {
+      $answer = '*Profesor asignado.';
     }
     return $answer;
   }

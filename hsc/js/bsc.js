@@ -75,5 +75,29 @@ jQuery(function ($) {
           $('<iframe name="" class="ifr" src="secundario/solicitud.php?idSolicitud=' + idSolicitud + '" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         });
-  
+
+        $('a.cambiarProfesor').click(function (e) {
+          var idClase = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="secundario/cambiarClase.php?idClase=' + idClase + '&func=rutProfesor" scrolling="no" frameborder="0"></iframe>').modal();
+          return false;
+        });
+
+        $('a.cambiarModuloInicio').click(function (e) {
+          var idClase = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="secundario/cambiarClase.php?idClase=' + idClase + '&func=moduloInicio" scrolling="no" frameborder="0"></iframe>').modal();
+          return false;
+        });  
+
+        $('a.cambiarModuloTermino').click(function (e) {
+          var idClase = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="secundario/cambiarClase.php?idClase=' + idClase + '&func=moduloTermino" scrolling="no" frameborder="0"></iframe>').modal();
+          return false;
+        });  
+
+        $('a.cambiarDiaClase').click(function (e) {
+          var idClase = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="secundario/cambiarClase.php?idClase=' + idClase + '&func=diaClase" scrolling="no" frameborder="0"></iframe>').modal();
+          return false;
+        });  
+
 });

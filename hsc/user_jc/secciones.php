@@ -76,7 +76,7 @@ if(isset($_SESSION['usuario']))
         <?php
           if(isset($msg))
             echo '<br><span class="error">'.$msg.'</span>';
-          $usuario->verRamosImpartidos($_SESSION['carrera'],$_SESSION['codigoSemestre']);
+          verRamosImpartidos($_SESSION['carrera'],$_SESSION['codigoSemestre']);
         ?>
       </div>
     </div>
