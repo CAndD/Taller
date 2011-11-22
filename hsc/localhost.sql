@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Nov 19, 2011 at 10:16 PM
+-- Generation Time: Nov 22, 2011 at 02:13 AM
 -- Server version: 5.1.53
 -- PHP Version: 5.3.4
 
@@ -623,7 +623,6 @@ INSERT INTO `carrera_tiene_ramos` (`Codigo_Carrera`, `Codigo_Ramo`, `Semestre`) 
 ('UNAB11550', 'FIS110', 1),
 ('UNAB11550', 'FIS120', 2),
 ('UNAB11550', 'FMM030', 1),
-('UNAB11550', 'FMM130', 2),
 ('UNAB11550', 'FMM230', 3),
 ('UNAB11550', 'IET090', 4),
 ('UNAB11550', 'IET091', 5),
@@ -641,19 +640,50 @@ INSERT INTO `carrera_tiene_ramos` (`Codigo_Carrera`, `Codigo_Ramo`, `Semestre`) 
 DROP TABLE IF EXISTS `clase`;
 CREATE TABLE IF NOT EXISTS `clase` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `Clase_Tipo` int(11) NOT NULL COMMENT 'Tipo de la clase.',
+  `Clase_Tipo` varchar(20) NOT NULL COMMENT 'Tipo de la clase.',
   `Seccion_Id` int(11) NOT NULL COMMENT 'Id de la sección a la cual pertenece la clase.',
   `RUT_Profesor` int(10) DEFAULT NULL COMMENT 'Rut del profesor que dicta la clase.',
   `Modulo_Inicio` int(11) DEFAULT NULL COMMENT 'Módulo de inicio de la clase.',
   `Modulo_Termino` int(11) DEFAULT NULL COMMENT 'Módulo de término de la clase.',
+  `Dia` varchar(12) DEFAULT NULL COMMENT 'Día de la clase.',
   `Codigo_Semestre` int(11) NOT NULL COMMENT 'Codigo del semestre al cual pertenece la clase.',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=31 ;
 
 --
 -- Dumping data for table `clase`
 --
 
+INSERT INTO `clase` (`Id`, `Clase_Tipo`, `Seccion_Id`, `RUT_Profesor`, `Modulo_Inicio`, `Modulo_Termino`, `Dia`, `Codigo_Semestre`) VALUES
+(2, 'Teoria', 21, NULL, NULL, NULL, NULL, 201125),
+(3, 'Teoria', 21, NULL, NULL, NULL, NULL, 201125),
+(4, 'Teoria', 22, NULL, NULL, NULL, NULL, 201125),
+(5, 'Teoria', 22, NULL, NULL, NULL, NULL, 201125),
+(6, 'Ayudantia', 22, NULL, NULL, NULL, NULL, 201125),
+(7, 'Teoria', 23, 164827607, NULL, NULL, NULL, 201125),
+(8, 'Teoria', 23, NULL, NULL, NULL, NULL, 201125),
+(9, 'Teoria', 23, NULL, NULL, NULL, NULL, 201125),
+(10, 'Ayudantia', 23, NULL, NULL, NULL, NULL, 201125),
+(11, 'Laboratorio', 23, NULL, NULL, NULL, NULL, 201125),
+(12, 'Taller', 23, NULL, NULL, NULL, NULL, 201125),
+(13, 'Teoria', 24, NULL, NULL, NULL, NULL, 201125),
+(14, 'Teoria', 24, NULL, NULL, NULL, NULL, 201125),
+(15, 'Teoria', 24, NULL, NULL, NULL, NULL, 201125),
+(16, 'Ayudantia', 24, NULL, NULL, NULL, NULL, 201125),
+(17, 'Laboratorio', 24, NULL, NULL, NULL, NULL, 201125),
+(18, 'Taller', 24, NULL, NULL, NULL, NULL, 201125),
+(19, 'Teoria', 25, 164827607, NULL, NULL, NULL, 201125),
+(20, 'Teoria', 25, 164827607, NULL, NULL, NULL, 201125),
+(21, 'Ayudantia', 25, NULL, NULL, NULL, NULL, 201125),
+(22, 'Teoria', 26, NULL, NULL, NULL, NULL, 201125),
+(23, 'Teoria', 26, NULL, NULL, NULL, NULL, 201125),
+(24, 'Ayudantia', 26, NULL, NULL, NULL, NULL, 201125),
+(25, 'Teoria', 29, NULL, NULL, NULL, NULL, 201125),
+(26, 'Teoria', 29, NULL, NULL, NULL, NULL, 201125),
+(27, 'Ayudantia', 29, NULL, NULL, NULL, NULL, 201125),
+(28, 'Teoria', 30, NULL, NULL, NULL, NULL, 201125),
+(29, 'Teoria', 30, NULL, NULL, NULL, NULL, 201125),
+(30, 'Ayudantia', 30, NULL, NULL, NULL, NULL, 201125);
 
 -- --------------------------------------------------------
 
@@ -807,9 +837,9 @@ INSERT INTO `ramo` (`Codigo`, `Nombre`, `Teoria`, `Tipo`, `Ayudantia`, `Laborato
 ('FMM030', 'CÃ¡lculo I', 4, 6, 2, 0, 0, 6),
 ('FMM130', 'CÃ¡lculo II', 4, 6, 2, 0, 0, 6),
 ('FMM230', 'CÃ¡lculo III', 4, 6, 2, 0, 0, 6),
-('IET090', 'Redes I', 0, 1, 0, 0, 0, 0),
+('IET090', 'Redes I', 4, 1, 2, 0, 0, 0),
 ('IET091', 'Redes II', 4, 1, 2, 2, 0, 6),
-('IET100', 'Elementos de la ComputaciÃ³n', 4, 1, 2, 2, 0, 6),
+('IET100', 'Elementos de la ComputaciÃ³n', 6, 1, 2, 2, 2, 6),
 ('IET110', 'Elementos', 0, 1, 0, 0, 0, 0),
 ('IET120', 'Computacion', 0, 1, 0, 0, 0, 0),
 ('INF090', 'Historia de la computaciÃ³n', 4, 1, 2, 0, 0, 6),
@@ -881,7 +911,7 @@ INSERT INTO `ramos_impartidos` (`Codigo_Carrera`, `Codigo_Ramo`, `Codigo_Semestr
 ('UNAB11500', 'FMM030', 201420, 1),
 ('UNAB11500', 'IET100', 201420, 1),
 ('UNAB11500', 'INF110', 201420, 1),
-('UNAB11500', 'IET100', 201125, 2),
+('UNAB11500', 'IET100', 201125, 1),
 ('UNAB11500', 'FMM130', 201125, 1),
 ('UNAB11500', 'IET091', 201125, 1),
 ('UNAB11500', 'INF111', 201125, 1),
@@ -903,7 +933,7 @@ INSERT INTO `ramos_impartidos` (`Codigo_Carrera`, `Codigo_Ramo`, `Codigo_Semestr
 ('UNAB11500', 'INF112', 201125, 1),
 ('UNAB11500', 'INF090', 201125, 1),
 ('DER1000', 'FMM030', 201410, 1),
-('UNAB11550', 'FMM030', 201125, 2),
+('UNAB11550', 'FMM030', 201125, 1),
 ('UNAB11550', 'INF090', 201125, 1),
 ('UNAB11550', 'IET090', 201125, 1),
 ('UNAB11550', 'FIS110', 201125, 1),
@@ -928,7 +958,7 @@ CREATE TABLE IF NOT EXISTS `seccion` (
   PRIMARY KEY (`Id`),
   KEY `Codigo_Ramo` (`Codigo_Ramo`),
   KEY `Numero_Seccion` (`Numero_Seccion`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=31 ;
 
 --
 -- Dumping data for table `seccion`
@@ -940,7 +970,25 @@ INSERT INTO `seccion` (`Id`, `Numero_Seccion`, `NRC`, `Codigo_Ramo`, `Codigo_Car
 (9, 1, 1524, 'IET090', 'UNAB11500', 201125, 60),
 (10, 2, 1524, 'IET090', 'UNAB11500', 201125, 60),
 (11, 3, 1524, 'IET090', 'UNAB11500', 201125, 60),
-(12, 4, 1524, 'IET090', 'UNAB11550', 201125, 60);
+(12, 4, 1524, 'IET090', 'UNAB11550', 201125, 60),
+(13, 5, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(14, 6, 1524, 'IET090', 'UNAB11550', 201125, 60),
+(15, 7, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(16, 8, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(17, 9, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(18, 10, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(19, 11, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(20, 12, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(21, 13, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(22, 14, 1524, 'IET090', 'UNAB11500', 201125, 60),
+(23, 1, 1524, 'IET100', 'UNAB11500', 201125, 60),
+(24, 2, 1524, 'IET100', 'UNAB11500', 201125, 60),
+(25, 1, 1524, 'INF090', 'UNAB11500', 201125, 60),
+(26, 2, 1524, 'INF090', 'UNAB11500', 201125, 60),
+(27, 1, 1524, 'INF111', 'UNAB11500', 201125, 60),
+(28, 2, 1524, 'INF111', 'UNAB11500', 201125, 60),
+(29, 1, 1524, 'INF110', 'UNAB11500', 201125, 60),
+(30, 3, 1524, 'INF090', 'UNAB11550', 201125, 60);
 
 -- --------------------------------------------------------
 
