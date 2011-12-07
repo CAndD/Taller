@@ -1046,6 +1046,51 @@ class jefeDeCarrera extends usuario {
     return $answer;
   }
 
+  public function asignarHorario($idClase,$dos,$tipo)
+  {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    if($tipo == 1)
+    {
+      $sql = "UPDATE Clase SET Dia = '{$dos}' WHERE Id = '{$idClase}';";
+      if(($mysqli->query($sql)) == true)
+      {
+        $answer = '*Día asignado.';
+      }
+      else
+      {
+        $answer = '*Día no asignado.';
+      }
+      return $answer;
+    }
+    elseif($tipo == 2)
+    {
+      $sql = "UPDATE Clase SET Modulo_Inicio = '{$dos}' WHERE Id = '{$idClase}';";
+      if(($mysqli->query($sql)) == true)
+      {
+        $answer = '*Módulo de inicio asignado.';
+      }
+      else
+      {
+        $answer = '*Módulo de inicio no asignado.';
+      }
+      return $answer;
+    }
+    elseif($tipo == 3)
+    {
+      $sql = "UPDATE Clase SET Modulo_Termino = '{$dos}' WHERE Id = '{$idClase}';";
+      if(($mysqli->query($sql)) == true)
+      {
+        $answer = '*Módulo de término asignado.';
+      }
+      else
+      {
+        $answer = '*Módulo de término no asignado.';
+      }
+      return $answer;
+    }
+  }
+
   private function programarHorario() {
   }
 }

@@ -34,6 +34,49 @@ if(isset($_SESSION['usuario']))
     }
   }
 
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Cambiar día')
+  {
+    if($_POST['cambiarDia'] == 'No')
+    {
+      $diaerror = 'Debe elegir un día.';
+      $_GET['idClase'] = $_POST['hiddenIdClase'];
+    }
+    else
+    {
+      $msg2 = $usuario->asignarHorario($_POST['hiddenIdClase'],$_POST['cambiarDia'],1);
+    }
+  }
+
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Cambiar inicio')
+  {
+    if($_POST['moduloInicio'] == 0)
+    {
+      $moduloerror = 'Debe elegir un módulo de inicio o debe elegir uno que no se encuentre en rojo.';
+      $_GET['idClase'] = $_POST['hiddenIdClase'];
+      $_GET['func'] = 'moduloInicio';
+    }
+    else
+    {
+      $msg3 = $usuario->asignarHorario($_POST['hiddenIdClase'],$_POST['moduloInicio'],2);
+      $_GET['func'] = 'moduloInicio';
+    }
+  }  
+
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Cambiar termino')
+  {
+    if($_POST['moduloTermino'] == 0)
+    {
+      $moduloerror = 'Debe elegir un módulo de término o debe elegir uno que no se encuentre en rojo.';
+      $_GET['idClase'] = $_POST['hiddenIdClase'];
+      $_GET['func'] = 'moduloTermino';
+    }
+    else
+    {
+      $msg4 = $usuario->asignarHorario($_POST['hiddenIdClase'],$_POST['moduloTermino'],3);
+      $_GET['func'] = 'moduloTermino';
+    }
+  }
+
   if($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3)
   {
 ?>
@@ -77,14 +120,70 @@ if(isset($_SESSION['usuario']))
     if(isset($_GET['func']) && $_GET['func'] == 'moduloInicio')
     {
       echo '<h2>Cambiar módulo de inicio</h2>';
+      if(isset($msg3))
+      {
+        echo $msg3;
+      }
+      else
+      {
+        if(isset($moduloerror))
+        {
+          echo '<span class="error">'.$moduloerror.'</span><br><br>';
+        }
+        $regimen = obtenerRegimenCarrera($_SESSION['carrera']);
+        echo '<form method="post" name="cambiarHoraInicio" target="_self"><select name="moduloInicio"><option value="0">Elegir módulo de inicio</option>';
+        obtenerModulosSugerencia($regimen,$_GET['idClase'],$_SESSION['carrera'],$_SESSION['codigoSemestre']);
+        echo '</select><input type="hidden" name="hiddenIdClase" value="'.$_GET['idClase'].'"></input><input type="submit" name="submit" value="Cambiar inicio"></input></form>';
+      }
     }
     if(isset($_GET['func']) && $_GET['func'] == 'moduloTermino')
     {
       echo '<h2>Cambiar módulo de término</h2>';
+      if(isset($msg4))
+      {
+        echo $msg4;
+      }
+      else
+      {
+        if(isset($moduloerror))
+        {
+          echo '<span class="error">'.$moduloerror.'</span><br><br>';
+        }
+        $regimen = obtenerRegimenCarrera($_SESSION['carrera']);
+        echo '<form method="post" name="cambiarHoraTermino" target="_self"><select name="moduloTermino"><option value="0">Elegir módulo de término</option>';
+        obtenerModulosSugerencia($regimen,$_GET['idClase'],$_SESSION['carrera'],$_SESSION['codigoSemestre']);
+        echo '</select><input type="hidden" name="hiddenIdClase" value="'.$_GET['idClase'].'"></input><input type="submit" name="submit" value="Cambiar termino"></input></form>';
+      }
     }
     if(isset($_GET['func']) && $_GET['func'] == 'diaClase')
     {
       echo '<h2>Cambiar día de clase</h2>';
+      if(isset($msg2))
+      {
+        echo $msg2;
+      }
+      else
+      {
+        if(isset($diaerror))
+        {
+          echo '<span class="error">'.$diaerror.'</span><br><br>';
+        }
+        $regimen = obtenerRegimenCarrera($_SESSION['carrera']);
+        if($regimen == 'D')
+        {
+          echo '<form method="post" name="cambiarDia" target="_self"><select name="cambiarDia"><option value="No">Elegir día</option>';
+          echo '<option value="Lunes">Lunes</option><option value="Martes">Martes</option><option value="Miercoles">Miércoles</option><option value="Jueves">Jueves</option><option value="Viernes">Viernes</option>';
+          echo '</select><input type="hidden" name="hiddenIdClase" value="'.$_GET['idClase'].'"></input>';
+          echo '<input type="submit" name="submit" value="Cambiar día"></input></form>';
+        }
+        else
+        {
+          echo '<form method="post" name="cambiarDia" target="_self"><select name="cambiarDia"><option value="0">Elegir día</option>';
+          echo '<option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option><option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option>';
+          echo '</select><input type="hidden" name="hiddenIdClase" value="'.$_GET['idClase'].'"></input>';
+          echo '<input type="submit" name="submit" value="Cambiar día"></input></form>';
+        }
+      }
     }
   ?>
   <br><br><a href="../clases.php?codigoRamo=<?php echo $codigoRamo; ?>" target="_parent">Salir</a>
