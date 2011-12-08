@@ -7,10 +7,12 @@ if(isset($_SESSION['usuario']))
 {
   $usuario = unserialize($_SESSION['usuario']);
   if(get_class($usuario) == 'jefeDeCarrera') {
-    $usuario = new administrador($usuario->getNombre(),$usuario->getNombreUsuario(),$usuario->getRut(),$usuario->getTipo());
+    $usuario = new departamento($usuario->getNombre(),$usuario->getNombreUsuario(),$usuario->getRut());
     $_SESSION['usuario'] = serialize($usuario);
+    $_SESSION['carrera'] = NULL;
+    $_SESSION['codigoSemestre'] = NULL;
   }
-  if($_SESSION['tipoUsuario'] == 2 || $_SESSION['tipoUsuario'] == 3)
+  if($_SESSION['tipoUsuario'] == 4)
   {
     if(isset($_POST['agrega']) && $_POST['agrega'] == 'Agregar')
     {
@@ -22,7 +24,7 @@ if(isset($_SESSION['usuario']))
         }
         else
         {
-          if($_POST['codigo'] == '' && $_POST['nombre'] == '' && $_POST['tipo'] == 0 && $_POST['periodo'] == 0 && $_POST['teo'] == '' && $_POST['periodo'] == '' && $_POST['ayu'] == '' && $_POST['lab'] == '' && $_POST['tall'] == '' && $_POST['cre'] == '')
+          if($_POST['codigo'] == '' && $_POST['nombre'] == '' && $_POST['tipo'] == 0 && $_POST['periodo'] == 0 && $_POST['teo'] == '' && $_POST['ayu'] == '' && $_POST['lab'] == '' && $_POST['tall'] == '' && $_POST['cre'] == '')
           {
             $answer = '*Debe ingresar los campos requeridos.';
           }
@@ -75,8 +77,6 @@ if(isset($_SESSION['usuario']))
   <meta name="keywords" content="website keywords, website keywords" />
   <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
   <link rel="stylesheet" type="text/css" href="../style/style.css" title="style" />
-  <link rel="stylesheet" type="text/css" href="../style/bsc.css" title="style" />
-  <script type="text/javascript" src="../js/js.js"></script>
 </head>
 
 <body>
@@ -91,27 +91,24 @@ if(isset($_SESSION['usuario']))
       </div>
       <div id="menubar">
         <ul id="menu">
-          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
-          <li><a href="admin.php">Home</a></li>
-          <li><a href="carreras.php">Carreras</a></li>
-          <li><a href="jdc.php">Jefes de carrera</a></li>
-          <li class="selected"><a href="ramos.php">Ramos</a></li>
-          <li><a href="profesores.php">Profesores</a></li>
-          <!--<li><a href="contacto.php">Contacto</a></li>-->
+          <li class="selected"><a href="depto.php">Ramos</a></li>
+          <li><a href="seccion.php">Secciones</a></li>
+          <li><a href="tipos.php">Tipos</a></li>
           <li><a href="../logout.php">Logout</a></li>
         </ul>
       </div>
     </div>
     <div id="site_content">
-
       <div id="content">
         <!-- insert the page content here -->
+        <h1>Bienvenido usuario departamento</h1>
+
         <h1>Ramos</h1>
  
         <h2>Agregar Ramo:</h2>
         <?php if(isset($answer)) echo '<span class="error">'.$answer.'</span>';?>
         <table>
-        <tr><td>Codigo</td><td>Nombre</td><td>Tipo</td><td>Período</td><td>Teó.</td><td>Ayu.</td><td>Lab.</td><td>Tall.</td><td>Créd.</td><td></td></tr> 
+        <tr><td>Codigo</td><td>Nombre</td><td>Tipo</td><td>Periodo</td><td>Teó.</td><td>Ayu.</td><td>Lab.</td><td>Tall.</td><td>Créd.</td><td></td></tr> 
         <form method="post" name="agregar" target="_self">
             <tr><td><input type="text" name="codigo" value="<?php if(isset($codigoold)) echo $codigoold;?>" maxlength="6" class="m" onkeyup="buscarCodigoRamo(this.value)"></input></td> 
             <td><input type="text" name="nombre" value="<?php if(isset($nombreold)) echo $nombreold;?>" maxlength="50"></input></td>
@@ -142,28 +139,20 @@ if(isset($_SESSION['usuario']))
         <h2>Lista de ramos:</h2><ul>
         <?php
           echo '<table>';
-          echo '<tr><td>Codigo</td><td>Nombre</td><td>Tipo</td><td>Periodo</td><td>Teó.</td><td>Ayu.</td><td>Lab.</td><td>Tall.</td><td>Créd.</td><td>Relacionar</td><td>Eliminar</td></tr>';     
+          echo '<tr><td>Codigo</td><td>Nombre</td><td>Tipo</td><td>Periodo</td><td>Teó.</td><td>Ayu.</td><td>Lab.</td><td>Tall.</td><td>Créd.</td><td>Eliminar</td></tr>';     
           verRamos($_SESSION['tipoUsuario']);
           echo '</table>';
         ?>
         </ul>
-     
-     </div>
+      </div>
     </div>
     <div id="content_footer"></div>
     <div id="footer">
-      <?php
-      if($_SESSION['tipoUsuario'] == 3) {
-        echo '<a href="../home.php">Modo Jefe de Carrera</a>';
-      }
-      ?>
     </div>
   </div>
-
   <script type='text/javascript' src='../js/jquery.js'></script> 
   <script type='text/javascript' src='../js/jquery.simplemodal.js'></script> 
-  <script type='text/javascript' src='../js/bsc.js'></script>
-</body>
+  <script type='text/javascript' src='../js/bsc.js'></script></body>
 </html><?php
   }
   else

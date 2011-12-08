@@ -65,6 +65,13 @@ class usuario {
         $_SESSION['tipoUsuario'] = $tipo;
         $login = true;       
       }
+      elseif($tipo == 4)
+      {
+        $departamento = new departamento($nombre,$this->getNombreUsuario(),$rut);
+        $_SESSION['usuario'] = serialize($departamento);
+        $_SESSION['tipoUsuario'] = $tipo;
+        $login = true;  
+      }
     }
     $res->free_result();
     if(!isset($login))
@@ -225,32 +232,10 @@ class administrador extends usuario {
   private function eliminarUsuario() {
   }
 
-  public function verRamos() {
-    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
-    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "SELECT r.Codigo,r.Nombre,r.Teoria,rt.Abreviacion,r.Ayudantia,r.Laboratorio,r.Taller,r.Creditos
-             FROM Ramo AS r 
-             INNER JOIN Ramo_Tipo AS rt ON rt.Id = r.Tipo
-            ORDER by r.Codigo;";
-    //$sql = "CALL select_ramos()";
-    $res = $mysqli->prepare($sql);
-    $res->execute();
-    $res->bind_result($codigo,$nombre,$teoria,$tipo,$ayudantia,$laboratorio,$taller,$creditos);
-    $car = 0;
-    while($res->fetch())
-    {
-      echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a id="'.$codigo.'" class="relacionar" href="">Relacionar</a></td><td class="mid"><a href="">X</a></td></tr>';
-    }
-    if(!isset($codigo))
-      echo '<tr><td>No hay carreras.</td></tr>';
-    $res->free_result();
-  }
-
   public function agregarRamo($codigo,$nombre,$tipo,$teo,$ayu,$lab,$tall,$cre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
     $sql = "INSERT INTO Ramo(Codigo,Nombre,Teoria,Tipo,Ayudantia,Laboratorio,Taller,Creditos) VALUES('{$codigo}','{$nombre}','{$teo}','{$tipo}','{$ayu}','{$lab}','{$tall}','{$cre}')";
-    //$sql = "CALL agregar_ramo('{$codigo}','{$nombre}','{$teo}','{$ayu}','{$lab}','{$tall}','{$cre}')";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Ramo agregado con éxito.';
@@ -1093,5 +1078,38 @@ class jefeDeCarrera extends usuario {
 
   private function programarHorario() {
   }
+}
+
+class departamento extends usuario {
+
+  function __construct($nombre,$nombreUsuario,$rut) {
+    $this->nombre = $nombre;
+    $this->nombreUsuario = $nombreUsuario;
+    $this->rut = $rut;
+  }
+
+  function __destruct() {
+    unset($this->nombre);
+    unset($this->nombreUsuario);
+    unset($this->rut);
+    unset($this);
+  }
+
+  public function crearTipoDeRamo($tipo,$abreviacion)
+  {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "INSERT INTO Ramo_Tipo(tipo,abreviacion) VALUES('{$tipo}','{$abreviacion}');";
+    if(($mysqli->query($sql)) == true)
+    {
+      $answer = '*Tipo creado.';
+    }
+    else
+    {
+      $answer = '*Tipo no creado.';
+    }
+    return $answer;
+  }
+
 }
 ?>

@@ -45,14 +45,30 @@ if(isset($_SESSION['usuario']))
   elseif(isset($_GET['rutProfesor']))
   {
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL buscarRutProfesor('{$_GET['rutProfesor']}')";
-    //"SELECT p.Rut_Profesor FROM Profesor AS p WHERE p.Rut_Profesor = $_GET['rutProfesor']";
+    $sql = "SELECT p.Rut_Profesor
+             FROM Profesor AS p
+            WHERE p.Rut_Profesor = '{$_GET['rutProfesor']}';";
     $res = $mysqli->prepare($sql);
     $res->execute();
     $res->bind_result($rutProfesor);
     if($res->fetch())
     {
       echo $rutProfesor;
+    }
+    $res->free_result();
+  }
+  elseif(isset($_GET['abrev']))
+  {
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "SELECT rt.Abreviacion
+             FROM Ramo_Tipo AS rt
+            WHERE rt.Abreviacion = '{$_GET['abrev']}';";
+    $res = $mysqli->prepare($sql);
+    $res->execute();
+    $res->bind_result($abreviacion);
+    if($res->fetch())
+    {
+      echo $abreviacion;
     }
     $res->free_result();
   }

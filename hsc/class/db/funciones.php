@@ -337,17 +337,44 @@ function obtenerGrados()
   $resf->free_result();
 }
 
-function obtenerTiposRamo()
+function obtenerTiposRamo($tipoUsuario)
 {
   global $mysqli,$db_host,$db_user,$db_pass,$db_database;
   $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-  $sqlf = "SELECT rt.id,rt.tipo FROM Ramo_Tipo AS rt;";
+  if($tipoUsuario == 2 || $tipoUsuario == 3)
+  {
+    $sqlf = "SELECT rt.id,rt.tipo 
+              FROM Ramo_Tipo AS rt
+             WHERE rt.Abreviacion = 'C' OR rt.Abreviacion = 'O' OR rt.Abreviacion = 'P';";
+  }
+  elseif($tipoUsuario == 4)
+  {
+    $sqlf = "SELECT rt.id,rt.tipo 
+              FROM Ramo_Tipo AS rt
+             WHERE rt.Abreviacion = 'F' OR rt.Abreviacion = 'I' OR rt.Abreviacion = 'M' OR rt.Abreviacion = 'Q';";
+  }
   $resf = $mysqlif->prepare($sqlf);
   $resf->execute();
   $resf->bind_result($id,$tipo);
   while($resf->fetch())
   {
     echo '<option value="'.$id.'">'.$tipo.'</option>';
+  }
+  $resf->free_result();
+}
+
+function verTiposDeRamos()
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlf = "SELECT rt.id,rt.tipo,rt.abreviacion 
+            FROM Ramo_Tipo AS rt;";
+  $resf = $mysqlif->prepare($sqlf);
+  $resf->execute();
+  $resf->bind_result($id,$tipo,$abreviacion);
+  while($resf->fetch())
+  {
+    echo '<tr><td>'.$id.'</td><td>'.$tipo.'</td><td>'.$abreviacion.'</td></tr>';
   }
   $resf->free_result();
 }
@@ -551,4 +578,140 @@ function verProfesores() {
   }
   $res->free_result();
 }
+
+function verRamos($tipoUsuario) {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    if($tipoUsuario == 2 || $tipoUsuario == 3)
+    { 
+      $sql = "SELECT r.Codigo,r.Nombre,r.Periodo,r.Teoria,rt.Abreviacion,r.Ayudantia,r.Laboratorio,r.Taller,r.Creditos
+               FROM Ramo AS r 
+               INNER JOIN Ramo_Tipo AS rt ON rt.Id = r.Tipo
+              ORDER by r.Codigo;";
+    }
+    elseif($tipoUsuario == 4)
+    {
+      $sql = "SELECT r.Codigo,r.Nombre,r.Periodo,r.Teoria,rt.Abreviacion,r.Ayudantia,r.Laboratorio,r.Taller,r.Creditos
+               FROM Ramo AS r 
+               INNER JOIN Ramo_Tipo AS rt ON rt.Id = r.Tipo
+              WHERE rt.Abreviacion = 'F' OR rt.Abreviacion = 'I' OR rt.Abreviacion = 'M' OR rt.Abreviacion = 'Q'
+              ORDER by r.Codigo;";
+    }
+    $res = $mysqli->prepare($sql);
+    $res->execute();
+    $res->bind_result($codigo,$nombre,$periodo,$teoria,$tipo,$ayudantia,$laboratorio,$taller,$creditos);
+    $car = 0;
+    while($res->fetch())
+    {
+      if($tipoUsuario == 2 || $tipoUsuario == 3)
+      {
+        if($tipo == 'C' || $tipo == 'O' || $tipo == 'P')
+        {
+          echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td>'.$periodo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a id="'.$codigo.'" class="relacionar" href="">Relacionar</a></td><td class="mid"><a href="">X</a></td></tr>';
+        }
+        else
+        {
+          echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td>'.$periodo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a id="'.$codigo.'" class="relacionar" href="">Relacionar</a></td><td></td></tr>';
+        }
+      }
+      elseif($tipoUsuario == 4)
+      {
+        echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td>'.$periodo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a href="">X</a></td></tr>';
+      }
+    }
+    if(!isset($codigo))
+      echo '<tr><td>No hay ramos.</td></tr>';
+    $res->free_result();
+  }
+
+function verRamosDepartamento() {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "SELECT r.Codigo,r.Nombre,r.Teoria,rt.Abreviacion,r.Ayudantia,r.Laboratorio,r.Taller,r.Creditos
+             FROM Ramo AS r 
+             INNER JOIN Ramo_Tipo AS rt ON rt.Id = r.Tipo
+            WHERE rt.Abreviacion = 'F' OR rt.Abreviacion = 'I' OR rt.Abreviacion = 'M' OR rt.Abreviacion = 'Q'
+            ORDER by r.Codigo;";
+    $res = $mysqli->prepare($sql);
+    $res->execute();
+    $res->bind_result($codigo,$nombre,$teoria,$tipo,$ayudantia,$laboratorio,$taller,$creditos);
+
+    $codigoSemestre = obtenerSemestreDepartamento();
+    $codigoTrimestre = obtenerTrimestreDepartamento();
+  
+    while($res->fetch())
+    {
+      $mysqliw = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+      if($codigoSemestre != 0 && $codigoTrimestre != 0)
+      {
+        $sqlw = "SELECT COUNT(s.Id)
+                  FROM Seccion AS s
+                 WHERE s.Codigo_Ramo = '{$codigo}' AND s.Codigo_Semestre = '{$codigoSemestre}' OR s.Codigo_Semestre = '{$codigoTrimestre}';";
+      }
+      elseif($codigoSemestre != 0 && $codigoTrimestre == 0)
+      {
+        $sqlw = "SELECT COUNT(s.Id)
+                  FROM Seccion AS s
+                 WHERE s.Codigo_Ramo = '{$codigo}' AND s.Codigo_Semestre = '{$codigoSemestre}';";
+      }
+      elseif($codigoSemestre == 0 && $codigoTrimestre != 0)
+      {
+        $sqlw = "SELECT COUNT(s.Id)
+                  FROM Seccion AS s
+                 WHERE s.Codigo_Ramo = '{$codigo}' AND s.Codigo_Semestre = '{$codigoTrimestre}';";
+      }
+      $resw = $mysqliw->prepare($sqlw);
+      $resw->execute();
+      $resw->bind_result($numero);
+      $resw->fetch();
+      echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td class="mid"><form method="post" name="crearSeccion" target="_self"><input type="submit" name="submit" value="Crear"></input></form></td><td>'.$numero.'</td></tr>';
+      $resw->free_result();
+    }
+    if(!isset($codigo))
+      echo '<tr><td>No hay ramos.</td></tr>';
+    $res->free_result();
+  }
+
+function obtenerSemestreDepartamento() {
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlio = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlo = "SELECT s.Codigo_Semestre
+            FROM Semestre AS s
+           WHERE s.Fecha_Termino IS NULL;";
+  $reso = $mysqlio->prepare($sqlo);
+  $reso->execute();
+  $reso->bind_result($codigoSemestre);
+  if($reso->fetch())
+  {
+    $reso->free_result();
+    return $codigoSemestre;
+  }
+  else
+  {
+    $reso->free_result();
+    return 0;
+  }
+}
+
+function obtenerTrimestreDepartamento() {
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlio = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlo = "SELECT t.Codigo_Semestre
+            FROM Trimestre AS t
+           WHERE t.Fecha_Termino IS NULL;";
+  $reso = $mysqlio->prepare($sqlo);
+  $reso->execute();
+  $reso->bind_result($codigoTrimestre);
+  if($reso->fetch())
+  {
+    $reso->free_result();
+    return $codigoTrimestre;
+  }
+  else
+  {
+    $reso->free_result();
+    return 0;
+  }
+}
+
 ?>

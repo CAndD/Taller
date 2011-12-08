@@ -29,6 +29,11 @@ if(!isset($_SESSION['usuario']))
             header("Location: user_admin/admin.php");
             exit();
           }
+          elseif($_SESSION['tipoUsuario'] == 4)
+          {
+            header("Location: user_departamento/depto.php");
+            exit();
+          }
         }
         else
         {
