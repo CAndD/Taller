@@ -627,26 +627,27 @@ function verRamos($tipoUsuario) {
 function verRamosDepartamento() {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "SELECT r.Codigo,r.Nombre,r.Teoria,rt.Abreviacion,r.Ayudantia,r.Laboratorio,r.Taller,r.Creditos
+    $sql = "SELECT r.Codigo,r.Nombre,r.Periodo,r.Teoria,rt.Abreviacion,r.Ayudantia,r.Laboratorio,r.Taller,r.Creditos
              FROM Ramo AS r 
              INNER JOIN Ramo_Tipo AS rt ON rt.Id = r.Tipo
             WHERE rt.Abreviacion = 'F' OR rt.Abreviacion = 'I' OR rt.Abreviacion = 'M' OR rt.Abreviacion = 'Q'
             ORDER by r.Codigo;";
     $res = $mysqli->prepare($sql);
     $res->execute();
-    $res->bind_result($codigo,$nombre,$teoria,$tipo,$ayudantia,$laboratorio,$taller,$creditos);
+    $res->bind_result($codigo,$nombre,$periodo,$teoria,$tipo,$ayudantia,$laboratorio,$taller,$creditos);
 
     $codigoSemestre = obtenerSemestreDepartamento();
-    $codigoTrimestre = obtenerTrimestreDepartamento();
-  
+    $codigoTrimestre = obtenerTrimestreDepartamento();  
+
     while($res->fetch())
     {
       $mysqliw = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+      $numero = 0;
       if($codigoSemestre != 0 && $codigoTrimestre != 0)
       {
         $sqlw = "SELECT COUNT(s.Id)
                   FROM Seccion AS s
-                 WHERE s.Codigo_Ramo = '{$codigo}' AND s.Codigo_Semestre = '{$codigoSemestre}' OR s.Codigo_Semestre = '{$codigoTrimestre}';";
+                 WHERE s.Codigo_Ramo = '{$codigo}' AND (s.Codigo_Semestre = '{$codigoSemestre}' OR s.Codigo_Semestre = '{$codigoTrimestre}');";
       }
       elseif($codigoSemestre != 0 && $codigoTrimestre == 0)
       {
@@ -664,7 +665,25 @@ function verRamosDepartamento() {
       $resw->execute();
       $resw->bind_result($numero);
       $resw->fetch();
-      echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td class="mid"><form method="post" name="crearSeccion" target="_self"><input type="submit" name="submit" value="Crear"></input></form></td><td>'.$numero.'</td></tr>';
+
+      if($periodo == 1 && $codigoSemestre != 0)
+      {
+        $form = '<form method="post" name="crearSeccion" target="_self"><input type="radio" name="regimen" value="D">D</input> <input type="radio" name="regimen" value="V">V</input><br><input type="hidden" name="hiddenCodigoRamo" value="'.$codigo.'"></input><input type="hidden" name="hiddenCodigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="Crear"></input></form>';
+      }
+      elseif($periodo == 1 && $codigoSemestre == 0)
+      {
+        $form = 'Semestre cerrado.';
+      }
+      elseif($periodo == 2 && $codigoTrimestre != 0)
+      {
+        $form = '<form method="post" name="crearSeccion" target="_self"><input type="radio" name="regimen" value="D">D</input> <input type="radio" name="regimen" value="V">V</input><br><input type="hidden" name="hiddenCodigoRamo" value="'.$codigo.'"></input><input type="hidden" name="hiddenCodigoSemestre" value="'.$codigoTrimestre.'"></input><input type="submit" name="submit" value="Crear"></input></form>';
+      }
+      elseif($periodo == 2 && $codigoTrimestre == 0)
+      {
+        $form = 'Trimestre cerrado.';
+      }
+
+      echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td class="mid">'.$form.'</td><td class="mid"><a id="'.$codigo.'" class="verClases" href="">'.$numero.'</a></td></tr>';
       $resw->free_result();
     }
     if(!isset($codigo))
@@ -696,7 +715,7 @@ function obtenerSemestreDepartamento() {
 function obtenerTrimestreDepartamento() {
   global $mysqli,$db_host,$db_user,$db_pass,$db_database;
   $mysqlio = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-  $sqlo = "SELECT t.Codigo_Semestre
+  $sqlo = "SELECT t.Codigo_Trimestre
             FROM Trimestre AS t
            WHERE t.Fecha_Termino IS NULL;";
   $reso = $mysqlio->prepare($sqlo);

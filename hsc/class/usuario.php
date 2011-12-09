@@ -1111,5 +1111,105 @@ class departamento extends usuario {
     return $answer;
   }
 
+  public function crearSeccionDepartamento($codigoRamo,$codigoSemestre,$regimen) {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    if($regimen == 'D')
+    {
+      $sql2 = "SELECT MAX(s.Numero_Seccion)
+                FROM Seccion AS s
+               WHERE s.Codigo_Ramo = 'FIS110' AND s.Codigo_Semestre = 201410 AND s.Codigo_Carrera = 'UNABDEPTO' AND (s.Numero_Seccion >= 1 AND s.Numero_Seccion <= 99);";
+    }
+    else
+    {
+      $sql2 = "SELECT MAX(s.Numero_Seccion)
+                FROM Seccion AS s
+               WHERE s.Codigo_Ramo = '{$codigoRamo}' AND s.Codigo_Semestre = '{$codigoSemestre}' AND s.Codigo_Carrera = 'UNABDEPTO' AND s.Numero_Seccion >= 100;";
+    }
+    $res2 = $mysqli2->prepare($sql2);
+    $res2->execute();
+    $res2->bind_result($numeroSeccion);
+    $res2->fetch();
+    $res2->free_result();
+
+    $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql3 = "SELECT r.Teoria,r.Ayudantia,r.Laboratorio,r.Taller
+              FROM Ramo AS r
+             WHERE r.Codigo = '{$codigoRamo}';";
+    $res3 = $mysqli3->prepare($sql3);
+    $res3->execute();
+    $res3->bind_result($teoria,$ayudantia,$laboratorio,$taller);
+    $res3->fetch();
+    $res3->free_result();
+
+    $mysqli4 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    if($numeroSeccion == 0) {
+      if($regimen == 'D')
+        $numeroSeccion = 1;
+      elseif($regimen == 'V')
+        $numeroSeccion = 100;
+    }
+    else
+      $numeroSeccion++;
+    $sql4 = "INSERT INTO Seccion(Numero_Seccion,NRC,Codigo_Ramo,Codigo_Carrera,Codigo_Semestre,Vacantes) VALUES('{$numeroSeccion}',1524,'{$codigoRamo}','UNABDEPTO','{$codigoSemestre}',60);";
+    if(($mysqli4->query($sql4)) == true)
+    {
+      $answer = '*Sección creada.';
+    }
+    else
+    {
+      $answer = '*Sección no creada.';
+    }
+
+    $mysqli5 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql5 = "SELECT s.Id
+              FROM Seccion AS s
+             WHERE s.Numero_Seccion = '{$numeroSeccion}' AND s.Codigo_Ramo = '{$codigoRamo}' AND s.Codigo_Carrera = 'UNABDEPTO' AND s.Codigo_Semestre = '{$codigoSemestre}';";
+    $res5 = $mysqli5->prepare($sql5);
+    $res5->execute();
+    $res5->bind_result($idSeccion);
+    $res5->fetch();
+    $res5->free_result();
+
+    $teoria = $teoria/2;
+    if($teoria > 0) {
+      for($i = 0;$i<$teoria;$i++)
+      {
+        $mysqliteo = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+        $sqlteo = "INSERT INTO Clase(Clase_Tipo,Seccion_Id,Codigo_Semestre) VALUES('Teoria','{$idSeccion}','{$codigoSemestre}');";
+        $mysqliteo->query($sqlteo);
+      } 
+    }
+    $ayudantia = $ayudantia/2;
+    if($ayudantia > 0) {
+      for($i = 0;$i<$ayudantia;$i++)
+      {
+        $mysqliteo = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+        $sqlteo = "INSERT INTO Clase(Clase_Tipo,Seccion_Id,Codigo_Semestre) VALUES('Ayudantia','{$idSeccion}','{$codigoSemestre}');";
+        $mysqliteo->query($sqlteo);
+      }
+    }
+    $laboratorio = $laboratorio/2;
+    if($laboratorio > 0) {
+      for($i = 0;$i<$laboratorio;$i++)
+      {
+        $mysqliteo = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+        $sqlteo = "INSERT INTO Clase(Clase_Tipo,Seccion_Id,Codigo_Semestre) VALUES('Laboratorio','{$idSeccion}','{$codigoSemestre}');";
+        $mysqliteo->query($sqlteo);
+      }
+    }
+    $taller = $taller/2;
+    if($taller > 0) {
+      for($i = 0;$i<$taller;$i++)
+      {
+        $mysqliteo = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+        $sqlteo = "INSERT INTO Clase(Clase_Tipo,Seccion_Id,Codigo_Semestre) VALUES('Taller','{$idSeccion}','{$codigoSemestre}');";
+        $mysqliteo->query($sqlteo);
+      }
+    }
+
+    return $answer;
+  }
+
 }
 ?>

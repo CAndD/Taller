@@ -13,18 +13,6 @@ if(isset($_SESSION['usuario']))
     $_SESSION['codigoSemestre'] = NULL;
   }
 
-  if(isset($_POST['submit']) && $_POST['submit'] == 'Crear') 
-  {
-    if(isset($_POST['hiddenCodigoRamo']) && isset($_POST['hiddenCodigoSemestre']) && isset($_POST['regimen']))
-    {
-      $msg = $usuario->crearSeccionDepartamento($_POST['hiddenCodigoRamo'],$_POST['hiddenCodigoSemestre'],$_POST['regimen']);
-    }
-    else
-    {
-      $msg = '*Debe seleccionar el regimen del ramo, D = diurno o V = vespertino.';
-    }  
-  }
-
   if($_SESSION['tipoUsuario'] == 4)
   {
 ?>
@@ -65,11 +53,8 @@ if(isset($_SESSION['usuario']))
         <h1>Secciones</h1>
         <?php
           if(isset($msg))
-            echo '<span class="error">'.$msg.'</span>';
-          echo '<table>';
-          echo '<tr><td>Codigo</td><td>Nombre</td><td>Crear sección</td><td>Seccines creadas</td></tr>';     
-          verRamosDepartamento();
-          echo '</table>';
+            echo '<br><span class="error">'.$msg.'</span>';
+          verClases($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre']);
         ?>
       </div>
     </div>

@@ -100,4 +100,10 @@ jQuery(function ($) {
           return false;
         });  
 
+        $('a.verClases').click(function (e) {
+          var idClase = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="clases.php?codigoRamo=' + idClase + '" scrolling="no" frameborder="0"></iframe>').modal();
+          return false;
+        }); 
+
 });
