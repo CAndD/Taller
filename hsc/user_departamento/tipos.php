@@ -71,7 +71,7 @@ if(isset($_SESSION['usuario']))
             <tr><td><input type="text" name="tipo" value="<?php if(isset($tipoold)) echo $tipoold;?>" maxlength="50"></input></td>
             <td><input type="text" name="abreviacion" value="<?php if(isset($abrevold)) echo $abrevold;?>" maxlength="3" class="xs" onkeyup="buscarAbreviacion(this.value)"></input></td>
             <td><?php if(isset($codigoold))echo '<input type="submit" name="agrega" value="Agregar tipo" id="btt">'; else echo '<input type="submit" name="agrega" value="Agregar tipo" id="btt" disabled>';?></input></td></tr>
-            <tr><div id="existe"><td><?php if(isset($tipoerror)) echo '<span class="error">'.$tipoerror.'</span>';?></td></div>
+            <tr><td><div id="existe"><td><?php if(isset($tipoerror)) echo '<span class="error">'.$tipoerror.'</span>';?></td></div>
                 <td><?php if(isset($abreverror)) echo '<span class="error">'.$abreverror.'</span>';?></td>
                 </tr>
           </form>
@@ -96,6 +96,7 @@ if(isset($_SESSION['usuario']))
   <script type='text/javascript' src='../js/jquery.js'></script> 
   <script type='text/javascript' src='../js/jquery.simplemodal.js'></script> 
   <script type='text/javascript' src='../js/bsc.js'></script>
+  <script type='text/javascript' src='../js/js.js'></script>
 </body>
 </html><?php
   }

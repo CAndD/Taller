@@ -51,11 +51,13 @@ if(isset($_SESSION['usuario']))
       <div id="content">
         <!-- insert the page content here -->
         <h1>Secciones</h1>
+        <a href="seccion.php">Volver</a>
         <?php
           if(isset($msg))
             echo '<br><span class="error">'.$msg.'</span>';
-          verClases($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre']);
+          verClasesDepartamento($_GET['codigoRamo']);
         ?>
+        <a href="seccion.php">Volver</a>
       </div>
     </div>
     <div id="content_footer"></div>
@@ -64,7 +66,8 @@ if(isset($_SESSION['usuario']))
   </div>
   <script type='text/javascript' src='../js/jquery.js'></script> 
   <script type='text/javascript' src='../js/jquery.simplemodal.js'></script> 
-  <script type='text/javascript' src='../js/bsc.js'></script></body>
+  <script type='text/javascript' src='../js/bsc.js'></script>
+  <script type='text/javascript' src='../js/js.js'></script></body>
 </html><?php
   }
   else

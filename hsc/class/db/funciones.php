@@ -683,7 +683,7 @@ function verRamosDepartamento() {
         $form = 'Trimestre cerrado.';
       }
 
-      echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td class="mid">'.$form.'</td><td class="mid"><a id="'.$codigo.'" class="verClases" href="">'.$numero.'</a></td></tr>';
+      echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td class="mid">'.$form.'</td><td class="mid"><a href="clases.php?codigoRamo='.$codigo.'">'.$numero.'</a></td></tr>';
       $resw->free_result();
     }
     if(!isset($codigo))
@@ -731,6 +731,76 @@ function obtenerTrimestreDepartamento() {
     $reso->free_result();
     return 0;
   }
+}
+
+function verClasesDepartamento($codigoRamo) {
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+
+  $codigoSemestre = obtenerSemestreDepartamento();
+  $codigoTrimestre = obtenerTrimestreDepartamento(); 
+
+  $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sql = "SELECT s.Id,s.Numero_Seccion,s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.Codigo_Semestre,s.Vacantes
+           FROM Seccion AS s
+           INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
+          WHERE s.Codigo_Ramo = '{$codigoRamo}' AND s.Codigo_Carrera = 'UNABDEPTO' AND (s.Codigo_Semestre = '{$codigoSemestre}' OR s.Codigo_Semestre = '{$codigoTrimestre}') ORDER BY s.Numero_Seccion;";
+  $res = $mysqli->prepare($sql);
+  $res->execute();
+  $res->bind_result($id,$numeroSeccion,$NRC,$codigoRamo,$nombre,$codigoCarrera,$codigoSemestre2,$vacantes);
+  $flag = 0;
+  echo '<table><tr><td>Sección</td><td>NRC</td><td>Nombre</td><td>Semestre</td></tr>';
+  while($res->fetch())
+  {
+    if($flag == 0)
+      $flag = 1;
+    $flag2 = 0;
+    echo '<tr><td class="dc">'.$numeroSeccion.'</td><td class="dc">'.$NRC.'</td><td class="dc">'.$nombre.'</td><td class="dc">'.$codigoSemestre2.'</td></tr>';
+    $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql2 = "SELECT c.Id,c.Clase_Tipo,c.RUT_Profesor,c.Modulo_Inicio,c.Modulo_Termino,c.Dia,c.Codigo_Semestre
+              FROM Clase AS c
+             WHERE c.Seccion_Id = '{$id}';";
+    $res2 = $mysqli2->prepare($sql2);
+    $res2->execute();
+    $res2->bind_result($idClase,$claseTipo,$rutProfesor,$moduloInicio,$moduloTermino,$diaClase,$codigoSemestreClase);
+    while($res2->fetch())
+    {
+      if($flag2 == 0)
+        $flag2 = 1;
+      if($diaClase == NULL) {
+        $diaClase = 'Día de la clase no asignado.<br><a id="'.$idClase.'" class="cambiarDiaClase" href="">Asignar</a>';
+        $asdf = false;  
+      }
+      else
+        $diaClase = $diaClase.'<br><a id="'.$idClase.'" class="cambiarDiaClase" href="">Cambiar</a>';
+      if($rutProfesor == NULL)
+        $rutProfesor = 'Profesor no asignado.<br><a id="'.$idClase.'" class="cambiarProfesor" href="">Asignar</a>';
+      else
+        $rutProfesor = $rutProfesor.'<br><a id="'.$idClase.'" class="cambiarProfesor" href="">Cambiar</a>';
+      if(isset($asdf) && $asdf == false) {
+          $moduloInicio = 'No se puede asignar módulo de inicio sin asignar antes el día.';
+          $moduloTermino = 'No se puede asignar módulo de término sin asignar antes el día.';
+      }
+      else
+      {
+        if($moduloInicio == NULL)
+          $moduloInicio = 'Hora de inicio no asignada.<br><a id="'.$idClase.'" class="cambiarModuloInicio" href="">Asignar</a>';
+        else
+          $moduloInicio = $moduloInicio.'<br><a id="'.$idClase.'" class="cambiarModuloInicio" href="">Cambiar</a>';
+        if($moduloTermino == NULL)
+          $moduloTermino = 'Hora de termino no asignada.<br><a id="'.$idClase.'" class="cambiarModuloTermino" href="">Asignar</a>';
+        else
+          $moduloTermino = $moduloTermino.'<br><a id="'.$idClase.'" class="cambiarModuloTermino" href="">Cambiar</a>';
+      }
+      echo '<tr><td>'.$claseTipo.'</td><td>'.$rutProfesor.'</td><td>'.$diaClase.'</td><td>'.$moduloInicio.'</td><td>'.$moduloTermino.'</td></tr>';
+    }
+    if($flag2 == 0)
+      echo '<tr><td class="dc">No existen clases para esta sección.</td></tr>';
+    $res2->free_result();
+  }
+  if($flag == 0)
+    echo '<tr><td>No hay secciones para este ramo.</td><td></td></tr>';
+  echo '</table>';
+  $res->free_result();
 }
 
 ?>
