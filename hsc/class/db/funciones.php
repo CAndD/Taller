@@ -413,6 +413,18 @@ function verRamosImpartidos($codigoCarrera,$codigoSemestre) {
         $seccionesCreadasNumero = '<a href="clases.php?codigoRamo='.$codigoRamo.'">'.$seccionesCreadasNumero.'</a>';
       $res2->free_result();
 
+      $mysqli22 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+      $sql22 = "SELECT COUNT(s.Id)
+                 FROM Solicitud AS s
+                WHERE s.Codigo_Ramo = '{$codigoRamo}' AND s.Carrera_Solicitante = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}' AND s.Estado = 2;";
+      $res22 = $mysqli22->prepare($sql22);
+      $res22->execute();
+      $res22->bind_result($seccionesPedidasNumero);
+      $res22->fetch();
+      if($seccionesPedidasNumero > 0)
+        $seccionesPedidasNumero = '<a href="clases.php?codigoRamo='.$codigoRamo.'">'.$seccionesPedidasNumero.'</a>';
+      $res22->free_result();
+
       $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
       $sql3 = "CALL seccionesCreadasOtroNumero('{$codigoRamo}','{$codigoCarrera}','{$codigoSemestre}')";
       $res3 = $mysqli3->prepare($sql3);
@@ -425,11 +437,11 @@ function verRamosImpartidos($codigoCarrera,$codigoSemestre) {
 
       if($tipo == '1')
       {
-        echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td class="mid"><form method="post" name="crearSeccion" target="_self"><input type="hidden" name="hiddenCodigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="hiddenCodigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="hiddenCodigoCarrera" value="'.$codigoCarrera.'"></input><input type="submit" name="submit" value="Crear"></input></form></td><td class="mid">'.$seccionesCreadasNumero.'</td><td class="mid">0</td><td class="mid">'.$seccionesCreadasOtroNumero.'</td></tr>';
+        echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td class="mid"><form method="post" name="crearSeccion" target="_self"><input type="hidden" name="hiddenCodigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="hiddenCodigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="hiddenCodigoCarrera" value="'.$codigoCarrera.'"></input><input type="submit" name="submit" value="Crear"></input></form></td><td class="mid">'.$seccionesCreadasNumero.'</td><td class="mid">'.$seccionesPedidasNumero.'</td><td class="mid">'.$seccionesCreadasOtroNumero.'</td></tr>';
       }
       else
       {
-        echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td class="mid"></td><td class="mid">'.$seccionesCreadasNumero.'</td><td class="mid">0</td><td class="mid">'.$seccionesCreadasOtroNumero.'</td></tr>';
+        echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td class="mid"></td><td class="mid">'.$seccionesCreadasNumero.'</td><td class="mid">'.$seccionesPedidasNumero.'</td><td class="mid">'.$seccionesCreadasOtroNumero.'</td></tr>';
       }
     }
     if($flag == 0)
@@ -460,6 +472,10 @@ function verSeccionesCreadas($codigoRamo,$codigoSemestre,$codigoCarrera) {
     echo '<tr><td>No hay secciones para este ramo.</td><td></td></tr>';
   echo '</table>';
   $res->free_result();
+}
+
+function verSeccionesPedidas() {
+  
 }
 
 function verSeccionesCreadasOtros($codigoRamo,$codigoSemestre,$codigoCarreraMia) {
@@ -500,21 +516,37 @@ function verSeccionesCreadasOtros($codigoRamo,$codigoSemestre,$codigoCarreraMia)
 function verClases($codigoRamo,$codigoCarrera,$codigoSemestre) {
   global $mysqli,$db_host,$db_user,$db_pass,$db_database;
   $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-  $sql = "SELECT s.Id,s.Numero_Seccion,s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.Codigo_Semestre,s.Vacantes
+  $sql = "SELECT s.Id,s.Numero_Seccion,s.NRC,s.Codigo_Ramo,r.Nombre,s.Codigo_Carrera,s.Codigo_Semestre,s.Vacantes,s.Vacantes_Utilizadas
            FROM Seccion AS s
            INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
           WHERE s.Codigo_Ramo = '{$codigoRamo}' AND s.Codigo_Carrera = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}' ORDER BY s.Numero_Seccion;";
   $res = $mysqli->prepare($sql);
   $res->execute();
-  $res->bind_result($id,$numeroSeccion,$NRC,$codigoRamo,$nombre,$codigoCarrera,$codigoSemestre,$vacantes);
+  $res->bind_result($id,$numeroSeccion,$NRC,$codigoRamo,$nombre,$codigoCarrera,$codigoSemestre,$vacantes,$vacantesUtilizadas);
   $flag = 0;
-  echo '<table><tr><td>Sección</td><td>NRC</td><td>Nombre</td><td>Semestre</td></tr>';
+  echo '<table><tr><td>Sección</td><td>NRC</td><td>Nombre</td><td>Semestre</td><td>Vacantes</td></tr>';
   while($res->fetch())
   {
     if($flag == 0)
       $flag = 1;
     $flag2 = 0;
-    echo '<tr><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombre.'</td><td>'.$codigoSemestre.'</td></tr>';
+    $vacantesFinal = calcularVacantesRestantes($id);
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqlio = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sqlo = "SELECT SUM(s.Vacantes_Asignadas)
+              FROM Solicitud AS s
+             WHERE s.Seccion_Asignada = '{$id}';";
+    $reso = $mysqlio->prepare($sqlo);
+    $reso->execute();
+    $reso->bind_result($vacantesSolicitud);
+    $reso->fetch();
+    $reso->free_result();
+
+    if($vacantesSolicitud == NULL)
+      $vacantesSolicitud = 0;    
+
+      $form = '<form method="post" target="_self" name="vacantes"><input type="text" name="vacantes" value="'.$vacantesUtilizadas.'" class="xs" maxlength="2"></input><input type="hidden" name="hiddenSolicitud" value="'.$vacantesSolicitud.'"></input><input type="hidden" name="hiddenTotal" value="'.$vacantes.'"></input><input type="hidden" name="hiddenIdSeccion" value="'.$id.'"></input> <input type="submit" name="submit" value="Cambiar"></input></form>';
+    echo '<tr><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombre.'</td><td>'.$codigoSemestre.'</td><td>Disponibles: '.$vacantes.'<br>Solicitud: '.$vacantesSolicitud.'<br>Utilizadas: '.$vacantesUtilizadas.' '.$form.'<br>Total: '.$vacantesFinal.'</td></tr>';
     $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
     $sql2 = "SELECT c.Id,c.Clase_Tipo,c.RUT_Profesor,c.Modulo_Inicio,c.Modulo_Termino,c.Dia,c.Codigo_Semestre
               FROM Clase AS c
@@ -544,12 +576,17 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre) {
       {
         if($moduloInicio == NULL)
           $moduloInicio = 'Hora de inicio no asignada.<br><a id="'.$idClase.'" class="cambiarModuloInicio" href="">Asignar</a>';
-        else
-          $moduloInicio = $moduloInicio.'<br><a id="'.$idClase.'" class="cambiarModuloInicio" href="">Cambiar</a>';
+        else {
+          $hora = obtenerHoraModulo($moduloInicio,$idClase);
+          $moduloInicio = ' '.$moduloInicio.'.'.$hora.' <br><a id="'.$idClase.'" class="cambiarModuloInicio" href="">Cambiar</a>';
+        }
         if($moduloTermino == NULL)
           $moduloTermino = 'Hora de termino no asignada.<br><a id="'.$idClase.'" class="cambiarModuloTermino" href="">Asignar</a>';
-        else
-          $moduloTermino = $moduloTermino.'<br><a id="'.$idClase.'" class="cambiarModuloTermino" href="">Cambiar</a>';
+        else {
+          
+          $hora2 = obtenerHoraModulo($moduloTermino,$idClase);
+          $moduloTermino = ' '.$moduloTermino.'.'.$hora2.' <br><a id="'.$idClase.'" class="cambiarModuloTermino" href="">Cambiar</a>';
+        }
       }
       echo '<tr><td class="dc">'.$claseTipo.'</td><td class="dc">'.$rutProfesor.'</td><td class="dc">'.$diaClase.'</td><td class="dc">'.$moduloInicio.'</td><td class="dc">'.$moduloTermino.'</td></tr>';
     }
@@ -561,6 +598,23 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre) {
     echo '<tr><td>No hay secciones para este ramo.</td><td></td></tr>';
   echo '</table>';
   $res->free_result();
+}
+
+function obtenerHoraModulo($modulo,$idClase)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sql = "SELECT m.Inicio,m.Termino
+           FROM Modulo AS m
+           INNER JOIN Clase AS c ON c.Id = '{$idClase}'
+           INNER JOIN Seccion AS s ON s.Id = c.Seccion_Id
+          WHERE m.Regimen = s.Regimen AND M.Modulo = '{$modulo}';";
+  $res = $mysqli->prepare($sql);
+  $res->execute();
+  $res->bind_result($inicio,$termino);
+  $res->fetch();
+  $res->free_result();
+  return substr($inicio,0,5).' - '.substr($termino,0,5);
 }
 
 function verProfesores() {
@@ -603,20 +657,24 @@ function verRamos($tipoUsuario) {
     $car = 0;
     while($res->fetch())
     {
+      if($periodo == 1)
+        $periodo = 'S';
+      elseif($periodo == 2)
+        $periodo = 'T';
       if($tipoUsuario == 2 || $tipoUsuario == 3)
       {
         if($tipo == 'C' || $tipo == 'O' || $tipo == 'P')
         {
-          echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td>'.$periodo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a id="'.$codigo.'" class="relacionar" href="">Relacionar</a></td><td class="mid"><a href="">X</a></td></tr>';
+          echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td class="mid">'.$periodo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a id="'.$codigo.'" class="relacionar" href="">Relacionar</a></td><td class="mid"><a href="">X</a></td></tr>';
         }
         else
         {
-          echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td>'.$periodo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a id="'.$codigo.'" class="relacionar" href="">Relacionar</a></td><td></td></tr>';
+          echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td class="mid">'.$periodo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a id="'.$codigo.'" class="relacionar" href="">Relacionar</a></td><td></td></tr>';
         }
       }
       elseif($tipoUsuario == 4)
       {
-        echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td>'.$periodo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a href="">X</a></td></tr>';
+        echo '<tr><td>'.$codigo.'</td><td>'.$nombre.'</td><td>'.$tipo.'</td><td class="mid">'.$periodo.'</td><td>'.$teoria.'</td><td>'.$ayudantia.'</td><td>'.$laboratorio.'</td><td>'.$taller.'</td><td>'.$creditos.'</td><td class="mid"><a href="">X</a></td></tr>';
       }
     }
     if(!isset($codigo))
@@ -624,6 +682,8 @@ function verRamos($tipoUsuario) {
     $res->free_result();
   }
 
+
+// Funciones usuario departamento
 function verRamosDepartamento() {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
@@ -801,6 +861,64 @@ function verClasesDepartamento($codigoRamo) {
     echo '<tr><td>No hay secciones para este ramo.</td><td></td></tr>';
   echo '</table>';
   $res->free_result();
+}
+
+function obtenerSeccionesSolicitud($idSolicitud)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlio = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlo = "SELECT sc.id,sc.Numero_Seccion,sc.NRC,sc.Codigo_Ramo,sc.Vacantes,sc.Vacantes_Utilizadas
+            FROM Solicitud AS s
+            INNER JOIN Seccion AS sc ON sc.Codigo_Ramo = s.Codigo_Ramo AND sc.Codigo_Carrera = s.Carrera AND sc.Codigo_Semestre = s.Codigo_Semestre
+           WHERE s.Id = '{$idSolicitud}';";
+  $reso = $mysqlio->prepare($sqlo);
+  $reso->execute();
+  $reso->bind_result($idSeccion,$numeroSeccion,$nrc,$codigoRamo,$vacantes,$vacantesUtilizadas);
+  echo '<table><tr><td># Sección</td><td>Ramo</td><td>NRC</td><td>Vacantes utilizadas</td><td></td></tr>';
+  while($reso->fetch())
+  {
+    $vacantesRestantes = calcularVacantesRestantes($idSeccion);
+    if($vacantesRestantes == 60)
+      echo '<tr><td>'.$numeroSeccion.'</td><td>'.$codigoRamo.'</td><td>'.$nrc.'</td><td>'.$vacantesRestantes.'<td><input type="radio" name="seccion" value="'.$idSeccion.'" disabled></input></td></tr>';
+    else
+      echo '<tr><td>'.$numeroSeccion.'</td><td>'.$codigoRamo.'</td><td>'.$nrc.'</td><td>'.$vacantesRestantes.'<td><input type="radio" name="seccion" value="'.$idSeccion.'"></input></td></tr>';
+  }
+  echo '</table>';
+  $reso->free_result();
+}
+
+function calcularVacantesRestantes($idSeccion)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlio = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlo = "SELECT s.Vacantes_Utilizadas
+            FROM Seccion AS s
+           WHERE s.Id = '{$idSeccion}';";
+  $reso = $mysqlio->prepare($sqlo);
+  $reso->execute();
+  $reso->bind_result($vacantesUtilizadas);
+  $reso->fetch();
+  $reso->free_result();
+
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqlio = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlo = "SELECT SUM(s.Vacantes_Asignadas)
+            FROM Solicitud AS s
+           WHERE s.Seccion_Asignada = '{$idSeccion}';";
+  $reso = $mysqlio->prepare($sqlo);
+  $reso->execute();
+  $reso->bind_result($vacantesSolicitud);
+  $reso->fetch();
+  $reso->free_result();
+
+  if($vacantesUtilizadas == NULL && $vacantesSolicitud == NULL)
+    return 0;
+  elseif($vacantesUtilizadas == NULL && $vacantesSolicitud != NULL)
+    return $vacantesSolicitud;
+  elseif($vacantesUtilizadas != NULL && $vacantesSolicitud == NULL)
+    return $vacantesUtilizadas;
+  else
+    return $vacantesUtilizadas+$vacantesSolicitud;
 }
 
 ?>

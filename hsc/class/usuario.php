@@ -774,7 +774,7 @@ class jefeDeCarrera extends usuario {
     }
     else
       $numeroSeccion++;
-    $sql4 = "INSERT INTO Seccion(Numero_Seccion,NRC,Codigo_Ramo,Codigo_Carrera,Codigo_Semestre,Vacantes) VALUES('{$numeroSeccion}',1524,'{$codigoRamo}','{$codigoCarrera}','{$codigoSemestre}',60);";
+    $sql4 = "INSERT INTO Seccion(Numero_Seccion,NRC,Codigo_Ramo,Codigo_Carrera,Codigo_Semestre,Regimen,Vacantes) VALUES('{$numeroSeccion}',1524,'{$codigoRamo}','{$codigoCarrera}','{$codigoSemestre}','{$regimen}',60);";
     if(($mysqli4->query($sql4)) == true)
     {
       $answer = '*Sección creada.';
@@ -967,11 +967,16 @@ class jefeDeCarrera extends usuario {
     return $vacantes;
   }
 
-  public function responderSolicitud($idSolicitud,$respuesta,$vacantes)
+  public function responderSolicitud($idSolicitud,$respuesta,$vacantes,$seccion)
   {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL responderSolicitud('{$idSolicitud}','{$respuesta}','{$vacantes}',NOW())";
+    if($respuesta == 2)
+      $sql = "UPDATE Solicitud SET estado = 2, Vacantes_Asignadas = '{$vacantes}', fecha_respuesta = NOW(), Seccion_Asignada = $seccion
+              WHERE id = '{$idSolicitud}';";
+    elseif($respuesta == 3)
+      $sql = "UPDATE Solicitud SET estado = 3, vacantes_asignadas = 0, fecha_respuesta = NOW(), Seccion_Asignada = NULL 
+              WHERE id = '{$idSolicitud}';";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Solicitud respondida.';
@@ -1076,6 +1081,22 @@ class jefeDeCarrera extends usuario {
     }
   }
 
+  public function cambiarVacantes($idSeccion,$vacantes)
+  {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "UPDATE Seccion SET Vacantes_Utilizadas = '{$vacantes}' WHERE Id = '{$idSeccion}';";
+    if(($mysqli->query($sql)) == true)
+    {
+      $answer = '*Vacantes asignadas.';
+    }
+    else
+    {
+      $answer = '*Vacantes no asignadas.';
+    }
+      return $answer;
+  }
+
   private function programarHorario() {
   }
 }
@@ -1095,11 +1116,27 @@ class departamento extends usuario {
     unset($this);
   }
 
+  public function agregarRamoDepartamento($codigo,$nombre,$tipo,$periodo,$teo,$ayu,$lab,$tall,$cre)
+  {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "INSERT INTO Ramo(Codigo,Nombre,Teoria,Tipo,Periodo,Ayudantia,Laboratorio,Taller,Creditos) VALUES('{$codigo}','{$nombre}','{$teo}','{$tipo}','{$periodo}','{$ayu}','{$lab}','{$tall}','{$cre}')";
+    if(($mysqli->query($sql)) == true)
+    {
+      $answer = '*Ramo agregado.';
+    }
+    else
+    {
+      $answer = '*Ramo no agregado.';
+    }
+    return $answer;
+  }
+
   public function crearTipoDeRamo($tipo,$abreviacion)
   {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "INSERT INTO Ramo_Tipo(tipo,abreviacion) VALUES('{$tipo}','{$abreviacion}');";
+    $sql = "INSERT INTO Ramo_Tipo(Tipo,Abreviacion) VALUES('{$tipo}','{$abreviacion}');";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Tipo creado.';
@@ -1118,7 +1155,7 @@ class departamento extends usuario {
     {
       $sql2 = "SELECT MAX(s.Numero_Seccion)
                 FROM Seccion AS s
-               WHERE s.Codigo_Ramo = 'FIS110' AND s.Codigo_Semestre = 201410 AND s.Codigo_Carrera = 'UNABDEPTO' AND (s.Numero_Seccion >= 1 AND s.Numero_Seccion <= 99);";
+               WHERE s.Codigo_Ramo = '{$codigoRamo}' AND s.Codigo_Semestre = '{$codigoSemestre}' AND s.Codigo_Carrera = 'UNABDEPTO' AND (s.Numero_Seccion >= 1 AND s.Numero_Seccion <= 99);";
     }
     else
     {
@@ -1143,7 +1180,7 @@ class departamento extends usuario {
     $res3->free_result();
 
     $mysqli4 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    if($numeroSeccion == 0) {
+    if($numeroSeccion == NULL) {
       if($regimen == 'D')
         $numeroSeccion = 1;
       elseif($regimen == 'V')
@@ -1151,7 +1188,7 @@ class departamento extends usuario {
     }
     else
       $numeroSeccion++;
-    $sql4 = "INSERT INTO Seccion(Numero_Seccion,NRC,Codigo_Ramo,Codigo_Carrera,Codigo_Semestre,Vacantes) VALUES('{$numeroSeccion}',1524,'{$codigoRamo}','UNABDEPTO','{$codigoSemestre}',60);";
+    $sql4 = "INSERT INTO Seccion(Numero_Seccion,NRC,Codigo_Ramo,Codigo_Carrera,Codigo_Semestre,Regimen,Vacantes) VALUES('{$numeroSeccion}',1524,'{$codigoRamo}','UNABDEPTO','{$codigoSemestre}','{$regimen}',60);";
     if(($mysqli4->query($sql4)) == true)
     {
       $answer = '*Sección creada.';

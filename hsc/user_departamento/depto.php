@@ -20,7 +20,7 @@ if(isset($_SESSION['usuario']))
       {
         if($_POST['codigo'] != '' && $_POST['nombre'] != '' && $_POST['tipo'] != 0 && $_POST['periodo'] != 0 && $_POST['teo'] != '' && $_POST['ayu'] != '' && $_POST['lab'] != '' && $_POST['tall'] != '' && $_POST['cre'] != '')
         {
-          $answer = $usuario->agregarRamo($_POST['codigo'],$_POST['nombre'],$_POST['tipo'],$_POST['periodo'],$_POST['teo'],$_POST['ayu'],$_POST['lab'],$_POST['tall'],$_POST['cre']);
+          $answer = $usuario->agregarRamoDepartamento($_POST['codigo'],$_POST['nombre'],$_POST['tipo'],$_POST['periodo'],$_POST['teo'],$_POST['ayu'],$_POST['lab'],$_POST['tall'],$_POST['cre']);
         }
         else
         {

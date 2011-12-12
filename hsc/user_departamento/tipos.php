@@ -18,7 +18,7 @@ if(isset($_SESSION['usuario']))
     {
       if($_POST['tipo'] != '' && $_POST['abreviacion'] != '')
       {
-        $usuario->crearTipoDeRamo($_POST['tipo'],$_POST['abreviacion']);
+        $msg = $usuario->crearTipoDeRamo($_POST['tipo'],$_POST['abreviacion']);
       }
       else
       {
@@ -64,13 +64,16 @@ if(isset($_SESSION['usuario']))
       <div id="content">
         <!-- insert the page content here -->
         <h1>Tipos de ramos</h1>
-
+        <?php
+          if(isset($msg))
+            echo '<span class="error">'.$msg.'</span>';
+        ?>
         <table>
         <tr><td>Tipo</td><td>Abreviación</td></tr> 
         <form method="post" name="agregar" target="_self">
             <tr><td><input type="text" name="tipo" value="<?php if(isset($tipoold)) echo $tipoold;?>" maxlength="50"></input></td>
             <td><input type="text" name="abreviacion" value="<?php if(isset($abrevold)) echo $abrevold;?>" maxlength="3" class="xs" onkeyup="buscarAbreviacion(this.value)"></input></td>
-            <td><?php if(isset($codigoold))echo '<input type="submit" name="agrega" value="Agregar tipo" id="btt">'; else echo '<input type="submit" name="agrega" value="Agregar tipo" id="btt" disabled>';?></input></td></tr>
+            <td><?php if(isset($codigoold))echo '<input type="submit" name="submit" value="Agregar tipo" id="btt">'; else echo '<input type="submit" name="submit" value="Agregar tipo" id="btt" disabled>';?></input></td></tr>
             <tr><td><div id="existe"><td><?php if(isset($tipoerror)) echo '<span class="error">'.$tipoerror.'</span>';?></td></div>
                 <td><?php if(isset($abreverror)) echo '<span class="error">'.$abreverror.'</span>';?></td>
                 </tr>

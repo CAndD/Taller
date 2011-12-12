@@ -13,7 +13,7 @@ if(isset($_SESSION['usuario']))
 
   if(isset($_POST['submit']) && $_POST['submit'] == 'Aceptar')
   {
-    if(isset($_POST['vacantes']) && isset($_POST['hiddenIdSolicitud']) && isset($_POST['hiddenVacantes']))
+    if(isset($_POST['vacantes']) && isset($_POST['hiddenIdSolicitud']) && isset($_POST['hiddenVacantes']) && isset($_POST['seccion']))
     {
       if($_POST['vacantes'] == 0 || $_POST['vacantes'] == '')
       {
@@ -29,10 +29,22 @@ if(isset($_SESSION['usuario']))
       }
       elseif($_POST['vacantes'] >= 1 && $_POST['vacantes'] <= $_POST['hiddenVacantes'])
       {
-        $msg = $usuario->responderSolicitud($_POST['hiddenIdSolicitud'],2,$_POST['vacantes']);
-        $_GET['idSolicitud'] = null;
-        $vacantes = null;
+        $vacantesFinal = calcularVacantesRestantes($_POST['seccion']);
+        $vacantesFinal = $_POST['hiddenVacantes'] - $vacantesFinal;
+        if($_POST['vacantes'] > $vacantesFinal) {
+          $msg2 = '*La cantidad de vacantes ingresadas, excede la cantidad permitida. Máximo '.$vacantesFinal.' para esta sección.';
+          $_GET['idSolicitud'] = $_POST['hiddenIdSolicitud']; 
+        }
+        else {
+          $msg = $usuario->responderSolicitud($_POST['hiddenIdSolicitud'],2,$_POST['vacantes'],$_POST['seccion']);
+          $_GET['idSolicitud'] = null;
+          $vacantes = null;
+        }
       }
+    }
+    else
+    {
+      $msg2 = '*Debe elegir una sección.';
     }
   }
 
@@ -70,9 +82,12 @@ if(isset($_SESSION['usuario']))
   ?>
   <table><tr>
     <form method="post" name="aceptarSolicitud" target="_self">
+      <?php
+        obtenerSeccionesSolicitud($_GET['idSolicitud']);
+      ?>
       <td><input type="text" name="vacantes" value="<?php echo $vacantes;?>" class="xs"></input></td><td><?php if(isset($msg2)) echo '<span class="error">'.$msg2.'</span>';?></td>
           <input type="hidden" name="hiddenIdSolicitud" value="<?php echo $_GET['idSolicitud'];?>"></input>
-          <input type="hidden" name="hiddenVacantes" value="<?php echo $vacantes;?>"></input>
+          <input type="hidden" name="hiddenVacantes" value="60"></input>
       <td><input type="submit" name="submit" value="Aceptar"></input></td></tr>
     </form>
   </table>

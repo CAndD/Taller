@@ -11,15 +11,28 @@ if(isset($_SESSION['usuario']))
     $_SESSION['usuario'] = serialize($usuario);
   }
 
-  if(isset($_POST['submit']) && $_POST['submit'] == 'Crear') 
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Cambiar') 
   {
-    if(isset($_POST['hiddenCodigoRamo']) && isset($_POST['hiddenCodigoSemestre']) && isset($_POST['hiddenCodigoCarrera']))
+    if(isset($_POST['vacantes']) && isset($_POST['hiddenSolicitud']) && isset($_POST['hiddenTotal']) && isset($_POST['hiddenIdSeccion']))
     {
-      $msg = $usuario->crearSeccion($_POST['hiddenCodigoRamo'],$_POST['hiddenCodigoSemestre'],$_POST['hiddenCodigoCarrera']);
+      if($_POST['vacantes'] > $_POST['hiddenTotal'])
+      {
+        $msg = '*El número que ingresó, excede el máximo de vacantes de '.$_POST['hiddenTotal'].'.';
+      }
+      elseif(($_POST['hiddenSolicitud'] + $_POST['vacantes']) > $_POST['hiddenTotal'])
+      {
+        $msg = '*El número que ingresó, excede la suma de vacantes.';
+      }
+      else
+      {
+        $msg = $usuario->cambiarVacantes($_POST['hiddenIdSeccion'],$_POST['vacantes']);
+      }
+    }
+    else
+    {
+      $msg = '*Debe ingresar un número de vacantes.';
     }  
   }
-
-  
 
   if(isset($_POST['cambiarCarrera']) && $_POST['cambiarCarrera'] == 'CAMBIAR CARRERA') {
     $_SESSION['carrera'] = null;
