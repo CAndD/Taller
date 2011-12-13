@@ -105,5 +105,11 @@ jQuery(function ($) {
           $('<iframe name="" class="ifr" src="clases.php?codigoRamo=' + idClase + '" scrolling="no" frameborder="0"></iframe>').modal();
           return false;
         }); 
+  
+        $('a.ingresarPresupuesto').click(function (e) {
+          var idClase = $(this).attr("id");
+          $('<iframe name="" class="ifr" src="user_jc/secundario/presupuesto.php"></iframe>').modal();
+          return false;
+        }); 
 
 });

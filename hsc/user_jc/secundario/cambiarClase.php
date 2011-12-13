@@ -34,6 +34,17 @@ if(isset($_SESSION['usuario']))
     }
   }
 
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Eliminar profesor')
+  {
+    if(isset($_POST['hiddenIdClase']))
+    {
+      $msg = $usuario->eliminarProfesorDeSeccion($_POST['hiddenIdClase']);
+      if($msg == 'Profesor eliminado.') {
+        $_GET['idClase'] = NULL; 
+      }
+    }
+  }
+
   if(isset($_POST['submit']) && $_POST['submit'] == 'Cambiar día')
   {
     if($_POST['cambiarDia'] == 'No')
@@ -116,6 +127,7 @@ if(isset($_SESSION['usuario']))
       echo '</select><input type="hidden" name="hiddenIdClase" value="'.$_GET['idClase'].'"></input><input type="submit" name="submit" value="Cambiar profesor"></input></form>';
       if(isset($profesorerror))
         echo '<span class="error">'.$profesorerror.'</span>';
+      echo 'O<br><form method="post" name="eliminarProfesor" target="_self"><input type="hidden" name="hiddenIdClase" value="'.$_GET['idClase'].'"></input><input type="submit" name="submit" value="Eliminar profesor"></input></form>';
     }
     if(isset($_GET['func']) && $_GET['func'] == 'moduloInicio')
     {

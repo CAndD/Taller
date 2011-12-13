@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 12, 2011 at 02:39 AM
+-- Generation Time: Dec 12, 2011 at 09:50 PM
 -- Server version: 5.1.53
 -- PHP Version: 5.3.4
 
@@ -199,14 +199,6 @@ BEGIN
 
 END$$
 
-DROP PROCEDURE IF EXISTS `jdc_carreras`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `jdc_carreras`(nombreUsuario VARCHAR(40))
-BEGIN
-  SELECT c.Codigo,c.Nombre_Carrera,c.Periodo
-   FROM Carrera AS c
-  WHERE c.NombreUsuario_JC = nombreUsuario;
-END$$
-
 DROP PROCEDURE IF EXISTS `modificarSolicitud`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `modificarSolicitud`(idSolicitud INT, numeroVacantes INT)
 BEGIN
@@ -252,29 +244,6 @@ BEGIN
   SELECT t.Codigo_Trimestre,t.Numero,t.Anho,t.Fecha_Inicio,t.Fecha_Termino
    FROM Trimestre AS t
   WHERE t.Codigo_Trimestre = (SELECT MAX(t.Codigo_Trimestre) FROM Trimestre AS t);
-END$$
-
-DROP PROCEDURE IF EXISTS `presupuesto`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `presupuesto`(codigo_carrera VARCHAR(7))
-BEGIN
-  SELECT presupuesto
-   FROM semestre;
-END$$
-
-DROP PROCEDURE IF EXISTS `prof_asignados`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `prof_asignados`(codigoCarrera VARCHAR(9))
-BEGIN
-  SELECT p.Rut_Profesor, p.Nombre
-   FROM Profesor AS p
-  WHERE p.codigo_carrera = codigoCarrera;
-END$$
-
-DROP PROCEDURE IF EXISTS `prof_asignados_sc`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `prof_asignados_sc`(codigoCarrera VARCHAR(9))
-BEGIN
-  SELECT p.Rut_Profesor, p.Nombre
-   FROM Profesor AS p
-  WHERE p.codigo_carrera = codigoCarrera AND p.Rut_Profesor NOT IN (SELECT s.Rut_Profesor FROM Seccion AS s WHERE s.Rut_Profesor IS NOT NULL);
 END$$
 
 DROP PROCEDURE IF EXISTS `ramoDictado`$$
@@ -439,32 +408,6 @@ BEGIN
   INSERT INTO Solicitud(Codigo_Ramo,Carrera,Carrera_Solicitante,Vacantes,Codigo_Semestre,Fecha_Envio,Fecha_Respuesta,Estado) VALUES (codigoRamo,codigoCarrera,codigoCarreraSolicitante,numeroVacantes,codigoSemestre,fechaEnvio,NULL,1);
 END$$
 
-DROP PROCEDURE IF EXISTS `solicitudesPedidas`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `solicitudesPedidas`(codigoCarrera VARCHAR(9), codigoSemestre INT)
-BEGIN
-  SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera_Solicitante,s.Vacantes
-   FROM Solicitud AS s
-   INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
-  WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera = codigoCarrera AND s.Estado = 1;
-END$$
-
-DROP PROCEDURE IF EXISTS `solicitudesSolicitadas`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `solicitudesSolicitadas`(codigoCarrera VARCHAR(9), codigoSemestre INT)
-BEGIN
-  SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera,s.Vacantes
-   FROM Solicitud AS s
-   INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
-  WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera_Solicitante = codigoCarrera AND s.Estado = 1;
-END$$
-
-DROP PROCEDURE IF EXISTS `user_login`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `user_login`(username VARCHAR(40),password VARCHAR(32))
-BEGIN
-  SELECT u.RUT,u.Nombre,u.Id_Tipo
-   FROM Usuario AS u
-  WHERE u.Nombre_Usuario = username AND u.Password = password;
-END$$
-
 DROP PROCEDURE IF EXISTS `verRamosImpartidos`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `verRamosImpartidos`(codigoCarrera VARCHAR(9), codigoSemestre INT)
 BEGIN
@@ -532,15 +475,6 @@ BEGIN
    FROM Solicitud AS s
    INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
   WHERE s.Codigo_Semestre = codigoSemestre AND s.Carrera = codigoCarrera ORDER BY s.Estado,s.Fecha_Envio,s.Carrera_Solicitante,s.Codigo_Ramo;
-END$$
-
-DROP PROCEDURE IF EXISTS `ver_malla`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ver_malla`(codigoCarrera VARCHAR(9))
-BEGIN
-  SELECT ctr.Codigo_Ramo,r.Nombre,r.Tipo,ctr.Semestre
-   FROM carrera_tiene_ramos AS ctr
-   INNER JOIN Ramo AS r ON ctr.Codigo_Ramo = r.Codigo
-  WHERE ctr.Codigo_Carrera = codigoCarrera ORDER BY ctr.Semestre;
 END$$
 
 DELIMITER ;
@@ -648,159 +582,22 @@ CREATE TABLE IF NOT EXISTS `clase` (
   `Dia` varchar(12) DEFAULT NULL COMMENT 'Día de la clase.',
   `Codigo_Semestre` int(11) NOT NULL COMMENT 'Codigo del semestre al cual pertenece la clase.',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=148 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
 
 --
 -- Dumping data for table `clase`
 --
 
 INSERT INTO `clase` (`Id`, `Clase_Tipo`, `Seccion_Id`, `RUT_Profesor`, `Modulo_Inicio`, `Modulo_Termino`, `Dia`, `Codigo_Semestre`) VALUES
-(2, 'Teoria', 21, NULL, NULL, NULL, NULL, 201125),
-(3, 'Teoria', 21, NULL, NULL, NULL, NULL, 201125),
-(4, 'Teoria', 22, 164827607, 1, 2, 'Martes', 201125),
-(5, 'Teoria', 22, 164827607, 1, 2, 'Miercoles', 201125),
-(6, 'Ayudantia', 22, NULL, NULL, NULL, 'Viernes', 201125),
-(7, 'Teoria', 23, 164827607, 1, NULL, 'Martes', 201125),
-(8, 'Teoria', 23, 164827607, NULL, NULL, NULL, 201125),
-(9, 'Teoria', 23, NULL, NULL, NULL, NULL, 201125),
-(10, 'Ayudantia', 23, NULL, NULL, NULL, NULL, 201125),
-(11, 'Laboratorio', 23, NULL, NULL, NULL, NULL, 201125),
-(12, 'Taller', 23, NULL, NULL, NULL, NULL, 201125),
-(13, 'Teoria', 24, NULL, NULL, NULL, NULL, 201125),
-(14, 'Teoria', 24, NULL, NULL, NULL, NULL, 201125),
-(15, 'Teoria', 24, NULL, NULL, NULL, NULL, 201125),
-(16, 'Ayudantia', 24, NULL, NULL, NULL, NULL, 201125),
-(17, 'Laboratorio', 24, NULL, NULL, NULL, NULL, 201125),
-(18, 'Taller', 24, NULL, NULL, NULL, NULL, 201125),
-(19, 'Teoria', 25, 164827607, NULL, NULL, NULL, 201125),
-(20, 'Teoria', 25, 164827607, NULL, NULL, NULL, 201125),
-(21, 'Ayudantia', 25, NULL, NULL, NULL, NULL, 201125),
-(22, 'Teoria', 26, NULL, NULL, NULL, NULL, 201125),
-(23, 'Teoria', 26, NULL, NULL, NULL, NULL, 201125),
-(24, 'Ayudantia', 26, NULL, NULL, NULL, NULL, 201125),
-(25, 'Teoria', 29, NULL, NULL, NULL, NULL, 201125),
-(26, 'Teoria', 29, NULL, NULL, NULL, NULL, 201125),
-(27, 'Ayudantia', 29, NULL, NULL, NULL, NULL, 201125),
-(28, 'Teoria', 30, NULL, NULL, NULL, NULL, 201125),
-(29, 'Teoria', 30, NULL, NULL, NULL, NULL, 201125),
-(30, 'Ayudantia', 30, NULL, NULL, NULL, NULL, 201125),
-(31, 'Teoria', 31, NULL, NULL, NULL, NULL, 201125),
-(32, 'Teoria', 31, NULL, NULL, NULL, NULL, 201125),
-(33, 'Ayudantia', 31, NULL, NULL, NULL, NULL, 201125),
-(34, 'Teoria', 0, NULL, NULL, NULL, NULL, 201410),
-(35, 'Teoria', 0, NULL, NULL, NULL, NULL, 201410),
-(36, 'Ayudantia', 0, NULL, NULL, NULL, NULL, 201410),
-(37, 'Teoria', 33, NULL, NULL, NULL, NULL, 201410),
-(38, 'Teoria', 33, NULL, NULL, NULL, NULL, 201410),
-(39, 'Ayudantia', 33, NULL, NULL, NULL, NULL, 201410),
-(40, 'Teoria', 33, NULL, NULL, NULL, NULL, 201410),
-(41, 'Teoria', 33, NULL, NULL, NULL, NULL, 201410),
-(42, 'Ayudantia', 33, NULL, NULL, NULL, NULL, 201410),
-(43, 'Teoria', 35, NULL, NULL, NULL, NULL, 201410),
-(44, 'Teoria', 35, NULL, NULL, NULL, NULL, 201410),
-(45, 'Ayudantia', 35, NULL, NULL, NULL, NULL, 201410),
-(46, 'Teoria', 35, NULL, NULL, NULL, NULL, 201410),
-(47, 'Teoria', 35, NULL, NULL, NULL, NULL, 201410),
-(48, 'Ayudantia', 35, NULL, NULL, NULL, NULL, 201410),
-(49, 'Teoria', 37, NULL, NULL, NULL, NULL, 201410),
-(50, 'Teoria', 37, NULL, NULL, NULL, NULL, 201410),
-(51, 'Ayudantia', 37, NULL, NULL, NULL, NULL, 201410),
-(52, 'Teoria', 38, NULL, NULL, NULL, NULL, 201410),
-(53, 'Ayudantia', 38, NULL, NULL, NULL, NULL, 201410),
-(54, 'Laboratorio', 38, NULL, NULL, NULL, NULL, 201410),
-(55, 'Teoria', 39, NULL, NULL, NULL, NULL, 201410),
-(56, 'Teoria', 39, NULL, NULL, NULL, NULL, 201410),
-(57, 'Ayudantia', 39, NULL, NULL, NULL, NULL, 201410),
-(58, 'Teoria', 40, NULL, NULL, NULL, NULL, 201410),
-(59, 'Teoria', 40, NULL, NULL, NULL, NULL, 201410),
-(60, 'Ayudantia', 40, NULL, NULL, NULL, NULL, 201410),
-(61, 'Teoria', 0, NULL, NULL, NULL, NULL, 201410),
-(62, 'Teoria', 0, NULL, NULL, NULL, NULL, 201410),
-(63, 'Ayudantia', 0, NULL, NULL, NULL, NULL, 201410),
-(64, 'Teoria', 41, NULL, NULL, NULL, NULL, 201410),
-(65, 'Teoria', 41, NULL, NULL, NULL, NULL, 201410),
-(66, 'Ayudantia', 41, NULL, NULL, NULL, NULL, 201410),
-(67, 'Teoria', 41, NULL, NULL, NULL, NULL, 201410),
-(68, 'Teoria', 41, NULL, NULL, NULL, NULL, 201410),
-(69, 'Ayudantia', 41, NULL, NULL, NULL, NULL, 201410),
-(70, 'Teoria', 41, NULL, NULL, NULL, NULL, 201410),
-(71, 'Teoria', 41, NULL, NULL, NULL, NULL, 201410),
-(72, 'Ayudantia', 41, NULL, NULL, NULL, NULL, 201410),
-(73, 'Teoria', 41, NULL, NULL, NULL, NULL, 201410),
-(74, 'Teoria', 41, NULL, NULL, NULL, NULL, 201410),
-(75, 'Ayudantia', 41, NULL, NULL, NULL, NULL, 201410),
-(76, 'Teoria', 1, NULL, NULL, NULL, NULL, 201410),
-(77, 'Teoria', 1, NULL, NULL, NULL, NULL, 201410),
-(78, 'Ayudantia', 1, NULL, NULL, NULL, NULL, 201410),
-(79, 'Teoria', 1, NULL, NULL, NULL, NULL, 201410),
-(80, 'Teoria', 1, NULL, NULL, NULL, NULL, 201410),
-(81, 'Ayudantia', 1, NULL, NULL, NULL, NULL, 201410),
-(82, 'Teoria', 3, NULL, NULL, NULL, NULL, 201410),
-(83, 'Teoria', 3, NULL, NULL, NULL, NULL, 201410),
-(84, 'Ayudantia', 3, NULL, NULL, NULL, NULL, 201410),
-(85, 'Teoria', 4, NULL, NULL, NULL, NULL, 201410),
-(86, 'Teoria', 4, NULL, NULL, NULL, NULL, 201410),
-(87, 'Ayudantia', 4, NULL, NULL, NULL, NULL, 201410),
-(88, 'Teoria', 5, NULL, NULL, NULL, NULL, 201410),
-(89, 'Teoria', 5, NULL, NULL, NULL, NULL, 201410),
-(90, 'Ayudantia', 5, NULL, NULL, NULL, NULL, 201410),
-(91, 'Teoria', 1, NULL, NULL, NULL, NULL, 201410),
-(92, 'Teoria', 1, NULL, NULL, NULL, NULL, 201410),
-(93, 'Ayudantia', 1, NULL, NULL, NULL, NULL, 201410),
-(94, 'Teoria', 7, NULL, NULL, NULL, NULL, 201410),
-(95, 'Teoria', 7, NULL, NULL, NULL, NULL, 201410),
-(96, 'Ayudantia', 7, NULL, NULL, NULL, NULL, 201410),
-(97, 'Teoria', 8, NULL, 1, 3, 'Lunes', 201410),
-(98, 'Teoria', 8, NULL, 5, 6, 'Lunes', 201410),
-(99, 'Ayudantia', 8, NULL, 12, 11, 'Viernes', 201410),
-(100, 'Teoria', 9, NULL, NULL, NULL, NULL, 201410),
-(101, 'Teoria', 9, NULL, NULL, NULL, NULL, 201410),
-(102, 'Ayudantia', 9, NULL, NULL, NULL, NULL, 201410),
-(103, 'Teoria', 10, NULL, NULL, NULL, NULL, 201410),
-(104, 'Ayudantia', 10, NULL, NULL, NULL, NULL, 201410),
-(105, 'Laboratorio', 10, NULL, NULL, NULL, NULL, 201410),
-(106, 'Teoria', 1, NULL, NULL, NULL, NULL, 201410),
-(107, 'Teoria', 1, NULL, NULL, NULL, NULL, 201410),
-(108, 'Ayudantia', 1, NULL, NULL, NULL, NULL, 201410),
-(109, 'Teoria', 2, NULL, NULL, NULL, NULL, 201410),
-(110, 'Teoria', 2, NULL, NULL, NULL, NULL, 201410),
-(111, 'Ayudantia', 2, NULL, NULL, NULL, NULL, 201410),
-(112, 'Teoria', 3, NULL, NULL, NULL, NULL, 201410),
-(113, 'Teoria', 3, NULL, NULL, NULL, NULL, 201410),
-(114, 'Ayudantia', 3, NULL, NULL, NULL, NULL, 201410),
-(115, 'Teoria', 4, NULL, NULL, NULL, NULL, 201410),
-(116, 'Teoria', 4, NULL, NULL, NULL, NULL, 201410),
-(117, 'Ayudantia', 4, NULL, NULL, NULL, NULL, 201410),
-(118, 'Teoria', 5, NULL, NULL, NULL, NULL, 201410),
-(119, 'Teoria', 5, NULL, NULL, NULL, NULL, 201410),
-(120, 'Ayudantia', 5, NULL, NULL, NULL, NULL, 201410),
-(121, 'Teoria', 6, NULL, NULL, NULL, NULL, 201410),
-(122, 'Teoria', 6, NULL, NULL, NULL, NULL, 201410),
-(123, 'Ayudantia', 6, NULL, NULL, NULL, NULL, 201410),
-(124, 'Teoria', 7, NULL, NULL, NULL, NULL, 201410),
-(125, 'Teoria', 7, NULL, NULL, NULL, NULL, 201410),
-(126, 'Ayudantia', 7, NULL, NULL, NULL, NULL, 201410),
-(127, 'Teoria', 8, NULL, NULL, NULL, NULL, 201125),
-(128, 'Teoria', 8, NULL, NULL, NULL, NULL, 201125),
-(129, 'Ayudantia', 8, NULL, NULL, NULL, NULL, 201125),
-(130, 'Teoria', 9, NULL, NULL, NULL, NULL, 201125),
-(131, 'Teoria', 9, NULL, NULL, NULL, NULL, 201125),
-(132, 'Ayudantia', 9, NULL, NULL, NULL, NULL, 201125),
-(133, 'Teoria', 10, NULL, NULL, NULL, NULL, 201125),
-(134, 'Teoria', 10, NULL, NULL, NULL, NULL, 201125),
-(135, 'Ayudantia', 10, NULL, NULL, NULL, NULL, 201125),
-(136, 'Teoria', 11, NULL, NULL, NULL, NULL, 201125),
-(137, 'Teoria', 11, NULL, NULL, NULL, NULL, 201125),
-(138, 'Teoria', 11, NULL, NULL, NULL, NULL, 201125),
-(139, 'Ayudantia', 11, NULL, NULL, NULL, NULL, 201125),
-(140, 'Laboratorio', 11, NULL, NULL, NULL, NULL, 201125),
-(141, 'Taller', 11, NULL, NULL, NULL, NULL, 201125),
-(142, 'Teoria', 12, NULL, NULL, NULL, NULL, 201125),
-(143, 'Teoria', 12, NULL, NULL, NULL, NULL, 201125),
-(144, 'Teoria', 12, NULL, NULL, NULL, NULL, 201125),
-(145, 'Ayudantia', 12, NULL, NULL, NULL, NULL, 201125),
-(146, 'Laboratorio', 12, NULL, NULL, NULL, NULL, 201125),
-(147, 'Taller', 12, NULL, NULL, NULL, NULL, 201125);
+(1, 'Teoria', 1, 164827607, NULL, NULL, NULL, 201125),
+(2, 'Teoria', 1, 164827608, NULL, NULL, NULL, 201125),
+(3, 'Ayudantia', 1, 164827608, NULL, NULL, NULL, 201125),
+(4, 'Teoria', 2, NULL, NULL, NULL, NULL, 201125),
+(5, 'Teoria', 2, NULL, NULL, NULL, NULL, 201125),
+(6, 'Ayudantia', 2, NULL, NULL, NULL, NULL, 201125),
+(7, 'Teoria', 3, NULL, NULL, NULL, NULL, 201125),
+(8, 'Teoria', 3, NULL, NULL, NULL, NULL, 201125),
+(9, 'Ayudantia', 3, NULL, NULL, NULL, NULL, 201125);
 
 -- --------------------------------------------------------
 
@@ -863,6 +660,27 @@ INSERT INTO `modulo` (`Modulo`, `Regimen`, `Inicio`, `Termino`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `presupuesto`
+--
+
+DROP TABLE IF EXISTS `presupuesto`;
+CREATE TABLE IF NOT EXISTS `presupuesto` (
+  `Codigo_Carrera` varchar(9) NOT NULL COMMENT 'Código de la carrera a la que le pertenece el presupuesto.',
+  `Codigo_Semestre` int(11) NOT NULL COMMENT 'Código del semestre en el que es válido el presupuesto.',
+  `Presupuesto` int(11) DEFAULT NULL COMMENT 'Monto.',
+  KEY `Codigo_Carrera` (`Codigo_Carrera`,`Codigo_Semestre`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `presupuesto`
+--
+
+INSERT INTO `presupuesto` (`Codigo_Carrera`, `Codigo_Semestre`, `Presupuesto`) VALUES
+('UNAB11500', 201125, 1000000);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `profesor`
 --
 
@@ -879,7 +697,8 @@ CREATE TABLE IF NOT EXISTS `profesor` (
 --
 
 INSERT INTO `profesor` (`RUT_Profesor`, `Nombre`, `Profesor_Grado`) VALUES
-(164827607, 'David Miranda', 1);
+(164827607, 'David Miranda', 1),
+(164827608, 'David M. Atenas', 1);
 
 -- --------------------------------------------------------
 
@@ -1086,25 +905,16 @@ CREATE TABLE IF NOT EXISTS `seccion` (
   PRIMARY KEY (`Id`),
   KEY `Codigo_Ramo` (`Codigo_Ramo`),
   KEY `Numero_Seccion` (`Numero_Seccion`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=14 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `seccion`
 --
 
 INSERT INTO `seccion` (`Id`, `Numero_Seccion`, `NRC`, `Codigo_Ramo`, `Codigo_Carrera`, `Codigo_Semestre`, `Regimen`, `Vacantes`, `Vacantes_utilizadas`) VALUES
-(1, 100, 1524, 'FIS110', 'UNABDEPTO', 201410, 'V', 60, 0),
-(2, 101, 1524, 'FIS110', 'UNABDEPTO', 201410, 'V', 60, 0),
-(3, 1, 1524, 'FIS110', 'UNABDEPTO', 201410, 'D', 60, 0),
-(4, 2, 1524, 'FIS110', 'UNABDEPTO', 201410, 'D', 60, 0),
-(5, 1, 1524, 'FIS121', 'UNABDEPTO', 201410, 'D', 60, 0),
-(6, 2, 1524, 'FIS121', 'UNABDEPTO', 201410, 'D', 60, 0),
-(7, 100, 1524, 'FIS121', 'UNABDEPTO', 201410, 'V', 60, 0),
-(8, 1, 1524, 'IET090', 'UNAB11500', 201125, 'D', 60, 35),
-(9, 2, 1524, 'IET090', 'UNAB11500', 201125, 'D', 60, 0),
-(10, 3, 1524, 'IET090', 'UNAB11550', 201125, 'D', 60, 0),
-(11, 1, 1524, 'IET100', 'UNAB11500', 201125, 'D', 60, 40),
-(12, 2, 1524, 'IET100', 'UNAB11500', 201125, 'D', 60, 10);
+(1, 1, 1524, 'IET090', 'UNAB11500', 201125, 'D', 60, 0),
+(2, 2, 1524, 'IET090', 'UNAB11500', 201125, 'D', 60, 0),
+(3, 3, 1524, 'IET090', 'UNAB11500', 201125, 'D', 60, 0);
 
 -- --------------------------------------------------------
 
@@ -1154,25 +964,12 @@ CREATE TABLE IF NOT EXISTS `solicitud` (
   `Fecha_Respuesta` datetime DEFAULT NULL COMMENT 'Fecha en la cual se respondio a la solicitud.',
   `Estado` int(11) NOT NULL COMMENT '1 = Esperando, 2 = Aceptada y 3 = Denegada.',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `solicitud`
 --
 
-INSERT INTO `solicitud` (`id`, `Codigo_Ramo`, `Seccion_asignada`, `Carrera`, `Carrera_Solicitante`, `Vacantes`, `Vacantes_Asignadas`, `Codigo_Semestre`, `Fecha_Envio`, `Fecha_Respuesta`, `Estado`) VALUES
-(2, 'FIS110', NULL, 'UNAB11500', 'UNAB11550', 20, 15, 201125, '2011-10-10 23:06:53', '2011-10-19 23:33:14', 2),
-(3, 'FIS120', NULL, 'UNAB11500', 'UNAB11550', 10, 0, 201125, '2011-10-10 23:59:20', NULL, 3),
-(4, 'FMM130', NULL, 'UNAB11500', 'UNAB11550', 5, 0, 201125, '2011-10-10 23:59:24', NULL, 0),
-(5, 'IET091', NULL, 'UNAB11500', 'UNAB11550', 15, 0, 201125, '2011-10-10 23:59:29', NULL, 3),
-(7, 'FIS110', NULL, 'UNAB11560', 'UNAB11500', 10, 0, 201125, '2011-10-18 11:56:11', NULL, 2),
-(8, 'FIS110', NULL, 'UNAB11500', 'UNAB11550', 10, 0, 201125, '2011-10-20 00:07:39', '2011-12-11 20:37:44', 3),
-(9, 'IET090', NULL, 'UNAB11500', 'UNAB11550', 10, 10, 201125, '2011-12-11 20:33:38', '2011-12-11 20:34:01', 2),
-(10, 'IET090', 8, 'UNAB11500', 'UNAB11550', 10, 10, 201125, '2011-12-11 20:37:33', '2011-12-12 00:11:40', 2),
-(11, 'IET090', 8, 'UNAB11500', 'UNAB11550', 15, 15, 201125, '2011-12-12 00:12:04', '2011-12-12 00:33:18', 2),
-(12, 'IET090', 9, 'UNAB11500', 'UNAB11550', 10, 10, 201125, '2011-12-12 00:41:00', '2011-12-12 01:56:41', 2),
-(13, 'IET100', 12, 'UNAB11500', 'UNAB11550', 15, 15, 201125, '2011-12-12 01:57:16', '2011-12-12 01:57:29', 2),
-(14, 'IET100', 12, 'UNAB11500', 'UNAB11550', 25, 25, 201125, '2011-12-12 01:58:17', '2011-12-12 02:38:26', 2);
 
 -- --------------------------------------------------------
 

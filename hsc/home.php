@@ -39,6 +39,7 @@ if(isset($_SESSION['usuario']))
   <meta name="keywords" content="website keywords, website keywords" />
   <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
   <link rel="stylesheet" type="text/css" href="style/style.css" title="style" />
+  <link rel="stylesheet" type="text/css" href="style/bsc.css" title="style" />
 </head>
 
 <body>
@@ -92,13 +93,13 @@ if(isset($_SESSION['usuario']))
         <tr>
         <td><div class="prog_presu"><span class="title">Programación versus Presupuesto</span><br>
           <?php
-            //$usuario->verProgramacionVsPresupuesto();
+            $usuario->verProgramacionVsPresupuesto($_SESSION['carrera'],$_SESSION['codigoSemestre']);
           ?>
         </div></td></tr>
         <tr>
         <td><div class="prof_asig"><span class="title">Profesores asignados</span><br>
           <?php
-            //$usuario->verProfesoresAsignados($_SESSION['carrera']);
+            $usuario->verProfesoresAsignados($_SESSION['carrera'],$_SESSION['codigoSemestre']);
           ?>
         </div></td>
         <td><div class="prof_asig_scarga"><span class="title">Profesores sin carga académica</span><br>
@@ -178,6 +179,11 @@ if(isset($_SESSION['usuario']))
     ?>
     </div>
   </div>
+
+  <script type='text/javascript' src='js/jquery.js'></script> 
+  <script type='text/javascript' src='js/jquery.simplemodal.js'></script> 
+  <script type='text/javascript' src='js/bsc.js'></script>
+  
 </body>
 </html>
 <?php

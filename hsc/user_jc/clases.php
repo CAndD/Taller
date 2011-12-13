@@ -91,7 +91,15 @@ if(isset($_SESSION['usuario']))
         <?php
           if(isset($msg))
             echo '<br><span class="error">'.$msg.'</span>';
-          verClases($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre']);
+          if(isset($_GET['mod']) && $_GET['mod'] == 1)
+            verClases($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre'],1);
+          else
+          {
+            if(isset($_GET['mod']) && $_GET['mod'] == 0 && isset($_GET['seccionId']))
+              verClase($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre'],$_GET['seccionId']);
+            else
+              verClases($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre'],0);
+          }
         ?>
       </div>
     </div>

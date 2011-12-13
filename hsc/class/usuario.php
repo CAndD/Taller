@@ -24,7 +24,9 @@ class usuario {
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
     $nombreUsuario = $this->getNombreUsuario();
     $pass = $this->getPassword();
-    $sql = "CALL user_login('{$nombreUsuario}','{$pass}')";
+    $sql = "SELECT u.RUT,u.Nombre,u.Id_Tipo
+             FROM Usuario AS u
+            WHERE u.Nombre_Usuario = '{$nombreUsuario}' AND u.Password = '{$pass}';";
     $res = $mysqli->prepare($sql);
     $res->execute();
     $res->bind_result($rut,$nombre,$tipo);
@@ -35,7 +37,9 @@ class usuario {
         $jdc = new jefeDeCarrera($nombre,$nombreUsuario,$rut);
         $_SESSION['usuario'] = serialize($jdc);
         $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-        $sql2 = "CALL jdc_carreras('{$nombreUsuario}')";
+        $sql2 = "SELECT c.Codigo,c.Nombre_Carrera,c.Periodo
+                  FROM Carrera AS c
+                 WHERE c.NombreUsuario_JC = '{$nombreUsuario}';";
         $res2 = $mysqli2->prepare($sql2);
         $res2->execute();
         $res2->bind_result($codigo,$nombre,$periodo);
@@ -498,7 +502,10 @@ class jefeDeCarrera extends usuario {
   public function verMalla($codigoCarrera) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL ver_malla('{$codigoCarrera}')";
+    $sql = "SELECT ctr.Codigo_Ramo,r.Nombre,r.Tipo,ctr.Semestre
+             FROM carrera_tiene_ramos AS ctr
+             INNER JOIN Ramo AS r ON ctr.Codigo_Ramo = r.Codigo
+            WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' ORDER BY ctr.Semestre;";
     $res = $mysqli->prepare($sql);
     $res->execute();
     $res->bind_result($codigoRamo,$nombreRamo,$tipo,$semestreRamo);
@@ -524,7 +531,10 @@ class jefeDeCarrera extends usuario {
   public function verRamosQuePiden($codigoCarrera,$codigoSemestre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL solicitudesPedidas('{$codigoCarrera}','{$codigoSemestre}')";
+    $sql = "SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera_Solicitante,s.Vacantes
+             FROM Solicitud AS s
+             INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
+            WHERE s.Codigo_Semestre = '{$codigoSemestre}' AND s.Carrera = '{$codigoCarrera}' AND s.Estado = 1;";
     $res = $mysqli->prepare($sql);
     $res->execute();
     $res->bind_result($idSolicitud,$codigoRamo,$nombreRamo,$carreraSolicitante,$vacantes);
@@ -544,7 +554,10 @@ class jefeDeCarrera extends usuario {
   public function verRamosQuePido($codigoCarrera,$codigoSemestre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL solicitudesSolicitadas('{$codigoCarrera}','{$codigoSemestre}')";
+    $sql = "SELECT s.Id,s.Codigo_Ramo,r.Nombre,s.Carrera,s.Vacantes
+             FROM Solicitud AS s
+             INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
+            WHERE s.Codigo_Semestre = '{$codigoSemestre}' AND s.Carrera_Solicitante = '{$codigoCarrera}' AND s.Estado = 1;";
     $res = $mysqli->prepare($sql);
     $res->execute();
     $res->bind_result($idSolicitud,$codigoRamo,$nombreRamo,$carreraDestino,$vacantes);
@@ -561,33 +574,43 @@ class jefeDeCarrera extends usuario {
     $res->free_result();
   }
 
-  public function verProgramacionVsPresupuesto() {
+  public function verProgramacionVsPresupuesto($codigoCarrera,$codigoSemestre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL presupuesto('INF1200')";
+    $sql = "SELECT p.presupuesto
+             FROM Presupuesto AS p
+            WHERE p.Codigo_Carrera = '{$codigoCarrera}' AND p.Codigo_Semestre = '{$codigoSemestre}'";
     $res = $mysqli->prepare($sql);
     $res->execute();
     $res->bind_result($presupuesto);
+    $presupuesto2 = '';
     echo '<table>';
     if($res->fetch())
     {
-      echo '<tr><td>'.$rut.'</td><td>'.$nombre.'</td></tr>';
+      $presupuesto = '$ '.$presupuesto;
+      echo '<tr><td>'.$presupuesto.'</td></tr>';
+      echo '<tr><td><a class="ingresarPresupuesto" href="">Cambiar presupuesto del semestre.</a></td></tr>';
     }
     else
     {
-      echo '<tr><td><a href="">Ingresar presupuesto del semestre.</a></td></tr>';
+      echo '<tr><td><a class="ingresarPresupuesto" href="">Ingresar presupuesto del semestre.</a></td></tr>';
     }
     echo '</table>';
     $res->free_result();
   }
 
-  public function verProfesoresAsignados($codigoCarrera) {
+  public function verProfesoresAsignados($codigoCarrera,$codigoSemestre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL prof_asignados('{$codigoCarrera}')";
+    $sql = "SELECT DISTINCT p.RUT_Profesor,p.Nombre,p.Profesor_Grado
+             FROM Profesor AS p
+             INNER JOIN Seccion AS s ON s.Codigo_Carrera = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}'
+             INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Codigo_Semestre = '{$codigoSemestre}' AND c.RUT_Profesor IS NOT NULL
+             INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo 
+            WHERE p.RUT_Profesor = c.RUT_Profesor ORDER BY p.Nombre;";
     $res = $mysqli->prepare($sql);
     $res->execute();
-    $res->bind_result($rut,$nombre);
+    $res->bind_result($rut,$nombre,$grado);
     $flag = 0;
     echo '<table><tr><td>RUT</td><td>Nombre</td></tr>';
     while($res->fetch())
@@ -605,7 +628,9 @@ class jefeDeCarrera extends usuario {
   public function verProfesoresSinCargaAcademica($codigoCarrera) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL prof_asignados_sc('{$codigoCarrera}')";
+    $sql = "SELECT p.Rut_Profesor, p.Nombre
+             FROM Profesor AS p
+            WHERE p.codigo_carrera = codigoCarrera AND p.Rut_Profesor NOT IN (SELECT s.Rut_Profesor FROM Seccion AS s WHERE s.Rut_Profesor IS NOT NULL);";
     $res = $mysqli->prepare($sql);
     $res->execute();
     $res->bind_result($rut,$nombre);
@@ -626,22 +651,58 @@ class jefeDeCarrera extends usuario {
   public function verSeccionesSinProfesor($codigoCarrera,$codigoSemestre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL verSeccionesSinProfesor('{$codigoCarrera}','{$codigoSemestre}')";
+    $sql = "SELECT DISTINCT s.Id,s.Numero_Seccion,r.Codigo,r.Nombre
+             FROM Seccion AS s
+             INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Codigo_Semestre = '{$codigoSemestre}' AND c.RUT_Profesor IS NULL
+             INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo 
+            WHERE s.Codigo_Carrera = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}'";
     $res = $mysqli->prepare($sql);
     $res->execute();
-    $res->bind_result($codigoRamo,$nombreRamo,$NRCSeccion);
+    $res->bind_result($idSeccion,$numeroSeccion,$codigoRamo,$nombreRamo);
     $flag = 0;
-    echo '<table><tr><td>Nombre</td><td>Código</td><td>NRC</td></tr>';
+    echo '<table><tr><td>Sección</td><td>Nombre</td><td>Código</td></tr>';
     while($res->fetch())
     {
       if($flag == 0)
         $flag = 1;
-      echo '<tr><td>'.$nombreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$NRCSeccion.'</td></tr>';
+      echo '<tr><td><a href="user_jc/clases.php?codigoRamo='.$codigoRamo.'&mod=0&seccionId='.$idSeccion.'">'.$numeroSeccion.'</a></td><td>'.$nombreRamo.'</td><td>'.$codigoRamo.'</td></tr>';
     }
     if($flag == 0)
       echo '<tr><td>No hay secciones sin profesor.</td><td></td></tr>';
     echo '</table>';
     $res->free_result();
+  }
+
+  public function ingresarPresupuesto($codigoCarrera,$codigoSemestre,$presupuesto)
+  {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "INSERT INTO Presupuesto(Codigo_Carrera,Codigo_Semestre,Presupuesto) VALUES('{$codigoCarrera}','{$codigoSemestre}','{$presupuesto}');";
+    if(($mysqli->query($sql)) == true)
+    {
+      $answer = '*Presupuesto ingresado.';
+    }
+    else
+    {
+      $answer = '*Presupuesto no ingresado.';
+    }
+    return $answer;
+  }
+
+  public function cambiarPresupuesto($codigoCarrera,$codigoSemestre,$presupuesto)
+  {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "UPDATE Presupuesto SET Presupuesto = '{$presupuesto}' WHERE Codigo_Carrera = '{$codigoCarrera}' AND Codigo_Semestre = '{$codigoSemestre}';";
+    if(($mysqli->query($sql)) == true)
+    {
+      $answer = '*Presupuesto actualizado.';
+    }
+    else
+    {
+      $answer = '*Presupuesto no actualizado.';
+    }
+    return $answer;
   }
 
   public function verRamosDeCarrera($codigoCarrera,$codigoSemestre) {
@@ -1032,6 +1093,22 @@ class jefeDeCarrera extends usuario {
     else
     {
       $answer = '*Profesor asignado.';
+    }
+    return $answer;
+  }
+
+  public function eliminarProfesorDeSeccion($idClase)
+  {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "UPDATE Clase SET RUT_Profesor = NULL WHERE Id = '{$idClase}';";
+    if(($mysqli->query($sql)) == true)
+    {
+      $answer = '*Profesor eliminado.';
+    }
+    else
+    {
+      $answer = '*Profesor no eliminado.';
     }
     return $answer;
   }
