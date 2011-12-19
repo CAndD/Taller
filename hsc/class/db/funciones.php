@@ -68,121 +68,6 @@ function obtenerModulos($regimen)
   $resf->free_result();
 }
 
-function obtenerModulosSugerencia($regimen,$idClase,$codigoCarrera,$codigoSemestre)
-{
-  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
-  $i = 0;
-  $ramos = array();
-
-  $mysqlif2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-  $sqlf2 = "SELECT c.Id,c.Dia,s.Id,r.Codigo,ctr.Semestre,carr.Numero
-             FROM Clase AS c
-             INNER JOIN Seccion AS s ON s.Id = c.Seccion_Id
-             INNER JOIN Ramo AS r ON r.Codigo = s.Codigo_Ramo
-             INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Codigo_Ramo = r.Codigo
-             INNER JOIN Carrera AS carr ON carr.Codigo = '{$codigoCarrera}'
-            WHERE c.Id = '{$claseId}'";
-  $resf2 = $mysqlif2->prepare($sqlf2);
-  $resf2->execute();
-  $resf2->bind_result($idClass,$dia,$idSeccion,$ramoCodigo,$semestreRamo,$semestres);
-  $resf2->fetch();
-  $resf2->free_result();
-  if($semestreRamo == 1)
-  {
-    $semestreAntes = 0;
-  }
-  else
-  {
-    $semestreAntes = $semestreRamo - 1;
-  }
-
-  if($semestreRamo == $semestres)
-  {
-    $semestreDespues = 0;
-  }
-  else
-  {
-    $semestreDespues = $semestreRamo + 1;
-  }
-
-  $mysqlif3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-  $sqlf3 = "SELECT ri.Codigo_Ramo
-             FROM Carrera_Tiene_Ramos AS ctr
-             INNER JOIN Ramos_Impartidos AS ri ON ri.Codigo_Ramo = ctr.Codigo_Ramo AND ri.Impartido = 1
-            WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Semestre = '{$semestreRamo}'";
-  $resf3 = $mysqlif3->prepare($sqlf3);
-  $resf3->execute();
-  $resf3->bind_result($codigoRamo);
-  while($resf3->fetch())
-  {
-    $ramos[$i] = $codigoRamo;
-    $i++;
-  }
-  $resf3->free_result();
-
-  if($semestreAntes > 0)
-  {
-    $mysqlif3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sqlf3 = "SELECT ri.Codigo_Ramo
-               FROM Carrera_Tiene_Ramos AS ctr
-               INNER JOIN Ramos_Impartidos AS ri ON ri.Codigo_Ramo = ctr.Codigo_Ramo AND ri.Impartido = 1
-              WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Semestre = '{$semestreAntes}'";
-    $resf3 = $mysqlif3->prepare($sqlf3);
-    $resf3->execute();
-    $resf3->bind_result($codigoRamo);
-    while($resf3->fetch())
-    {
-      $ramos[$i] = $codigoRamo;
-      $i++;
-    }
-    $resf3->free_result();
-  }
-  if($semestreDespues > 0)
-  {
-    $mysqlif3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sqlf3 = "SELECT ri.Codigo_Ramo
-               FROM Carrera_Tiene_Ramos AS ctr
-               INNER JOIN Ramos_Impartidos AS ri ON ri.Codigo_Ramo = ctr.Codigo_Ramo AND ri.Impartido = 1
-              WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Semestre = '{$semestreDespues}'";
-    $resf3 = $mysqlif3->prepare($sqlf3);
-    $resf3->execute();
-    $resf3->bind_result($codigoRamo);
-    while($resf3->fetch())
-    {
-      $ramos[$i] = $codigoRamo;
-      $i++;
-    }
-    $resf3->free_result();
-  }
-
-  $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-  $sqlf = "SELECT m.Modulo,m.Inicio,m.Termino FROM Modulo AS m WHERE m.Regimen = '{$regimen}'";
-  $resf = $mysqlif->prepare($sqlf);
-  $resf->execute();
-  $resf->bind_result($modulo,$inicio,$termino);
-  while($resf->fetch())
-  {
-    $mysqlif3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sqlf3 = "SELECT c.Clase_Tipo
-               FROM Seccion AS s
-               INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$modulo}' OR c.Modulo_Termino = '{$modulo}'
-              WHERE s.Codigo_Ramo = '{$codigoRamo}' AND s.Codigo_Semestre = '{$codigoSemestre}' AND s.Codigo_Carrera = '{$codigoCarrera}'";
-    $resf3 = $mysqlif3->prepare($sqlf3);
-    $resf3->execute();
-    $resf3->bind_result($codigoRamo);
-    if($resf3->fetch())
-    {
-      echo '<option value="0" style="background-color: red;">'.$modulo.'. '.$inicio.' - '.$termino.'</option>';
-    }
-    else
-    {
-      echo '<option value="'.$modulo.'">'.$modulo.'. '.$inicio.' - '.$termino.'</option>';
-    }
-    $resf3->free_result();
-  }
-  $resf->free_result();
-}
-
 function obtenerSemestre($periodo)
 {
   global $mysqli,$db_host,$db_user,$db_pass,$db_database;
@@ -547,7 +432,7 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre,$mod) {
       if($vacantesSolicitud == NULL)
         $vacantesSolicitud = 0;    
 
-        $form = '<form method="post" target="_self" name="vacantes"><input type="text" name="vacantes" value="'.$vacantesUtilizadas.'" class="xs" maxlength="2"></input><input type="hidden" name="hiddenSolicitud" value="'.$vacantesSolicitud.'"></input><input type="hidden" name="hiddenTotal" value="'.$vacantes.'"></input><input type="hidden" name="hiddenIdSeccion" value="'.$id.'"></input> <input type="submit" name="submit" value="Cambiar"></input></form>';
+        $form = '<form method="post" target="_self" name="vacantes"><input type="text" name="vacantes" value="'.$vacantesUtilizadas.'" class="xs" maxlength="2"></input><input type="hidden" name="hiddenSolicitud" value="'.$vacantesSolicitud.'"></input><input type="hidden" name="hiddenTotal" value="'.$vacantes.'"></input><input type="hidden" name="hiddenIdSeccion" value="'.$id.'"></input> <input type="submit" name="submit" value="Reservar"></input></form>';
       echo '<tr><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombre.'</td><td>'.$codigoSemestre.'</td><td>Disponibles: '.$vacantes.'<br>Solicitud: '.$vacantesSolicitud.'<br>Utilizadas: '.$vacantesUtilizadas.' '.$form.'<br>Total: '.$vacantesFinal.'</td></tr>';
       $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
       $sql2 = "SELECT c.Id,c.Clase_Tipo,c.RUT_Profesor,c.Modulo_Inicio,c.Modulo_Termino,c.Dia,c.Codigo_Semestre
@@ -850,6 +735,96 @@ function revisarPresupuesto($codigoCarrera,$codigoSemestre)
   }
 }
 
+function verHorario($codigoCarrera,$codigoSemestre,$numeroSemestre)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sql = "SELECT c.Periodo,c.Regimen,c.Numero
+           FROM Carrera AS c 
+          WHERE c.Codigo = '{$codigoCarrera}';"; 
+  $res = $mysqli->prepare($sql);
+  $res->execute();
+  $res->bind_result($periodo,$regimen,$numero);
+  $res->fetch();
+  $res->free_result();  
+  
+  $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sql2 = "SELECT m.Modulo,m.Inicio,m.Termino
+           FROM Modulo AS m 
+          WHERE m.Regimen = '{$regimen}';"; 
+  $res2 = $mysqli2->prepare($sql2);
+  $res2->execute();
+  $res2->bind_result($modulo,$inicio,$termino);
+  if($regimen == 'D')
+    echo '<div class="down"><table><tr><td class="dc">Módulo / Días</td><td class="dc">Lunes</td><td class="dc">Martes</td><td class="dc">Miércoles</td><td class="dc">Jueves</td><td class="dc">Viernes</td></tr>';
+  else
+    echo '<div class="down"><table><tr><td class="dc">Módulo / Días</td><td class="dc">Lunes</td><td class="dc">Martes</td><td class="dc">Miércoles</td><td class="dc">Jueves</td><td class="dc">Viernes</td><td class="hor">Sábado</td></tr>';
+  while($res2->fetch())
+  {
+    if($modulo % 2 != 0) 
+    {
+        echo '<tr><td class="dc">'.$modulo.'. '.substr($inicio,0,5).'-'.substr($termino,0,5).'<br>';
+        $moduloAnterior = $modulo;
+    }
+    else 
+    {
+      if($regimen == 'D') 
+      {
+        echo $modulo.'. '.substr($inicio,0,5).'-'.substr($termino,0,5).'</td>';
+        $dias = array('Lunes','Martes','Miercoles','Jueves','Viernes','Sabado');
+        $i = 0;
+        for($i = 0;$i<5;$i++)
+        {
+          $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+          $sql = "SELECT s.Codigo_Ramo,s.Numero_Seccion,c.Clase_Tipo,c.Dia,c.Modulo_Inicio,c.Modulo_Termino
+                   FROM Carrera_Tiene_Ramos AS ctr 
+                   INNER JOIN Ramos_Impartidos AS ri ON ri.Codigo_Carrera = ctr.Codigo_Carrera AND ri.Codigo_Ramo = ctr.Codigo_Ramo AND ri.Codigo_Semestre = '{$codigoSemestre}' AND ri.Impartido = 1
+                   INNER JOIN Seccion AS s ON s.Codigo_Ramo = ri.Codigo_Ramo AND s.Codigo_Carrera = ri.Codigo_Carrera AND s.Codigo_Semestre = ri.Codigo_Semestre
+                   INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Modulo_Inicio = '{$moduloAnterior}' AND c.Modulo_Termino = '{$modulo}' AND c.Dia = '{$dias[$i]}'
+                  WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Semestre = '{$numeroSemestre}';"; 
+          $res = $mysqli->prepare($sql);
+          $res->execute();
+          $res->bind_result($codigoRamo,$numeroSeccion,$claseTipo,$dia,$moduloInicio,$moduloTermino);
+          $flag = 0;
+          while($res->fetch())
+          {
+            if($flag == 0) {
+              $flag = 1;
+              echo '<td class="drop">';
+            }
+            echo '<div class="item assigned" style="position: static; left: 649px; top: 450px;">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'</div>';
+          }
+          if($flag == 0)
+            echo '<td class="drop"></td>';
+          else
+            echo '</td>';
+          $res->free_result();  
+        }
+        echo '</tr>';
+      }
+      else {
+        echo $modulo.'. '.substr($inicio,0,5).'-'.substr($termino,0,5).'</td><td class="hor"></td><td class="hor"></td><td class="hor"></td><td class="hor"></td><td class="hor"></td><td class="hor"></td></tr>';
+      }
+    }
+  }
+  $res2->free_result();  
+  echo '</table></div>';
+}
+
+function numeroSemestres($codigoCarrera)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sql = "SELECT c.Numero
+           FROM Carrera AS c 
+          WHERE c.Codigo = '{$codigoCarrera}';"; 
+  $res = $mysqli->prepare($sql);
+  $res->execute();
+  $res->bind_result($numeroSemestres);
+  $res->fetch();
+  $res->free_result();  
+  return $numeroSemestres;
+}
 
 // Funciones usuario departamento
 function verRamosDepartamento() {

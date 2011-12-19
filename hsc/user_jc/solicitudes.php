@@ -76,10 +76,10 @@ if(isset($_SESSION['usuario']))
           if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && (is_string($_SESSION['carrera']) == true)) {
             echo '<li><a href="ramos.php">Ramos</a></li>';
             echo '<li><a href="secciones.php">Secciones y Vacantes</a></li>';
+            echo '<li><a href="horario.php">Horario</a></li>';
             echo '<li class="selected"><a href="solicitudes.php">Solicitudes</a></li>';
           }
           ?>
-          <li><a href="">Contacto</a></li>
           <li><a href="../logout.php">Logout</a></li>
         </ul>
       </div>

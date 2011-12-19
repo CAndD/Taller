@@ -423,3 +423,50 @@ input.xl {
       background: #bacfff;
       color: black;
     }
+
+div.mid {
+          float: center;
+        }
+/*clases de horario*/
+.centerTable {
+               margin-left:auto; 
+               margin-right:auto;
+             }
+
+.up {
+    }
+
+.up table {
+          }
+
+.up td {
+       }
+
+.down {
+      }
+
+.down table {
+            }
+
+.down td {
+         }
+
+.down td.drop {
+                width: 110px;
+                height: auto;
+              }
+
+.down td.over {
+                background:#fbec88;
+              }
+
+.item  {
+         text-align:center;
+	 border:1px solid #499b33;
+	 background:#fafafa;
+         height: 35px;
+	 width:110px;
+       }
+
+.assigned {
+          }

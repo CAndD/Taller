@@ -60,10 +60,10 @@ if(isset($_SESSION['usuario']))
           if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && (is_string($_SESSION['carrera']) == true)) {
             echo '<li><a href="user_jc/ramos.php">Ramos</a></li>';
             echo '<li><a href="user_jc/secciones.php">Secciones y Vacantes</a></li>';
+            echo '<li><a href="user_jc/horario.php">Horario</a></li>';
             echo '<li><a href="user_jc/solicitudes.php">Solicitudes</a></li>';
           }
           ?>
-          <li><a href="">Contacto</a></li>
           <li><a href="logout.php">Logout</a></li>
         </ul>
       </div>
@@ -134,7 +134,9 @@ if(isset($_SESSION['usuario']))
      
           echo 'Elija la carrera: ';
           $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-          $sql = "CALL jdc_carreras('{$usuario->getNombreUsuario()}')";
+          $sql = "SELECT c.Codigo,c.Nombre_Carrera,c.Periodo
+                  FROM Carrera AS c
+                 WHERE c.NombreUsuario_JC = '{$usuario->getNombreUsuario()}';";
           $res = $mysqli->prepare($sql);
           $res->execute();
           $res->bind_result($codigo,$nombre,$periodo);
