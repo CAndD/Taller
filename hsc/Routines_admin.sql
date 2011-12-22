@@ -111,27 +111,6 @@ BEGIN
   END IF;
 END;//
 
-CREATE PROCEDURE buscarCodigoRamo(codigoRamo VARCHAR(6))
-BEGIN
-  SELECT codigo
-   FROM Ramo
-  WHERE codigo = codigoRamo;
-END;//
-
-CREATE PROCEDURE buscarCodigoCarrera(codigoCarrera VARCHAR(9))
-BEGIN
-  SELECT codigo
-   FROM Carrera
-  WHERE codigo = codigoCarrera;
-END;//
-
-CREATE PROCEDURE buscarNombreUsuario(nombreUsuario VARCHAR(40))
-BEGIN
-  SELECT Nombre_Usuario
-   FROM Usuario
-  WHERE Nombre_Usuario = nombreUsuario;
-END;//
-
 CREATE PROCEDURE selectCarrera(codigoCarrera VARCHAR(9))
 BEGIN
   SELECT c.Codigo,c.Nombre_Carrera,c.Periodo

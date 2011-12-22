@@ -32,14 +32,13 @@ if(isset($_SESSION['usuario']))
   <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
   <link rel="stylesheet" type="text/css" href="../style/style.css" title="style" />
   <link rel="stylesheet" type="text/css" href="../style/bsc.css" title="style" />
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
-  <script type="text/javascript" src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+  <script type="text/javascript" src="../js/jquery-1.6.1.min.js"></script>
+  <script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
 
   <script>
 		$(function(){
 			$('.up .item').draggable({
-				revert:true,
-				proxy:'clone'
+				revert:true
 			});
 			$('.down td.drop').droppable({
 				onDragEnter:function(){
@@ -97,10 +96,14 @@ if(isset($_SESSION['usuario']))
         <!-- insert the page content here -->
         <h2>Horario</h2>
         <div>
-        <?php
-          echo '<div class="up">';
-          echo '<div class="item"></div>';
-          echo '</div>';
+        <?php 
+          if(isset($_GET['idClase']))
+          {
+            
+            echo '<div class="up">';
+            echo '<div class="item" id="'.$_GET['idClase'].'">'.$_GET['codigoRamo'].'<br>'.$_GET['numeroSeccion'].'. '.$_GET['tipoClase'].'</div>';
+            echo '</div>';
+          }
 
           $numeroSemestres = numeroSemestres($_SESSION['carrera']);
           if(isset($_GET['numeroSemestre']) || isset($_POST['numeroSemestre']))
@@ -117,9 +120,9 @@ if(isset($_SESSION['usuario']))
                 echo '<a href="horario.php?numeroSemestre='.($_GET['numeroSemestre']+1).'">adelante</a>';
               echo '</td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>';
             }
-            elseif(isset($_POST['numeroSemestre']))
+            elseif(isset($_POST['submit']) && $_POST['submit'] == 'Cambiar' && isset($_POST['numeroSemestre']))
             {
-              if($_POST['numeroSemestre'] < 0 || $_POST['numeroSemestre'] > $numeroSemestres)
+              if($_POST['numeroSemestre'] <= 0 || $_POST['numeroSemestre'] > $numeroSemestres)
               {
                 $_POST['numeroSemestre'] = 1;
                 echo '<span class="error">*Debe escoger un semestre entre 1 y '.$numeroSemestres.'.</span>';
@@ -162,6 +165,9 @@ if(isset($_SESSION['usuario']))
   </div>
   <!--<script type='text/javascript' src='../js/jquery.js'></script>-->
   <!--<script type='text/javascript' src='../js/jquery.simplemodal.js'></script>-->
+  <script type='text/javascript'>
+    
+  </script>
   <script type='text/javascript' src='../js/bsc.js'></script>
 </body>
 </html>

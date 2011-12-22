@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 12, 2011 at 09:50 PM
+-- Generation Time: Dec 22, 2011 at 01:07 PM
 -- Server version: 5.1.53
 -- PHP Version: 5.3.4
 
@@ -84,38 +84,6 @@ DROP PROCEDURE IF EXISTS `asignar_jdc`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `asignar_jdc`(codigoCarrera VARCHAR(9),nombreUsuario VARCHAR(40))
 BEGIN
   UPDATE Carrera AS c SET c.NombreUsuario_JC = nombreUsuario WHERE c.Codigo = codigoCarrera;
-END$$
-
-DROP PROCEDURE IF EXISTS `buscarCodigoCarrera`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `buscarCodigoCarrera`(codigoCarrera VARCHAR(9))
-BEGIN
-  SELECT codigo
-   FROM Carrera
-  WHERE codigo = codigoCarrera;
-END$$
-
-DROP PROCEDURE IF EXISTS `buscarCodigoRamo`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `buscarCodigoRamo`(codigoRamo VARCHAR(6))
-BEGIN
-  SELECT codigo
-   FROM Ramo
-  WHERE codigo = codigoRamo;
-END$$
-
-DROP PROCEDURE IF EXISTS `buscarNombreUsuario`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `buscarNombreUsuario`(nombreUsuario VARCHAR(40))
-BEGIN
-  SELECT Nombre_Usuario
-   FROM Usuario
-  WHERE Nombre_Usuario = nombreUsuario;
-END$$
-
-DROP PROCEDURE IF EXISTS `buscarRutProfesor`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `buscarRutProfesor`(rutProfesor VARCHAR(10))
-BEGIN
-  SELECT p.Rut_Profesor 
-   FROM Profesor AS p 
-  WHERE p.Rut_Profesor = rutProfesor;
 END$$
 
 DROP PROCEDURE IF EXISTS `cambiar_jdc`$$
@@ -582,22 +550,48 @@ CREATE TABLE IF NOT EXISTS `clase` (
   `Dia` varchar(12) DEFAULT NULL COMMENT 'Día de la clase.',
   `Codigo_Semestre` int(11) NOT NULL COMMENT 'Codigo del semestre al cual pertenece la clase.',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=36 ;
 
 --
 -- Dumping data for table `clase`
 --
 
 INSERT INTO `clase` (`Id`, `Clase_Tipo`, `Seccion_Id`, `RUT_Profesor`, `Modulo_Inicio`, `Modulo_Termino`, `Dia`, `Codigo_Semestre`) VALUES
-(1, 'Teoria', 1, 164827607, NULL, NULL, NULL, 201125),
+(1, 'Teoria', 1, 164827607, 1, 2, 'Martes', 201125),
 (2, 'Teoria', 1, 164827608, NULL, NULL, NULL, 201125),
 (3, 'Ayudantia', 1, 164827608, NULL, NULL, NULL, 201125),
-(4, 'Teoria', 2, NULL, NULL, NULL, NULL, 201125),
+(4, 'Teoria', 2, NULL, 1, 2, 'Martes', 201125),
 (5, 'Teoria', 2, NULL, NULL, NULL, NULL, 201125),
 (6, 'Ayudantia', 2, NULL, NULL, NULL, NULL, 201125),
 (7, 'Teoria', 3, NULL, NULL, NULL, NULL, 201125),
 (8, 'Teoria', 3, NULL, NULL, NULL, NULL, 201125),
-(9, 'Ayudantia', 3, NULL, NULL, NULL, NULL, 201125);
+(9, 'Ayudantia', 3, NULL, NULL, NULL, NULL, 201125),
+(10, 'Teoria', 4, NULL, NULL, NULL, NULL, 201125),
+(11, 'Teoria', 4, NULL, NULL, NULL, NULL, 201125),
+(12, 'Teoria', 4, NULL, NULL, NULL, NULL, 201125),
+(13, 'Ayudantia', 4, NULL, NULL, NULL, NULL, 201125),
+(14, 'Laboratorio', 4, NULL, NULL, NULL, NULL, 201125),
+(15, 'Taller', 4, NULL, NULL, NULL, NULL, 201125),
+(16, 'Teoria', 5, NULL, 1, 2, 'Martes', 201125),
+(17, 'Teoria', 5, NULL, NULL, NULL, NULL, 201125),
+(18, 'Ayudantia', 5, NULL, NULL, NULL, NULL, 201125),
+(19, 'Laboratorio', 5, NULL, NULL, NULL, NULL, 201125),
+(20, 'Teoria', 6, 164827608, NULL, NULL, 'Lunes', 201125),
+(21, 'Teoria', 6, NULL, NULL, NULL, NULL, 201125),
+(22, 'Ayudantia', 6, NULL, NULL, NULL, NULL, 201125),
+(23, 'Teoria', 7, NULL, NULL, NULL, NULL, 201125),
+(24, 'Teoria', 7, NULL, NULL, NULL, NULL, 201125),
+(25, 'Ayudantia', 7, NULL, NULL, NULL, NULL, 201125),
+(26, 'Teoria', 8, NULL, NULL, NULL, NULL, 201125),
+(27, 'Teoria', 8, NULL, NULL, NULL, NULL, 201125),
+(28, 'Ayudantia', 8, NULL, NULL, NULL, NULL, 201125),
+(29, 'Teoria', 9, NULL, NULL, NULL, NULL, 201125),
+(30, 'Teoria', 9, NULL, NULL, NULL, NULL, 201125),
+(31, 'Ayudantia', 9, NULL, NULL, NULL, NULL, 201125),
+(32, 'Teoria', 10, NULL, NULL, NULL, NULL, 201125),
+(33, 'Teoria', 10, NULL, NULL, NULL, NULL, 201125),
+(34, 'Ayudantia', 10, NULL, NULL, NULL, NULL, 201125),
+(35, 'Laboratorio', 10, NULL, NULL, NULL, NULL, 201125);
 
 -- --------------------------------------------------------
 
@@ -905,7 +899,7 @@ CREATE TABLE IF NOT EXISTS `seccion` (
   PRIMARY KEY (`Id`),
   KEY `Codigo_Ramo` (`Codigo_Ramo`),
   KEY `Numero_Seccion` (`Numero_Seccion`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
 
 --
 -- Dumping data for table `seccion`
@@ -914,7 +908,14 @@ CREATE TABLE IF NOT EXISTS `seccion` (
 INSERT INTO `seccion` (`Id`, `Numero_Seccion`, `NRC`, `Codigo_Ramo`, `Codigo_Carrera`, `Codigo_Semestre`, `Regimen`, `Vacantes`, `Vacantes_utilizadas`) VALUES
 (1, 1, 1524, 'IET090', 'UNAB11500', 201125, 'D', 60, 0),
 (2, 2, 1524, 'IET090', 'UNAB11500', 201125, 'D', 60, 0),
-(3, 3, 1524, 'IET090', 'UNAB11500', 201125, 'D', 60, 0);
+(3, 3, 1524, 'IET090', 'UNAB11500', 201125, 'D', 60, 0),
+(4, 1, 1524, 'IET100', 'UNAB11500', 201125, 'D', 60, 0),
+(5, 1, 1524, 'IET091', 'UNAB11500', 201125, 'D', 60, 0),
+(6, 1, 1524, 'INF090', 'UNAB11500', 201125, 'D', 60, 0),
+(7, 2, 1524, 'INF090', 'UNAB11500', 201125, 'D', 60, 0),
+(8, 3, 1524, 'INF090', 'UNAB11500', 201125, 'D', 60, 0),
+(9, 4, 1524, 'INF090', 'UNAB11500', 201125, 'D', 60, 0),
+(10, 2, 1524, 'IET091', 'UNAB11500', 201125, 'D', 60, 0);
 
 -- --------------------------------------------------------
 

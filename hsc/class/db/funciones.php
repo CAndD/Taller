@@ -445,37 +445,19 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre,$mod) {
       {
         if($flag2 == 0)
           $flag2 = 1;
-        if($diaClase == NULL) {
-          $diaClase = 'Día de la clase no asignado.<br><a id="'.$idClase.'" class="cambiarDiaClase" href="">Asignar</a>';
-          $asdf = false;  
-        }
-        else
-          $diaClase = $diaClase.'<br><a id="'.$idClase.'" class="cambiarDiaClase" href="">Cambiar</a>';
         if($rutProfesor == NULL)
           $rutProfesor = 'Profesor no asignado.<br><a id="'.$idClase.'" class="cambiarProfesor" href="">Asignar</a>';
         else
           $rutProfesor = $rutProfesor.'<br><a id="'.$idClase.'" class="cambiarProfesor" href="">Cambiar</a>';
-        if(isset($asdf) && $asdf == false) {
-            $moduloInicio = 'No se puede asignar módulo de inicio sin asignar antes el día.';
-            $moduloTermino = 'No se puede asignar módulo de término sin asignar antes el día.';
+        if($diaClase == NULL && $moduloInicio == NULL && $moduloTermino == NULL) {
+          $diaClase = 'Horario no asignado.<br><a id="'.$idClase.'" class="asignarHorario" href="horario.php?idClase='.$idClase.'&codigoRamo='.$codigoRamo.'&numeroSeccion='.$numeroSeccion.'&tipoClase='.$claseTipo.'">Asignar</a>'; 
         }
         else
         {
-          if($moduloInicio == NULL)
-            $moduloInicio = 'Hora de inicio no asignada.<br><a id="'.$idClase.'" class="cambiarModuloInicio" href="">Asignar</a>';
-          else {
-            $hora = obtenerHoraModulo($moduloInicio,$idClase);
-            $moduloInicio = ' '.$moduloInicio.'.'.$hora.' <br><a id="'.$idClase.'" class="cambiarModuloInicio" href="">Cambiar</a>';
-          }
-          if($moduloTermino == NULL)
-            $moduloTermino = 'Hora de termino no asignada.<br><a id="'.$idClase.'" class="cambiarModuloTermino" href="">Asignar</a>';
-          else {
-          
-            $hora2 = obtenerHoraModulo($moduloTermino,$idClase);
-            $moduloTermino = ' '.$moduloTermino.'.'.$hora2.' <br><a id="'.$idClase.'" class="cambiarModuloTermino" href="">Cambiar</a>';
-          }
+          $hora2 = obtenerHoraModulo($moduloTermino,$idClase);
+          $diaClase = $diaClase.' '.$moduloTermino.'. '.$hora2.' <br><a id="'.$idClase.'" class="cambiarHorario" href="">Cambiar</a>';
         }
-        echo '<tr><td class="dc">'.$claseTipo.'</td><td class="dc">'.$rutProfesor.'</td><td class="dc">'.$diaClase.'</td><td class="dc">'.$moduloInicio.'</td><td class="dc">'.$moduloTermino.'</td></tr>';
+        echo '<tr><td class="dc">'.$claseTipo.'</td><td class="dc">'.$rutProfesor.'</td><td class="dc">'.$diaClase.'</td></tr>';
       }
       if($flag2 == 0)
         echo '<tr><td class="dc">No existen clases para esta sección.</td></tr>';
