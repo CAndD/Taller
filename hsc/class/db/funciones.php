@@ -435,12 +435,13 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre,$mod) {
         $form = '<form method="post" target="_self" name="vacantes"><input type="text" name="vacantes" value="'.$vacantesUtilizadas.'" class="xs" maxlength="2"></input><input type="hidden" name="hiddenSolicitud" value="'.$vacantesSolicitud.'"></input><input type="hidden" name="hiddenTotal" value="'.$vacantes.'"></input><input type="hidden" name="hiddenIdSeccion" value="'.$id.'"></input> <input type="submit" name="submit" value="Reservar"></input></form>';
       echo '<tr><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombre.'</td><td>'.$codigoSemestre.'</td><td>Disponibles: '.$vacantes.'<br>Solicitud: '.$vacantesSolicitud.'<br>Utilizadas: '.$vacantesUtilizadas.' '.$form.'<br>Total: '.$vacantesFinal.'</td></tr>';
       $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-      $sql2 = "SELECT c.Id,c.Clase_Tipo,c.RUT_Profesor,c.Modulo_Inicio,c.Modulo_Termino,c.Dia,c.Codigo_Semestre
+      $sql2 = "SELECT c.Id,c.Clase_Tipo,c.RUT_Profesor,c.Modulo_Inicio,c.Modulo_Termino,c.Dia,c.Codigo_Semestre,ctr.Semestre
                 FROM Clase AS c
+                INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Ramo = '{$codigoRamo}' AND ctr.Codigo_Carrera = '{$codigoCarrera}'
                WHERE c.Seccion_Id = '{$id}';";
       $res2 = $mysqli2->prepare($sql2);
       $res2->execute();
-      $res2->bind_result($idClase,$claseTipo,$rutProfesor,$moduloInicio,$moduloTermino,$diaClase,$codigoSemestreClase);
+      $res2->bind_result($idClase,$claseTipo,$rutProfesor,$moduloInicio,$moduloTermino,$diaClase,$codigoSemestreClase,$semestreRamo);
       while($res2->fetch())
       {
         if($flag2 == 0)
@@ -450,7 +451,7 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre,$mod) {
         else
           $rutProfesor = $rutProfesor.'<br><a id="'.$idClase.'" class="cambiarProfesor" href="">Cambiar</a>';
         if($diaClase == NULL && $moduloInicio == NULL && $moduloTermino == NULL) {
-          $diaClase = 'Horario no asignado.<br><a id="'.$idClase.'" class="asignarHorario" href="horario.php?idClase='.$idClase.'&codigoRamo='.$codigoRamo.'&numeroSeccion='.$numeroSeccion.'&tipoClase='.$claseTipo.'">Asignar</a>'; 
+          $diaClase = 'Horario no asignado.<br><a id="'.$idClase.'" class="asignarHorario" href="horario.php?idClase='.$idClase.'&codigoRamo='.$codigoRamo.'&numeroSeccion='.$numeroSeccion.'&tipoClase='.$claseTipo.'&numeroSemestre='.$semestreRamo.'">Asignar</a>'; 
         }
         else
         {

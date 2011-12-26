@@ -111,7 +111,7 @@ if(isset($_SESSION['usuario']))
           }
 
           $numeroSemestres = numeroSemestres($_SESSION['carrera']);
-          if(isset($_GET['numeroSemestre']) || isset($_POST['numeroSemestre']))
+          if(isset($_GET['numeroSemestre']) || (isset($_POST['submit']) && $_POST['submit'] == 'Cambiar' && isset($_POST['numeroSemestre'])))
           {
             if(isset($_GET['numeroSemestre'])) 
             {

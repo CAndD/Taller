@@ -81,14 +81,30 @@ if(isset($_SESSION['usuario']))
   elseif(isset($_GET['idClase']) && isset($_GET['horario']))
   {
     $list($dia,$moduloInicio,$moduloTermino) = explode(".",$_GET['horario']);
-    echo $dia.$moduloInicio.$moduloTermino;
+    //echo $dia.$moduloInicio.$moduloTermino;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "SELECT rt.Abreviacion
-             FROM Ramo_Tipo AS rt
-            WHERE rt.Abreviacion = '{}';";
+    $sql = "SELECT ctr.Codigo_Ramo,ctr.semestre,c.Clase_Tipo
+             FROM Clase AS c
+             INNER JOIN Seccion AS s ON s.Id = c.Seccion_Id AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}'
+             INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Ramo = s.Codigo_Ramo AND ctr.Codigo_Carrera = '{$_SESSION['carrera']}'
+            WHERE c.Id = '{$_GET['idClase']}';";
     $res = $mysqli->prepare($sql);
     $res->execute();
-    $res->bind_result($abreviacion);
+    $res->bind_result($codigoRamo,$semestreRamo,$claseTipo);
+    $res->fetch();
+    $res->free_result();
+
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "SELECT c.Id
+             FROM Carrera_Tiene_Ramos AS ctr
+             INNER JOIN Seccion AS s ON s.Codigo_Ramo = ctr.Codigo_Ramo AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}'
+             INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$moduloInicio}' AND c.Modulo_Termino = '{$moduloTermino}'
+            WHERE ctr.Codigo_Carrera = '{$_SESSION['carrera']}' AND ctr.Semestre = '{$semestreRamo}';";
+    $res = $mysqli->prepare($sql);
+    $res->execute();
+    $res->bind_result($semestreRamo);
+    $res->fetch();
+    $res->free_result();
     if($res->fetch())
     {
       echo $abreviacion;
