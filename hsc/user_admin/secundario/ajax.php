@@ -78,8 +78,10 @@ if(isset($_SESSION['usuario']))
     }
     $res->free_result();
   }
-  elseif(isset($_GET['idClase']) && isset($_GET['diaClase']) && isset($_GET['moduloInicio']) && isset($_GET['moduloTermino']) && isset($_GET['codigoSemestre']))
+  elseif(isset($_GET['idClase']) && isset($_GET['horario']))
   {
+    $list($dia,$moduloInicio,$moduloTermino) = explode(".",$_GET['horario']);
+    echo $dia.$moduloInicio.$moduloTermino;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
     $sql = "SELECT rt.Abreviacion
              FROM Ramo_Tipo AS rt
@@ -90,6 +92,10 @@ if(isset($_SESSION['usuario']))
     if($res->fetch())
     {
       echo $abreviacion;
+    }
+    else
+    {
+      
     }
     $res->free_result();
   }

@@ -34,6 +34,7 @@ if(isset($_SESSION['usuario']))
   <link rel="stylesheet" type="text/css" href="../style/bsc.css" title="style" />
   <script type="text/javascript" src="../js/jquery-1.6.1.min.js"></script>
   <script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+  <script type="text/javascript" src="../js/js.js"></script>
 
   <script>
 		$(function(){
@@ -51,8 +52,12 @@ if(isset($_SESSION['usuario']))
 					$(this).removeClass('over');
 					if ($(source).hasClass('assigned')){
 						$(this).append(source);
+                                                //alert($(this).attr('id') + $(source).attr('id'));
 					} else {
 						var c = $(source).clone().addClass('assigned');
+                                                //alert($(this).attr('id'));
+                                                var resp = asignarHorario($(source).attr('id'),$(this).attr('id'));
+                                                //$('.up').empty();
 						$(this).append(c);
 						c.draggable({
 							revert:true
@@ -165,9 +170,7 @@ if(isset($_SESSION['usuario']))
   </div>
   <!--<script type='text/javascript' src='../js/jquery.js'></script>-->
   <!--<script type='text/javascript' src='../js/jquery.simplemodal.js'></script>-->
-  <script type='text/javascript'>
-    
-  </script>
+  <script type='text/javascript' src='../js/horario.js'></script>
   <script type='text/javascript' src='../js/bsc.js'></script>
 </body>
 </html>

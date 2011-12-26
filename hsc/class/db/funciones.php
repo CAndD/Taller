@@ -738,9 +738,9 @@ function verHorario($codigoCarrera,$codigoSemestre,$numeroSemestre)
   $res2->execute();
   $res2->bind_result($modulo,$inicio,$termino);
   if($regimen == 'D')
-    echo '<div class="down"><table><tr><td class="dc">Módulo / Días</td><td class="dc">Lunes</td><td class="dc">Martes</td><td class="dc">Miércoles</td><td class="dc">Jueves</td><td class="dc">Viernes</td></tr>';
+    echo '<div class="down"><table><tr><td class="dc">Módulo / Días</td><td class="dc" id="Lunes">Lunes</td><td class="dc" id="Martes">Martes</td><td class="dc" id="Miercoles">Miércoles</td><td class="dc" id="Jueves">Jueves</td><td class="dc" id="Viernes">Viernes</td></tr>';
   else
-    echo '<div class="down"><table><tr><td class="dc">Módulo / Días</td><td class="dc">Lunes</td><td class="dc">Martes</td><td class="dc">Miércoles</td><td class="dc">Jueves</td><td class="dc">Viernes</td><td class="hor">Sábado</td></tr>';
+    echo '<div class="down"><table><tr><td class="dc">Módulo / Días</td><td class="dc" id="Lunes">Lunes</td><td class="dc" id="Martes">Martes</td><td class="dc" id="Miercoles">Miércoles</td><td class="dc" id="Jueves">Jueves</td><td class="dc" id="Viernes">Viernes</td><td class="dc" id="Sabado">Sábado</td></tr>';
   while($res2->fetch())
   {
     if($modulo % 2 != 0) 
@@ -758,7 +758,7 @@ function verHorario($codigoCarrera,$codigoSemestre,$numeroSemestre)
         for($i = 0;$i<5;$i++)
         {
           $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-          $sql = "SELECT s.Codigo_Ramo,s.Numero_Seccion,c.Clase_Tipo,c.Dia,c.Modulo_Inicio,c.Modulo_Termino
+          $sql = "SELECT c.Id,s.Codigo_Ramo,s.Numero_Seccion,c.Clase_Tipo,c.Dia,c.Modulo_Inicio,c.Modulo_Termino
                    FROM Carrera_Tiene_Ramos AS ctr 
                    INNER JOIN Ramos_Impartidos AS ri ON ri.Codigo_Carrera = ctr.Codigo_Carrera AND ri.Codigo_Ramo = ctr.Codigo_Ramo AND ri.Codigo_Semestre = '{$codigoSemestre}' AND ri.Impartido = 1
                    INNER JOIN Seccion AS s ON s.Codigo_Ramo = ri.Codigo_Ramo AND s.Codigo_Carrera = ri.Codigo_Carrera AND s.Codigo_Semestre = ri.Codigo_Semestre
@@ -766,18 +766,18 @@ function verHorario($codigoCarrera,$codigoSemestre,$numeroSemestre)
                   WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Semestre = '{$numeroSemestre}';"; 
           $res = $mysqli->prepare($sql);
           $res->execute();
-          $res->bind_result($codigoRamo,$numeroSeccion,$claseTipo,$dia,$moduloInicio,$moduloTermino);
+          $res->bind_result($claseId,$codigoRamo,$numeroSeccion,$claseTipo,$dia,$moduloInicio,$moduloTermino);
           $flag = 0;
           while($res->fetch())
           {
             if($flag == 0) {
               $flag = 1;
-              echo '<td class="drop">';
+              echo '<td class="drop" id="'.$dias[$i].'.'.$moduloInicio.'.'.$moduloTermino.'">';
             }
-            echo '<div class="item assigned" style="position: static; left: 649px; top: 450px;">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'</div>';
+            echo '<div class="item assigned" id="'.$claseId.'">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'</div>';
           }
           if($flag == 0)
-            echo '<td class="drop"></td>';
+            echo '<td class="drop" id="'.$dias[$i].'.'.$moduloAnterior.'.'.$modulo.'"></td>';
           else
             echo '</td>';
           $res->free_result();  

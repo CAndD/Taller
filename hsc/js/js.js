@@ -143,13 +143,13 @@ function buscarAbreviacion(abrev)
   }
 }
 
-function asignarHorario(idClase,diaClase,moduloInicio,moduloTermino,codigoSemestre)
+function asignarHorario(idClase,horario)
 {
   var err = '<span class="error">*Tope de horario.</span>';
   var acc = '<span class="error">*Horario asignado.</span>';
   var xmlhttp;
   xmlhttp=new XMLHttpRequest();
-  xmlhttp.open("GET","../user_admin/secundario/ajax.php?idClase="+idClase+"&diaClase="+diaClase+"&moduloInicio="+moduloInicio+"&moduloTermino="+moduloTermino+"&codigoSemestre="+codigoSemestre,true);
+  xmlhttp.open("GET","../user_admin/secundario/ajax.php?idClase="+idClase+"&horario="+horario,true);
   xmlhttp.send();
   xmlhttp.onreadystatechange=function()
   {
