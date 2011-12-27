@@ -80,40 +80,81 @@ if(isset($_SESSION['usuario']))
   }
   elseif(isset($_GET['idClase']) && isset($_GET['horario']))
   {
-    $list($dia,$moduloInicio,$moduloTermino) = explode(".",$_GET['horario']);
-    //echo $dia.$moduloInicio.$moduloTermino;
-    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "SELECT ctr.Codigo_Ramo,ctr.semestre,c.Clase_Tipo
+    $inicio = 0;
+    $fin = 0;
+    $largo = strlen($_GET['horario']); 
+    $flag = 0;
+    $i = 0;
+    for($i = 0;$i<2;$i++)
+    {
+      $flag = 0;
+      while($flag == 0)
+      {
+        if(substr($_GET['horario'],$fin,1) == '.')
+        {
+          if($i == 0) {
+            $dia = substr($_GET['horario'],0,$fin);
+            $inicio = $fin+1;
+            $flag = 1;
+          }
+          elseif($i == 1) {
+            $moduloInicio = substr($_GET['horario'],$inicio,$fin-$inicio);
+            $moduloTermino = substr($_GET['horario'],$fin+1,$largo-$fin);
+            $flag = 1;    
+          }
+        } 
+        $fin++;
+      }
+    }
+    //echo $_GET['idClase'].'-'.$_GET['horario'].'<br>';
+    //echo 'dia: '.$dia.' inicio: '.$moduloInicio.' termino: '.$moduloTermino.'<br>';
+    $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql2 = "SELECT ctr.Codigo_Ramo,ctr.semestre,c.Clase_Tipo
              FROM Clase AS c
              INNER JOIN Seccion AS s ON s.Id = c.Seccion_Id AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}'
              INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Ramo = s.Codigo_Ramo AND ctr.Codigo_Carrera = '{$_SESSION['carrera']}'
             WHERE c.Id = '{$_GET['idClase']}';";
-    $res = $mysqli->prepare($sql);
-    $res->execute();
-    $res->bind_result($codigoRamo,$semestreRamo,$claseTipo);
-    $res->fetch();
-    $res->free_result();
+    $res2 = $mysqli2->prepare($sql2);
+    $res2->execute();
+    $res2->bind_result($codigoRamo,$semestreRamo,$claseTipo);
+    $res2->fetch();
+    $res2->free_result();
 
-    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "SELECT c.Id
+    //echo 'codigoRamo: '.$codigoRamo.' semestreRamo: '.$semestreRamo.' claseTipo: '.$claseTipo.'<br>';
+    //echo 'carrera : '.$_SESSION['carrera'].' semestre: '.$_SESSION['codigoSemestre'].'<br>';
+
+    $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql3 = "SELECT c.Id
              FROM Carrera_Tiene_Ramos AS ctr
              INNER JOIN Seccion AS s ON s.Codigo_Ramo = ctr.Codigo_Ramo AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}'
              INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$moduloInicio}' AND c.Modulo_Termino = '{$moduloTermino}'
             WHERE ctr.Codigo_Carrera = '{$_SESSION['carrera']}' AND ctr.Semestre = '{$semestreRamo}';";
-    $res = $mysqli->prepare($sql);
-    $res->execute();
-    $res->bind_result($semestreRamo);
-    $res->fetch();
-    $res->free_result();
-    if($res->fetch())
+    $res3 = $mysqli3->prepare($sql3);
+    $res3->execute();
+    $res3->bind_result($idClase);
+    $res3->fetch();
+    $res3->free_result();
+    if($res3->fetch())
     {
-      echo $abreviacion;
+      //echo '0 idClase: '.$idClase;
+      echo '0';
     }
     else
     {
-      
+      $mysqli4 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+      $sql4 = "UPDATE Clase SET Dia = '{$dia}',Modulo_Inicio = '{$moduloInicio}',Modulo_Termino = '{$moduloTermino}' WHERE Id = '{$_GET['idClase']}';";
+      //$sql4 = "UPDATE Clase SET Dia = '{$dia}' WHERE Id = '{$_GET['idClase']}';";
+      if(($mysqli4->query($sql4)) == true)
+      {
+        //echo '1 dia: '.$dia.' inicio: '.$moduloInicio.' termino: '.$moduloTermino;
+        echo '1';
+      }
+      else
+      {
+        echo '2';
+      }
     }
-    $res->free_result();
+    $res3->free_result();
   }
 }
 else

@@ -57,6 +57,7 @@ if(isset($_SESSION['usuario']))
 						var c = $(source).clone().addClass('assigned');
                                                 //alert($(this).attr('id'));
                                                 var resp = asignarHorario($(source).attr('id'),$(this).attr('id'));
+                                                alert(resp);
                                                 //$('.up').empty();
 						$(this).append(c);
 						c.draggable({
@@ -101,6 +102,7 @@ if(isset($_SESSION['usuario']))
         <!-- insert the page content here -->
         <h2>Horario</h2>
         <div>
+         <div id="horario"></div>
         <?php 
           if(isset($_GET['idClase']))
           {
@@ -170,7 +172,7 @@ if(isset($_SESSION['usuario']))
   </div>
   <!--<script type='text/javascript' src='../js/jquery.js'></script>-->
   <!--<script type='text/javascript' src='../js/jquery.simplemodal.js'></script>-->
-  <script type='text/javascript' src='../js/horario.js'></script>
+  <!--<script type='text/javascript' src='../js/horario.js'></script>-->
   <script type='text/javascript' src='../js/bsc.js'></script>
 </body>
 </html>

@@ -147,6 +147,7 @@ function asignarHorario(idClase,horario)
 {
   var err = '<span class="error">*Tope de horario.</span>';
   var acc = '<span class="error">*Horario asignado.</span>';
+  var errmysql = '<span class="error">*No se pudo asignar horario.</span>';
   var xmlhttp;
   xmlhttp=new XMLHttpRequest();
   xmlhttp.open("GET","../user_admin/secundario/ajax.php?idClase="+idClase+"&horario="+horario,true);
@@ -157,11 +158,17 @@ function asignarHorario(idClase,horario)
     {
       if(xmlhttp.responseText)
       {
-        document.getElementById("existe").innerHTML=err;
-      }
-      else
-      {
-        document.getElementById("existe").innerHTML="";
+        return xmlhttp.responseText;
+        //document.getElementById("horario").innerHTML=err;
+        //if(xmlhttp.responseText == '0')
+          //return '0';
+          //document.getElementById("horario").innerHTML=err;
+        //else if(xmlhttp.responseText == '1')
+          //return '1';
+          //document.getElementById("horario").innerHTML=acc;
+        //else if(xmlhttp.responseText == '2')
+          //return '2';
+          //document.getElementById("horario").innerHTML=errmysql;
       }
     }
   }
