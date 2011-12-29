@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 22, 2011 at 01:07 PM
+-- Generation Time: Dec 29, 2011 at 09:16 AM
 -- Server version: 5.1.53
 -- PHP Version: 5.3.4
 
@@ -550,17 +550,17 @@ CREATE TABLE IF NOT EXISTS `clase` (
   `Dia` varchar(12) DEFAULT NULL COMMENT 'Día de la clase.',
   `Codigo_Semestre` int(11) NOT NULL COMMENT 'Codigo del semestre al cual pertenece la clase.',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=36 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=42 ;
 
 --
 -- Dumping data for table `clase`
 --
 
 INSERT INTO `clase` (`Id`, `Clase_Tipo`, `Seccion_Id`, `RUT_Profesor`, `Modulo_Inicio`, `Modulo_Termino`, `Dia`, `Codigo_Semestre`) VALUES
-(1, 'Teoria', 1, 164827607, 1, 2, 'Martes', 201125),
-(2, 'Teoria', 1, 164827608, NULL, NULL, NULL, 201125),
+(1, 'Teoria', 1, 164827607, 3, 4, 'Martes', 201125),
+(2, 'Teoria', 1, 164827608, 3, 4, 'Martes', 201125),
 (3, 'Ayudantia', 1, 164827608, NULL, NULL, NULL, 201125),
-(4, 'Teoria', 2, NULL, 1, 2, 'Martes', 201125),
+(4, 'Teoria', 2, NULL, NULL, NULL, NULL, 201125),
 (5, 'Teoria', 2, NULL, NULL, NULL, NULL, 201125),
 (6, 'Ayudantia', 2, NULL, NULL, NULL, NULL, 201125),
 (7, 'Teoria', 3, NULL, NULL, NULL, NULL, 201125),
@@ -572,11 +572,11 @@ INSERT INTO `clase` (`Id`, `Clase_Tipo`, `Seccion_Id`, `RUT_Profesor`, `Modulo_I
 (13, 'Ayudantia', 4, NULL, NULL, NULL, NULL, 201125),
 (14, 'Laboratorio', 4, NULL, NULL, NULL, NULL, 201125),
 (15, 'Taller', 4, NULL, NULL, NULL, NULL, 201125),
-(16, 'Teoria', 5, NULL, 1, 2, 'Martes', 201125),
+(16, 'Teoria', 5, NULL, NULL, NULL, NULL, 201125),
 (17, 'Teoria', 5, NULL, NULL, NULL, NULL, 201125),
 (18, 'Ayudantia', 5, NULL, NULL, NULL, NULL, 201125),
 (19, 'Laboratorio', 5, NULL, NULL, NULL, NULL, 201125),
-(20, 'Teoria', 6, 164827608, NULL, NULL, 'Lunes', 201125),
+(20, 'Teoria', 6, 164827608, NULL, NULL, NULL, 201125),
 (21, 'Teoria', 6, NULL, NULL, NULL, NULL, 201125),
 (22, 'Ayudantia', 6, NULL, NULL, NULL, NULL, 201125),
 (23, 'Teoria', 7, NULL, NULL, NULL, NULL, 201125),
@@ -591,7 +591,13 @@ INSERT INTO `clase` (`Id`, `Clase_Tipo`, `Seccion_Id`, `RUT_Profesor`, `Modulo_I
 (32, 'Teoria', 10, NULL, NULL, NULL, NULL, 201125),
 (33, 'Teoria', 10, NULL, NULL, NULL, NULL, 201125),
 (34, 'Ayudantia', 10, NULL, NULL, NULL, NULL, 201125),
-(35, 'Laboratorio', 10, NULL, NULL, NULL, NULL, 201125);
+(35, 'Laboratorio', 10, NULL, NULL, NULL, NULL, 201125),
+(36, 'Teoria', 11, NULL, NULL, NULL, NULL, 201125),
+(37, 'Teoria', 11, NULL, NULL, NULL, NULL, 201125),
+(38, 'Ayudantia', 11, NULL, NULL, NULL, NULL, 201125),
+(39, 'Teoria', 12, NULL, NULL, NULL, NULL, 201125),
+(40, 'Teoria', 12, NULL, NULL, NULL, NULL, 201125),
+(41, 'Ayudantia', 12, NULL, NULL, NULL, NULL, 201125);
 
 -- --------------------------------------------------------
 
@@ -899,7 +905,7 @@ CREATE TABLE IF NOT EXISTS `seccion` (
   PRIMARY KEY (`Id`),
   KEY `Codigo_Ramo` (`Codigo_Ramo`),
   KEY `Numero_Seccion` (`Numero_Seccion`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
 
 --
 -- Dumping data for table `seccion`
@@ -915,7 +921,9 @@ INSERT INTO `seccion` (`Id`, `Numero_Seccion`, `NRC`, `Codigo_Ramo`, `Codigo_Car
 (7, 2, 1524, 'INF090', 'UNAB11500', 201125, 'D', 60, 0),
 (8, 3, 1524, 'INF090', 'UNAB11500', 201125, 'D', 60, 0),
 (9, 4, 1524, 'INF090', 'UNAB11500', 201125, 'D', 60, 0),
-(10, 2, 1524, 'IET091', 'UNAB11500', 201125, 'D', 60, 0);
+(10, 2, 1524, 'IET091', 'UNAB11500', 201125, 'D', 60, 0),
+(11, 1, 1524, 'INF112', 'UNAB11500', 201125, 'D', 60, 0),
+(12, 2, 1524, 'INF112', 'UNAB11500', 201125, 'D', 60, 0);
 
 -- --------------------------------------------------------
 
