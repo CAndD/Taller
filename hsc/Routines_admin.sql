@@ -1,3 +1,6 @@
+TRIGGER apertura de semestre
+
+
 CREATE PROCEDURE agregar_carrera(cod VARCHAR(7),nombre VARCHAR(100))
 BEGIN
   IF ((SELECT Codigo,Nombre_Carrera FROM Carrera WHERE Codigo = cod AND Nombre_Carrera = nombre) IS NOT NULL) THEN

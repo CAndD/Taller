@@ -93,7 +93,7 @@ if(isset($_SESSION['usuario']))
         <?php
           if(isset($msg))
             echo '<span class="error">'.$msg.'</span>';
-          $usuario->verRamosDeCarrera($_SESSION['carrera'],$_SESSION['codigoSemestre']);
+          verRamosDeCarrera($_SESSION['carrera'],$_SESSION['codigoSemestre']);
         ?>
       </div>
     </div>

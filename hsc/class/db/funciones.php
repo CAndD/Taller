@@ -456,7 +456,7 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre,$mod) {
         else
         {
           $hora2 = obtenerHoraModulo($moduloTermino,$idClase);
-          $diaClase = $diaClase.' '.$moduloTermino.'. '.$hora2.' <br><a id="'.$idClase.'" class="cambiarHorario" href="">Cambiar</a>';
+          $diaClase = $diaClase.' '.$moduloInicio.'-'.$moduloTermino.'. '.$hora2.' <br><a id="'.$idClase.'" class="cambiarHorario">Cambiar</a>';
         }
         echo '<tr><td class="dc">'.$claseTipo.'</td><td class="dc">'.$rutProfesor.'</td><td class="dc">'.$diaClase.'</td></tr>';
       }
@@ -759,12 +759,18 @@ function verHorario($codigoCarrera,$codigoSemestre,$numeroSemestre)
         for($i = 0;$i<5;$i++)
         {
           $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-          $sql = "SELECT c.Id,s.Codigo_Ramo,s.Numero_Seccion,c.Clase_Tipo,c.Dia,c.Modulo_Inicio,c.Modulo_Termino
+          $sql = "(SELECT c.Id,s.Codigo_Ramo,s.Numero_Seccion,c.Clase_Tipo,c.Dia,c.Modulo_Inicio,'SI'
                    FROM Carrera_Tiene_Ramos AS ctr 
                    INNER JOIN Ramos_Impartidos AS ri ON ri.Codigo_Carrera = ctr.Codigo_Carrera AND ri.Codigo_Ramo = ctr.Codigo_Ramo AND ri.Codigo_Semestre = '{$codigoSemestre}' AND ri.Impartido = 1
                    INNER JOIN Seccion AS s ON s.Codigo_Ramo = ri.Codigo_Ramo AND s.Codigo_Carrera = ri.Codigo_Carrera AND s.Codigo_Semestre = ri.Codigo_Semestre
                    INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Modulo_Inicio = '{$moduloAnterior}' AND c.Modulo_Termino = '{$modulo}' AND c.Dia = '{$dias[$i]}'
-                  WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Semestre = '{$numeroSemestre}';"; 
+                  WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Semestre = '{$numeroSemestre}')
+                  UNION
+                  (SELECT c.Id,CONCAT(s.Carrera,' ',s.Codigo_Ramo),s.Seccion_Asignada,c.Clase_Tipo,c.Dia,c.Modulo_Inicio,'NO'
+                   FROM Solicitud AS s
+                   INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Codigo_Ramo = s.Codigo_Ramo AND ctr.Semestre = '{$numeroSemestre}'
+                   INNER JOIN Clase AS c ON c.Seccion_Id = s.Seccion_Asignada AND c.Modulo_Inicio = '{$moduloAnterior}' AND c.Modulo_Termino = '{$modulo}' AND c.Dia = '{$dias[$i]}'
+                  WHERE s.Carrera_Solicitante = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}' AND s.Estado = 2);"; 
           $res = $mysqli->prepare($sql);
           $res->execute();
           $res->bind_result($claseId,$codigoRamo,$numeroSeccion,$claseTipo,$dia,$moduloInicio,$moduloTermino);
@@ -775,7 +781,10 @@ function verHorario($codigoCarrera,$codigoSemestre,$numeroSemestre)
               $flag = 1;
               echo '<td class="drop" id="'.$dias[$i].'.'.$moduloInicio.'.'.$moduloTermino.'">';
             }
-            echo '<div class="item assigned" id="'.$claseId.'">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'</div>';
+            if($moduloTermino == 'SI')
+              echo '<div class="item assigned" id="'.$claseId.'">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'</div>';
+            elseif($moduloTermino == 'NO')
+              echo '<div class="" id="'.$claseId.'" style="background-color: #c7c7c7;">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'</div>';
           }
           if($flag == 0)
             echo '<td class="drop" id="'.$dias[$i].'.'.$moduloAnterior.'.'.$modulo.'"></td>';
@@ -808,6 +817,57 @@ function numeroSemestres($codigoCarrera)
   $res->free_result();  
   return $numeroSemestres;
 }
+
+function verRamosDeCarrera($codigoCarrera,$codigoSemestre) {
+    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sql = "SELECT ctr.codigo_Ramo,r.Nombre,r.Tipo,rt.Abreviacion,ctr.Semestre 
+             FROM Carrera_Tiene_Ramos AS ctr
+             INNER JOIN Ramo AS r ON r.Codigo = ctr.Codigo_Ramo
+             INNER JOIN Ramo_Tipo AS rt ON rt.Id = r.Tipo
+            WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' ORDER BY ctr.Semestre;";
+    $res = $mysqli->prepare($sql);
+    $res->execute();
+    $res->bind_result($codigoRamo,$nombreRamo,$tipo,$tipoAbreviacion,$semestreRamo);
+    $flag = 0;
+    $periodo = obtenerPeriodoCarrera($codigoCarrera);
+    if($periodo == 1)
+      echo '<table><tr><td>Año / Semestre</td><td>Código</td><td>Nombre</td><td>Tipo</td><td>Dictar</td><td>No dictar</td></tr>';
+    elseif($periodo == 2)
+      echo '<table><tr><td>Año / Trimestre</td><td>Código</td><td>Nombre</td><td>Tipo</td><td>Dictar</td><td>No dictar</td></tr>';
+    while($res->fetch())
+    {
+      if($flag == 0)
+        $flag = 1;
+      $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+      $sql2 = "SELECT ri.Codigo_Ramo,ri.Impartido
+                FROM Ramos_Impartidos AS ri
+               WHERE ri.Codigo_Carrera = '{$codigoCarrera}' AND ri.Codigo_Ramo = '{$codigoRamo}' AND ri.Codigo_Semestre = '{$codigoSemestre}';";
+      $res2 = $mysqli2->prepare($sql2);
+      $res2->execute();
+      $res2->bind_result($codigoRamoRes,$impartido);
+      $semestreRamo = anhoSemestre($periodo,$semestreRamo);
+      if($res2->fetch())
+      {
+        if($impartido == 1)
+        {
+          echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$tipoAbreviacion.'</td><td>Si</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="No dictar"></input></form></td></tr>';
+        }
+        elseif($impartido == 2)
+        {
+          echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$tipoAbreviacion.'</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="Dictar"></input></form></td><td></td></tr>';
+        }
+        else
+          echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$tipoAbreviacion.'</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="primera" value="primera"></input><input type="submit" name="submit" value="Dictar"></input></form></td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="primera" value="primera"></input><input type="submit" name="submit" value="No dictar"></input></form></td><td><span class="error">*Debe elegir si impartir o no el ramo.</span></td></tr>';
+      }
+      $res2->free_result();
+    }
+    if($flag == 0)
+      echo '<tr><td>No hay ramos asociados a la carrera.</td><td></td></tr>';
+    echo '</table>';
+    $res->free_result();
+  }
+
 
 // Funciones usuario departamento
 function verRamosDepartamento() {
