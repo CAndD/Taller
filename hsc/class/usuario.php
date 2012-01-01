@@ -55,8 +55,10 @@ class usuario {
           $semestre = obtenerSemestre($periodo);
           $_SESSION['codigoSemestre'] = $semestre;
         }
-        elseif($i>1)
+        elseif($i>1) {
           $_SESSION['carrera'] = null;
+          $_SESSION['codigoSemestre'] = null;
+        }
         $_SESSION['nroCarrera'] = $i;
         $res2->free_result();
         $_SESSION['tipoUsuario'] = $tipo;
@@ -147,10 +149,10 @@ class administrador extends usuario {
     $res->free_result();
   }
 
-  public function agregarCarrera($codigo,$nombre,$periodo,$nro) {
+  public function agregarCarrera($codigo,$nombre,$periodo,$regimen,$semestre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL agregar_carrera('{$codigo}','{$nombre}','{$periodo}','{$nro}')";
+    $sql = "INSERT INTO Carrera(Codigo,Nombre_Carrera,Periodo,Regimen,Numero) VALUES ('{$codigo}','{$nombre}','{$periodo}','{$regimen}','{$semestre}');";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Carrera agregada con éxito.';
@@ -236,10 +238,10 @@ class administrador extends usuario {
   private function eliminarUsuario() {
   }
 
-  public function agregarRamo($codigo,$nombre,$tipo,$teo,$ayu,$lab,$tall,$cre) {
+  public function agregarRamo($codigo,$nombre,$tipo,$periodo,$teo,$ayu,$lab,$tall,$cre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "INSERT INTO Ramo(Codigo,Nombre,Teoria,Tipo,Ayudantia,Laboratorio,Taller,Creditos) VALUES('{$codigo}','{$nombre}','{$teo}','{$tipo}','{$ayu}','{$lab}','{$tall}','{$cre}')";
+    $sql = "INSERT INTO Ramo(Codigo,Nombre,Teoria,Tipo,Periodo,Ayudantia,Laboratorio,Taller,Creditos) VALUES('{$codigo}','{$nombre}','{$teo}','{$tipo}','{$periodo}','{$ayu}','{$lab}','{$tall}','{$cre}')";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Ramo agregado con éxito.';
@@ -712,7 +714,6 @@ class jefeDeCarrera extends usuario {
       $sql = "INSERT INTO Ramos_Impartidos(Codigo_Carrera,Codigo_Ramo,Codigo_Semestre,Impartido) VALUES('{$codigoCarrera}','{$codigoRamo}','{$codigoSemestre}',1);";
     elseif($primera == 0)
       $sql = "UPDATE Ramos_Impartidos SET Impartido = 1 WHERE Codigo_Carrera = '{$codigoCarrera}' AND Codigo_Ramo = '{$codigoRamo}' AND Codigo_Semestre = '{$codigoSemestre}';";
-    //$sql = "CALL impartirRamo('{$codigoCarrera}','{$codigoRamo}','{$codigoSemestre}',1)";
     if(($mysqli->query($sql)) == true)
     {
       $answer = '*Ramo impartido.';

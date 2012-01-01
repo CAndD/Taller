@@ -94,6 +94,7 @@ if(isset($_SESSION['usuario']))
           if(isset($msg))
             echo '<span class="error">'.$msg.'</span>';
           verRamosDeCarrera($_SESSION['carrera'],$_SESSION['codigoSemestre']);
+          echo "asdf: ".$_SESSION['codigoSemestre'];
         ?>
       </div>
     </div>

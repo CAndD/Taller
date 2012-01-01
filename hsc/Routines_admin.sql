@@ -1,6 +1,5 @@
 TRIGGER apertura de semestre
 
-
 CREATE PROCEDURE agregar_carrera(cod VARCHAR(7),nombre VARCHAR(100))
 BEGIN
   IF ((SELECT Codigo,Nombre_Carrera FROM Carrera WHERE Codigo = cod AND Nombre_Carrera = nombre) IS NOT NULL) THEN
@@ -16,11 +15,6 @@ BEGIN
   ELSE
     SELECT 1;
   END IF;
-END;//
-
-CREATE PROCEDURE agregar_carrera(cod VARCHAR(9),nombre VARCHAR(100),period INT,semestre INT)
-BEGIN
-  INSERT INTO Carrera(Codigo,Nombre_Carrera,Periodo,Numero) VALUES (cod,nombre,period,semestre);
 END;//
 
 CREATE PROCEDURE agregar_jefe_carrera(rut VARCHAR(10),nombre VARCHAR(40),nombreusuario VARCHAR(40),pass VARCHAR(32))
@@ -171,11 +165,6 @@ BEGIN
   SELECT t.Codigo_Trimestre,t.Numero,t.Anho,t.Fecha_Inicio,t.Fecha_Termino
    FROM Trimestre AS t
   WHERE t.Codigo_Trimestre = (SELECT MAX(t.Codigo_Trimestre) FROM Trimestre AS t);
-END;//
-
-CREATE PROCEDURE impartirRamo(codigoCarrera VARCHAR(9), codigoRamo VARCHAR(6), codigoSemestre INT, impartir INT)
-BEGIN
-  INSERT INTO ramos_impartidos(codigo_carrera,codigo_ramo,codigo_semestre,impartido) VALUES(codigoCarrera,codigoRamo,codigoSemestre,impartir);
 END;//
 
 CREATE PROCEDURE ramoDictado(codigoCarrera VARCHAR(9), codigoRamo VARCHAR(6), codigoSemestre INT)

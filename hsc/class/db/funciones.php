@@ -73,15 +73,21 @@ function obtenerSemestre($periodo)
   global $mysqli,$db_host,$db_user,$db_pass,$db_database;
   $mysqlif = @new mysqli($db_host, $db_user, $db_pass, $db_database);
   if($periodo == 1)
-    $sqlf = "SELECT s.Codigo_Semestre FROM Semestre AS s WHERE s.Fecha_Termino = NULL";
+    $sqlf = "SELECT s.Codigo_Semestre FROM Semestre AS s WHERE s.Fecha_Termino IS NULL;";
   elseif($periodo == 2)
-    $sqlf = "SELECT t.Codigo_Trimestre FROM Trimestre AS t WHERE t.Fecha_Termino = NULL";
+    $sqlf = "SELECT t.Codigo_Trimestre FROM Trimestre AS t WHERE t.Fecha_Termino IS NULL;";
   $resf = $mysqlif->prepare($sqlf);
   $resf->execute();
-  $resf->bind_result($codigoSemestre);
-  $resf->fetch();
-  $resf->free_result();
-  return $codigoSemestre;
+  if($resf->bind_result($codigoSemestre))
+  {
+    $resf->fetch();
+    $resf->free_result();
+    return $codigoSemestre;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 function anhoSemestre($periodoCarrera,$semestreRamo)
@@ -856,9 +862,11 @@ function verRamosDeCarrera($codigoCarrera,$codigoSemestre) {
         elseif($impartido == 2)
         {
           echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$tipoAbreviacion.'</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="submit" name="submit" value="Dictar"></input></form></td><td></td></tr>';
-        }
-        else
-          echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$tipoAbreviacion.'</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="primera" value="primera"></input><input type="submit" name="submit" value="Dictar"></input></form></td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="primera" value="primera"></input><input type="submit" name="submit" value="No dictar"></input></form></td><td><span class="error">*Debe elegir si impartir o no el ramo.</span></td></tr>';
+        }      
+      }
+      else
+      {
+        echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td>'.$tipoAbreviacion.'</td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="primera" value="primera"></input><input type="submit" name="submit" value="Dictar"></input></form></td><td><form method="post" name="impartir" target="_self"><input type="hidden" name="codigoCarrera" value="'.$codigoCarrera.'"></input><input type="hidden" name="codigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="codigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="primera" value="primera"></input><input type="submit" name="submit" value="No dictar"></input></form></td><td><span class="error">*Debe elegir si impartir o no el ramo.</span></td></tr>';
       }
       $res2->free_result();
     }

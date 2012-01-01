@@ -18,13 +18,17 @@ if(isset($_SESSION['usuario']))
       {
         if(!isset($_POST['periodo']))
           $_POST['periodo'] = 0;
-        if($_POST['codigo'] != '' && $_POST['nombre'] != '' && $_POST['periodo'] != 0 && $_POST['numero'] != '')
+        if($_POST['regimen'] == 1)
+          $_POST['regimen'] = 'D';
+        elseif($_POST['regimen'] == 2)
+          $_POST['regimen'] = 'V';
+        if($_POST['codigo'] != '' && $_POST['nombre'] != '' && $_POST['periodo'] != 0 && $_POST['regimen'] != '' && $_POST['numero'] != '')
         {
-          $answer = $usuario->agregarCarrera($_POST['codigo'],$_POST['nombre'],$_POST['periodo'],$_POST['numero']);
+          $answer = $usuario->agregarCarrera($_POST['codigo'],$_POST['nombre'],$_POST['periodo'],$_POST['regimen'],$_POST['numero']);
         }
         else
         {
-          if($_POST['codigo'] == '' && $_POST['nombre'] == '' && $_POST['periodo'] == 0 && $_POST['numero'] == '')
+          if($_POST['codigo'] == '' && $_POST['nombre'] == '' && $_POST['periodo'] == 0 && $_POST['regimen'] == 0 && $_POST['numero'] == '')
           {
             $answer = '*Debe ingresar código, nombre y semestres de duración de carrera.';
           }
@@ -33,13 +37,15 @@ if(isset($_SESSION['usuario']))
             if($_POST['codigo'] == ''){
               $codigoerror = '*Debe ingresar el código de la carrera.';}
             else{
-              $codigoold = $_POST['codigo'];}  
+              $codigoold = $_POST['codigo'];}
             if($_POST['nombre'] == ''){
               $nombreerror = '*Debe ingresar el nombre de la carrera.';}
             else{
               $nombreold = $_POST['nombre'];}
             if($_POST['periodo'] == 0){
               $periodoerror = '*Debe ingresar el tipo de período de la carrera.';}
+            if($_POST['regimen'] == 0) {
+              $regimenerror = '*Debe escoger el regimen de la carrera.';}
             if($_POST['numero'] == ''){
               $numeroerror = '*Debe ingresar el número de semestre o trimestres de la carrera.';}
             else{
@@ -98,15 +104,17 @@ if(isset($_SESSION['usuario']))
         <?php if(isset($answer)) echo '<span class="error">'.$answer.'</span>';?>
         <table>
         <form method="post" name="agregar" target="_self">
-          <tr><td>Código</td><td>Nombre</td><td>Período</td><td>Número Sem/Trim</td></tr>
+          <tr><td>Código</td><td>Nombre</td><td>Período</td><td>Regimen</td><td>Número Sem/Trim</td></tr>
           <tr><td><input type="text" name="codigo" value="<?php if(isset($codigoold)) echo $codigoold;?>" maxlength="9" onkeyup="buscarCodigoCarrera(this.value)" class="xl"></input></td>
           <td><input type="text" name="nombre" value="<?php if(isset($nombreold)) echo $nombreold;?>" maxlength="100"></input></td>
           <td><input type="radio" name="periodo" value="1">Semestral<br></input><input type="radio" name="periodo" value="2">Trimestral</input></td>
+          <td><select name="regimen"><option value="0">Elegir regimen</option><option value="1">Diurno</option><option value="2">Vespertino</option></select></td>
           <td><input type="text" name="numero" value="<?php if(isset($numeroold)) echo $numeroold;?>" maxlength="2" class="xs"></input></td>
           <td><?php if(isset($codigoold)) echo '<input id="btt" type="submit" name="agrega" value="Agregar">'; else echo '<input id="btt" type="submit" name="agrega" value="Agregar" disabled>';?></input></td></tr>
           <tr><td><div id="existe"><?php if(isset($codigoerror)) echo '<td><span class="error">'.$codigoerror.'</span></td>';?></div></td>
               <td><?php if(isset($nombreerror)) echo '<span class="error">'.$nombreerror.'</span>';?></td>
               <td><?php if(isset($periodoerror)) echo '<span class="error">'.$periodoerror.'</span>';?></td>
+              <td><?php if(isset($regimenerror)) echo '<span class="error">'.$regimenerror.'</span>';?></td>
               <td><?php if(isset($numeroerror)) echo '<span class="error">'.$numeroerror.'</span>';?></td>
               <td></td>
           </tr>
