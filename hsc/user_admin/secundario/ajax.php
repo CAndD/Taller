@@ -118,7 +118,9 @@ if(isset($_SESSION['usuario']))
     $res2->fetch();
     $res2->free_result();
 
-    //1. Clase de un ramo diferente al que se le está asignando horario.
+    $flag2 = 0;
+
+    //1. Buscar clase de sección de diferente ramo.
     $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
     $sql3 = "SELECT c.Id
              FROM Carrera_Tiene_Ramos AS ctr
@@ -127,23 +129,27 @@ if(isset($_SESSION['usuario']))
             WHERE ctr.Codigo_Carrera = '{$_SESSION['carrera']}' AND ctr.Semestre = '{$semestreRamo}' AND ctr.Codigo_Ramo != '{$codigoRamo}';";
     $res3 = $mysqli3->prepare($sql3);
     $res3->execute();
-    $res3->bind_result($idClase);
-    if($res3->fetch())
+    $res3->bind_result($idClaseSql3);
+    while($res3->fetch())
+    {
+      $flag2 = 1;
+    }
+    if($flag2 == 1)
     {
       echo '-2';
     }
     else
     {
-      //2. Clase de la misma sección.
+      //2. Buscar clase de la misma sección.
       $mysqli4 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-      //$sql4 = "SELECT c.Id
-                //FROM Carrera_Tiene_Ramos AS ctr
-                //INNER JOIN Seccion AS s ON s.Codigo_Ramo = ctr.Codigo_Ramo AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}' AND s.Codigo_Ramo = '{$codigoRamo}' AND s.Numero_Seccion = '{$numeroSeccion}'
-                //INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$moduloInicio}' AND c.Modulo_Termino = '{$moduloTermino}'
-               //WHERE ctr.Codigo_Carrera = '{$_SESSION['carrera']}' AND ctr.Semestre = '{$semestreRamo}';";
       $sql4 = "SELECT c.Id
-                FROM Clase AS c
-               WHERE c.Seccion_Id = '{$idSeccion}' AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$moduloInicio}' AND c.Modulo_Termino = '{$moduloTermino}';";
+                FROM Carrera_Tiene_Ramos AS ctr
+                INNER JOIN Seccion AS s ON s.Codigo_Ramo = ctr.Codigo_Ramo AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}' AND s.Codigo_Ramo = '{$codigoRamo}' AND s.Numero_Seccion = '{$numeroSeccion}'
+                INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$moduloInicio}' AND c.Modulo_Termino = '{$moduloTermino}'
+               WHERE ctr.Codigo_Carrera = '{$_SESSION['carrera']}' AND ctr.Semestre = '{$semestreRamo}';";
+      //$sql4 = "SELECT c.Id
+                //FROM Clase AS c
+               //WHERE c.Seccion_Id = '{$idSeccion}' AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$moduloInicio}' AND c.Modulo_Termino = '{$moduloTermino}';";
       $res4 = $mysqli4->prepare($sql4);
       $res4->execute();
       $res4->bind_result($idClase);
@@ -153,7 +159,7 @@ if(isset($_SESSION['usuario']))
       }
       else
       {
-        //3. Clase de un ramo diferente pedido por solicitud.
+        //3. Buscar clase de sección obtenida por solicitud que sea de otro ramo.
         $mysqli5 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
         $sql5 = "SELECT c.Id
                   FROM Solicitud AS s
