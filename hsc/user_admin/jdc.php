@@ -131,7 +131,7 @@ if(isset($_SESSION['usuario']))
 
         <h2>Lista de jefes carrera:</h2><ul>
         <?php
-          $usuario->verJefesDeCarrera();
+          verJefesDeCarrera();
         ?>
         </ul>
       </div>
@@ -147,8 +147,10 @@ if(isset($_SESSION['usuario']))
   </div>
   <script type='text/javascript' src='../js/jquery.js'></script> 
   <script type='text/javascript' src='../js/jquery.simplemodal.js'></script> 
-  <script type='text/javascript' src='../js/bsc.js'></script></body>
-</html><?php
+  <script type='text/javascript' src='../js/bsc.js'></script>
+</body>
+</html>
+<?php
   }
   else
   {

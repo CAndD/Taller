@@ -57,7 +57,7 @@ if(isset($_SESSION['usuario']))
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
           <li class="selected"><a href="home.php">Home</a></li>
           <?php
-          if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && (is_string($_SESSION['carrera']) == true)) {
+          if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && (is_string($_SESSION['carrera']) == true) && $_SESSION['codigoSemestre'] != 0 && $_SESSION['codigoSemestre'] > 0) {
             echo '<li><a href="user_jc/ramos.php">Ramos</a></li>';
             echo '<li><a href="user_jc/secciones.php">Secciones y Vacantes</a></li>';
             echo '<li><a href="user_jc/horario.php">Horario</a></li>';
@@ -73,7 +73,7 @@ if(isset($_SESSION['usuario']))
         <!-- insert the page content here -->
         <h1>Bienvenido <?php echo $usuario->getNombre();?></h1>
         <?php
-        if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && (is_string($_SESSION['carrera']) == true) && $_SESSION['codigoSemestre'] != 0) {?>
+        if(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && (is_string($_SESSION['carrera']) == true) && $_SESSION['codigoSemestre'] != 0 && $_SESSION['codigoSemestre'] > 0) {?>
         <table><tr>
         <td><div class="ramos_malla" style="overflow: scroll;"><a href="user_jc/ramos.php" class="title">Ramos de malla</a>
           <?php
@@ -160,12 +160,12 @@ if(isset($_SESSION['usuario']))
           echo '</table>';
           $res->free_result();
         }
+        elseif(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && $_SESSION['carrera'] == -1 && is_null($_SESSION['codigoSemestre'])) {
+          echo 'Aún no se le ha asignado una carrera.';
+        }
         elseif(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && $_SESSION['codigoSemestre'] == 0)
         {
           echo 'El periodo de programación está cerrado.';
-        }
-        elseif(($_SESSION['tipoUsuario'] == 1 || $_SESSION['tipoUsuario'] == 3) && $_SESSION['carrera'] == 0) {
-          echo 'Aún no se le ha asignado una carrera.';
         }
         ?>
       </div>

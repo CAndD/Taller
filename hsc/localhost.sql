@@ -1058,34 +1058,3 @@ INSERT INTO `usuario` (`Nombre_Usuario`, `RUT`, `Nombre`, `Password`, `Id_Tipo`)
 ('depto', '164827607', 'Jorge Atenas', '040b7cf4a55014e185813e0644502ea9', 4),
 ('usuario', '16482760-7', 'David Miranda', '040b7cf4a55014e185813e0644502ea9', 3),
 ('usuario2', '1659584-7', 'John Goodman', '040b7cf4a55014e185813e0644502ea9', 3);
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `carrera`
---
-ALTER TABLE `carrera`
-  ADD CONSTRAINT `carrera_ibfk_1` FOREIGN KEY (`NombreUsuario_JC`) REFERENCES `usuario` (`Nombre_Usuario`);
-
---
--- Constraints for table `carrera_tiene_ramos`
---
-ALTER TABLE `carrera_tiene_ramos`
-  ADD CONSTRAINT `carrera_tiene_ramos_ibfk_1` FOREIGN KEY (`Codigo_Carrera`) REFERENCES `carrera` (`Codigo`),
-  ADD CONSTRAINT `carrera_tiene_ramos_ibfk_2` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`);
-
---
--- Constraints for table `ramos_impartidos`
---
-ALTER TABLE `ramos_impartidos`
-  ADD CONSTRAINT `ramos_impartidos_ibfk_1` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`),
-  ADD CONSTRAINT `ramos_impartidos_ibfk_3` FOREIGN KEY (`Codigo_Carrera`) REFERENCES `carrera` (`Codigo`);
-
---
--- Constraints for table `seccion`
---
-ALTER TABLE `seccion`
-  ADD CONSTRAINT `seccion_ibfk_1` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`),
-  ADD CONSTRAINT `seccion_ibfk_3` FOREIGN KEY (`Codigo_Ramo`) REFERENCES `ramo` (`Codigo`);

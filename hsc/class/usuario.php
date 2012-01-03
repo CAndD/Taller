@@ -49,8 +49,10 @@ class usuario {
           $_SESSION['carrera'] = $codigo;
           $i++;
         }
-        if($i == 0)
-          $_SESSION['carrera'] = 0;
+        if($i == 0) {
+          $_SESSION['carrera'] = -1;
+          $_SESSION['codigoSemestre'] = null;
+        }
         elseif($i == 1) {
           $semestre = obtenerSemestre($periodo);
           $_SESSION['codigoSemestre'] = $semestre;
@@ -170,30 +172,6 @@ class administrador extends usuario {
   private function eliminarCarrera() {
   }
 
-  public function verJefesDeCarrera() {
-    global $mysqli,$db_host,$db_user,$db_pass,$db_database;
-    $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL select_jefe_carrera()";
-    $res = $mysqli->prepare($sql);
-    $res->execute();
-    $res->bind_result($nombreUsuarioJC,$rutJC,$nombreJC);
-    $flag = 0;
-    echo '<table>';
-    while($res->fetch())
-    {
-      if($flag == 0)
-      {
-        echo '<tr><td>Nombre</td><td>RUT</td><td>Nombre de usuario</td><td>Eliminar</td></tr>';
-        $flag = 1;
-      }
-      echo '<tr><td>'.$nombreJC.'</td><td>'.$rutJC.'</td><td>'.$nombreUsuarioJC.'</td><td><a id="'.$nombreUsuarioJC.'" class="eliminar" href="">X</a></td></tr>';
-    }
-    if(!isset($rutJC))
-      echo 'No hay carreras.';
-    echo '</table>';
-    $res->free_result();
-  }
-
   public function agregarJefeDeCarrera($rut,$nombre,$nusuario,$pass) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
@@ -262,21 +240,47 @@ class administrador extends usuario {
   public function relacionarRamoConCarrera($codigoRamo,$codigoCarrera,$semestre) {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql = "CALL relacionar_cramos('{$codigoRamo}','{$codigoCarrera}','{$semestre}')";
+    $sql = "SELECT c.Numero
+             FROM carrera AS c
+            WHERE c.Codigo = '{$codigoCarrera}';";
     $res = $mysqli->prepare($sql);
     $res->execute();
-    $res->bind_result($answer2);
+    $res->bind_result($answer);
     $res->fetch();
-    if($answer2 == 1)
+    $res->free_result();
+    if($semestre <= $answer && $semestre > 0)
     {
-      $answer2 = '*Carrera y ramo relacionados con éxito.';
+      $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+      $sql2 = "SELECT ctr.Codigo_Ramo 
+                FROM carrera_tiene_ramos AS ctr 
+               WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Codigo_Ramo = '{$codigoRamo}';";
+      $res2 = $mysqli2->prepare($sql2);
+      $res2->execute();
+      $res2->bind_result($answer2);
+      if($res2->fetch())
+      {
+        $resp = '*Ya existe la relación entre el ramo y la carrera.';
+      }
+      else
+      {
+        $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+        $sql3 = "INSERT INTO carrera_tiene_ramos (Codigo_Carrera,Codigo_Ramo,Semestre) VALUES ('{$codigoCarrera}','{$codigoRamo}','{$semestre}');";
+        if(($mysqli3->query($sql3)) == true)
+        {
+          $resp = '*Ramo agregado con éxito.';
+        }
+        else
+        {
+          $resp = '*Relación no realizada.';
+        }
+      }
+      $res2->free_result();
     }
     else
     {
-      $answer2 = '*Esta relación ya existe.';
+      $resp = '*Debe seleccionar un semestre o trimestre dentro del rango de la carrera (1-'.$answer.').';
     }
-    return $answer2;
-    $res->free_result();
+    return $resp;
   }
 
   public function comenzarSemestre($codigoSemestre,$anno,$semestre) {

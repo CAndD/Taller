@@ -27,13 +27,6 @@ BEGIN
   INSERT INTO Ramo(Codigo,Nombre,Teoria,Ayudantia,Laboratorio,Taller,Creditos) VALUES (codigoRamo,nombreRamo,hTeoricas,hAyudantia,hLaboratorio,hTaller,credito);
 END;//
 
-CREATE PROCEDURE select_jefe_carrera()
-BEGIN
-  SELECT u.Nombre_Usuario,u.RUT,u.Nombre
-   FROM Usuario AS u
-  WHERE u.Id_Tipo = 1 OR u.Id_Tipo = 3 ORDER BY u.Nombre;
-END;//
-
 CREATE PROCEDURE select_carreras()
 BEGIN
 DECLARE Nombre_JC VARCHAR(40);
@@ -47,13 +40,6 @@ SET Rut_JC = 'No asignado';
   (SELECT c.Codigo,c.Nombre_Carrera AS nombreCarrera,c.NombreUsuario_JC,c.Periodo,c.Numero,Nombre_JC,Rut_JC
     FROM Carrera AS c
    WHERE c.NombreUsuario_JC IS NULL) ORDER BY nombreCarrera;
-END;//
-
-CREATE PROCEDURE select_ccarreras(codigoRamo VARCHAR(6))
-BEGIN
-  SELECT c.Codigo,c.Nombre_Carrera
-   FROM Carrera AS c
-  WHERE c.Codigo NOT IN (SELECT Codigo_Carrera FROM Carrera_Tiene_Ramos WHERE Codigo_Ramo = codigoRamo);
 END;//
 
 CREATE PROCEDURE select_ramoCarrera(codigoRamo VARCHAR(6))
@@ -72,22 +58,6 @@ BEGIN
   WHERE ctr.Codigo_Carrera = codigoCarrera ORDER BY ctr.Semestre,r.Codigo;
 END;// 
 
-CREATE PROCEDURE select_cramos(codigoRamo VARCHAR(6))
-BEGIN
-  SELECT r.Codigo,r.Nombre
-   FROM Ramo AS r
-  WHERE r.Codigo = codigoRamo;
-END;//
-CREATE PROCEDURE asignar_jdc(codigoCarrera VARCHAR(9),nombreUsuario VARCHAR(40))
-BEGIN
-  UPDATE Carrera AS c SET c.NombreUsuario_JC = nombreUsuario WHERE c.Codigo = codigoCarrera;
-END;//
-
-CREATE PROCEDURE cambiar_jdc(codigoCarrera VARCHAR(9),nombreUsuario VARCHAR(40))
-BEGIN
-  UPDATE Carrera AS c SET c.NombreUsuario_JC = nombreUsuario WHERE c.Codigo = codigoCarrera;
-END;//
-
 CREATE PROCEDURE eliminar_jdc(nombreUsuario VARCHAR(40))
 BEGIN
   IF ((SELECT COUNT(c.nombreUsuario_JC) FROM carrera AS c WHERE c.nombreUsuario_JC = nombreUsuario) > 0) THEN
@@ -95,16 +65,6 @@ BEGIN
     DELETE FROM usuario WHERE Nombre_Usuario = nombreUsuario;
   ELSE
     DELETE FROM usuario WHERE Nombre_Usuario = nombreUsuario;
-  END IF;
-END;//
-
-CREATE PROCEDURE relacionar_cramos(codigoRamo VARCHAR(6),codigoCarrera VARCHAR(9),semest INT)
-BEGIN
-  IF((SELECT ctr.Codigo_Ramo FROM carrera_tiene_ramos AS ctr WHERE ctr.Codigo_Carrera = codigoCarrera AND ctr.Codigo_Ramo = codigoRamo) IS NULL) THEN
-    INSERT INTO carrera_tiene_ramos (Codigo_Carrera,Codigo_Ramo,Semestre) VALUES (codigoCarrera,codigoRamo,semest);
-    SELECT 1;
-  ELSE
-    SELECT 0;
   END IF;
 END;//
 

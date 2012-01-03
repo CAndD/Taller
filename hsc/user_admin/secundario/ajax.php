@@ -107,23 +107,24 @@ if(isset($_SESSION['usuario']))
       }
     }
     $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql2 = "SELECT ctr.Codigo_Ramo,ctr.semestre,s.Numero_Seccion,c.Clase_Tipo
+    $sql2 = "SELECT ctr.Codigo_Ramo,ctr.semestre,s.Numero_Seccion,c.Clase_Tipo,s.Id
              FROM Clase AS c
              INNER JOIN Seccion AS s ON s.Id = c.Seccion_Id AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}'
              INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Ramo = s.Codigo_Ramo AND ctr.Codigo_Carrera = '{$_SESSION['carrera']}'
             WHERE c.Id = '{$_GET['idClase']}';";
     $res2 = $mysqli2->prepare($sql2);
     $res2->execute();
-    $res2->bind_result($codigoRamo,$semestreRamo,$numeroSeccion,$claseTipo);
+    $res2->bind_result($codigoRamo,$semestreRamo,$numeroSeccion,$claseTipo,$idSeccion);
     $res2->fetch();
     $res2->free_result();
 
+    //1. Clase de un ramo diferente al que se le está asignando horario.
     $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
     $sql3 = "SELECT c.Id
              FROM Carrera_Tiene_Ramos AS ctr
-             INNER JOIN Seccion AS s ON s.Codigo_Ramo = ctr.Codigo_Ramo AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}' AND s.Codigo_Ramo != '{$codigoRamo}'
+             INNER JOIN Seccion AS s ON s.Codigo_Ramo = ctr.Codigo_Ramo AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}'
              INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$moduloInicio}' AND c.Modulo_Termino = '{$moduloTermino}'
-            WHERE ctr.Codigo_Carrera = '{$_SESSION['carrera']}' AND ctr.Semestre = '{$semestreRamo}';";
+            WHERE ctr.Codigo_Carrera = '{$_SESSION['carrera']}' AND ctr.Semestre = '{$semestreRamo}' AND ctr.Codigo_Ramo != '{$codigoRamo}';";
     $res3 = $mysqli3->prepare($sql3);
     $res3->execute();
     $res3->bind_result($idClase);
@@ -133,12 +134,16 @@ if(isset($_SESSION['usuario']))
     }
     else
     {
+      //2. Clase de la misma sección.
       $mysqli4 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+      //$sql4 = "SELECT c.Id
+                //FROM Carrera_Tiene_Ramos AS ctr
+                //INNER JOIN Seccion AS s ON s.Codigo_Ramo = ctr.Codigo_Ramo AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}' AND s.Codigo_Ramo = '{$codigoRamo}' AND s.Numero_Seccion = '{$numeroSeccion}'
+                //INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$moduloInicio}' AND c.Modulo_Termino = '{$moduloTermino}'
+               //WHERE ctr.Codigo_Carrera = '{$_SESSION['carrera']}' AND ctr.Semestre = '{$semestreRamo}';";
       $sql4 = "SELECT c.Id
-                FROM Carrera_Tiene_Ramos AS ctr
-                INNER JOIN Seccion AS s ON s.Codigo_Ramo = ctr.Codigo_Ramo AND s.Codigo_Carrera = '{$_SESSION['carrera']}' AND s.Codigo_Semestre = '{$_SESSION['codigoSemestre']}' AND s.Codigo_Ramo = '{$codigoRamo}' AND s.Numero_Seccion = '{$numeroSeccion}'
-                INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$moduloInicio}' AND c.Modulo_Termino = '{$moduloTermino}'
-               WHERE ctr.Codigo_Carrera = '{$_SESSION['carrera']}' AND ctr.Semestre = '{$semestreRamo}';";
+                FROM Clase AS c
+               WHERE c.Seccion_Id = '{$idSeccion}' AND c.Dia = '{$dia}' AND c.Modulo_Inicio = '{$moduloInicio}' AND c.Modulo_Termino = '{$moduloTermino}';";
       $res4 = $mysqli4->prepare($sql4);
       $res4->execute();
       $res4->bind_result($idClase);
@@ -148,6 +153,7 @@ if(isset($_SESSION['usuario']))
       }
       else
       {
+        //3. Clase de un ramo diferente pedido por solicitud.
         $mysqli5 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
         $sql5 = "SELECT c.Id
                   FROM Solicitud AS s

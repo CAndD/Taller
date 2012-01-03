@@ -8,31 +8,30 @@ if(isset($_SESSION['usuario']))
   $usuario = unserialize($_SESSION['usuario']);
   if($_SESSION['tipoUsuario'] == 2 || $_SESSION['tipoUsuario'] == 3)
   {
-    if(isset($_POST['submit']) && $_POST['submit'] == 'Relacionar'){
-      if(isset($_POST['hiddenCodigoRamo']) && isset($_POST['codigocarrera']) && isset($_POST['semestre']))
+    if(isset($_POST['submit']) && $_POST['submit'] == 'Relacionar')
+    {
+      if(isset($_POST['hiddenCodigoRamo']) && isset($_POST['codigoCarrera']) && isset($_POST['semestre']))
       {
-        if($_POST['hiddenCodigoRamo'] != '' && $_POST['codigocarrera'] != '' && $_POST['semestre'] != '')
+        if($_POST['codigoCarrera'] != '' && $_POST['semestre'] != '')
         {
-          $answer2 = $usuario->relacionarRamoConCarrera($_POST['hiddenCodigoRamo'],$_POST['codigocarrera'],$_POST['semestre']);
+          $answer2 = $usuario->relacionarRamoConCarrera($_POST['hiddenCodigoRamo'],$_POST['codigoCarrera'],$_POST['semestre']);
         }
         else
         {
-          if($_POST['codigoramo'] == '' && $_POST['codigocarrera'] == '' && $_POST['semestre'])
+          if($_POST['codigoCarrera'] == '' && $_POST['semestre'] == '')
           {
-            $answer2 = '*Debe ingresar código del ramo y código de la carrera.';
+            $answer2 = '*Debe ingresar código de la carrera y el semestre o trimestre.';
           }
           else
           {
-            if($_POST['codigoramo'] == ''){
-              $codigoramoerror = '*Debe ingresar el código del ramo.';}
-            if($_POST['codigocarrera'] == ''){
-              $codigocarreraerror = '*Debe ingresar el nombre del ramo.';}
+            if($_POST['codigoCarrera'] == ''){
+              $codigocarreraerror = '*Debe escoger la carrera.';}
             if($_POST['semestre'] == ''){
               $semestreerror = '*Debe ingresar el semestre.';}
           }
         }
       }
-    }
+   }
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -54,7 +53,9 @@ if(isset($_SESSION['usuario']))
        <tr><td>Ramo: 
                                         <?php 
                                           $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-                                          $sql = "CALL select_cramos('{$_GET['codigoRamo']}')";
+                                          $sql = "SELECT r.Codigo,r.Nombre
+                                                   FROM Ramo AS r
+                                                  WHERE r.Codigo = '{$_GET['codigoRamo']}';";
                                           $res = $mysqli->prepare($sql);
                                           $res->execute();
                                           $res->bind_result($codigoRamo,$nombreRamo);
@@ -65,10 +66,13 @@ if(isset($_SESSION['usuario']))
                                           $res->free_result();
                                         ?>
                                        <?php if(isset($codigoramoerror)) echo '<td><span class="error">'.$codigoramoerror.'</span></td>';?></tr>
-       <tr><td>Carrera: </td><td><select name="codigocarrera"><option value="">Seleccionar carrera</option>
+       <tr><td>Carrera: </td><td><select name="codigoCarrera"><option value="">Seleccionar carrera</option>
                                         <?php 
                                           $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-                                          $sql = "CALL select_ccarreras('{$_GET['codigoRamo']}')";
+                                          $sql = "SELECT c.Codigo,c.Nombre_Carrera
+                                                   FROM Carrera AS c
+                                                   INNER JOIN Ramo AS r ON r.Codigo = '{$_GET['codigoRamo']}'
+                                                  WHERE c.Periodo = r.Periodo AND c.Codigo NOT IN (SELECT Codigo_Carrera FROM Carrera_Tiene_Ramos WHERE Codigo_Ramo = '{$_GET['codigoRamo']}');";
                                           $res = $mysqli->prepare($sql);
                                           $res->execute();
                                           $res->bind_result($codigoCarrera,$nombreCarrera);
@@ -98,8 +102,10 @@ if(isset($_SESSION['usuario']))
                                           $res->free_result();
                                         ?>
       </table>
-  <a href="../ramos.php" target="_parent">Cerrar</a></body>
-</html><?php
+  <a href="../ramos.php" target="_parent">Cerrar</a>
+</body>
+</html>
+<?php
   }
 }
 else

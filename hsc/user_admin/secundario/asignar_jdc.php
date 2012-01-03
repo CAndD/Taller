@@ -11,7 +11,9 @@ if(isset($_SESSION['usuario']))
     if(isset($_POST['asignarJDC']) && $_POST['asignarJDC'] == 'Ingresar')
     {
       $d01_mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-      $sql = "CALL asignar_jdc('{$_POST['hidden_car']}','{$_POST['jdc']}')";
+      $sql = "UPDATE Carrera AS c 
+               SET c.NombreUsuario_JC = '{$_POST['jdc']}' 
+              WHERE c.Codigo = '{$_POST['hidden_car']}';";
       if(($d01_mysqli->query($sql)) == true)
       {
         $msg = 'Jefe de carrera asignado.';
@@ -25,7 +27,14 @@ if(isset($_SESSION['usuario']))
     if(isset($_POST['cambiarJDC']) && $_POST['cambiarJDC'] == 'Ingresar')
     {
       $d01_mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-      $sql = "CALL cambiar_jdc('{$_POST['hidden_car']}','{$_POST['jdc']}')";
+      if($_POST['jdc'] == NULL)
+        $sql = "UPDATE Carrera AS c 
+               SET c.NombreUsuario_JC NULL
+              WHERE c.Codigo = '{$_POST['hidden_car']}';";
+      else
+        $sql = "UPDATE Carrera AS c 
+                 SET c.NombreUsuario_JC = '{$_POST['jdc']}'
+                WHERE c.Codigo = '{$_POST['hidden_car']}';";
       if(($d01_mysqli->query($sql)) == true)
       {
         $msg = 'Jefe de carrera cambiado.';
@@ -60,11 +69,13 @@ if(isset($_SESSION['usuario']))
   <?php
     if(isset($_GET['asigna']) && $_GET['asigna'] == 1) {?>
   <form method="post" name="asignar_jdc" target="_self">
-   <input type="hidden" name="hidden_car" value="<?php if(isset($_GET['hidden_car'])){echo$_GET['hidden_car'];}elseif(isset($_POST['hidden_car'])){echo$_POST['hidden_car'];}?>"></input>
+   <input type="hidden" name="hidden_car" value="<?php if(isset($_GET['hidden_car'])){echo$_GET['hidden_car']; $cod = $_GET['hidden_car'];}elseif(isset($_POST['hidden_car'])){echo$_POST['hidden_car']; $cod = $_POST['hidden_car'];}?>"></input>
    <select name="jdc"><option value="0">Seleccione jefe de carrera</option>
      <?php 
       $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-      $sql = "CALL select_jefe_carrera()";
+      $sql = "SELECT u.Nombre_Usuario,u.RUT,u.Nombre
+               FROM Usuario AS u
+              WHERE (u.Id_Tipo = 1 OR u.Id_Tipo = 3) AND u.Nombre_Usuario NOT IN (SELECT NombreUsuario_JC FROM Carrera WHERE Codigo = '{$cod}') ORDER BY u.Nombre;";
       $res = $mysqli->prepare($sql);
       $res->execute();
       $res->bind_result($nombreUsuarioJC,$rutJC,$nombreJC);
@@ -83,12 +94,14 @@ if(isset($_SESSION['usuario']))
   }
   elseif(isset($_GET['cambia']) && $_GET['cambia'] == 1) {?>
     <form method="post" name="cambiar_jdc" target="_self">
-   <input type="hidden" name="hidden_car" value="<?php if(isset($_GET['hidden_car'])){echo$_GET['hidden_car'];}elseif(isset($_POST['hidden_car'])){echo$_POST['hidden_car'];}?>"></input>
+   <input type="hidden" name="hidden_car" value="<?php if(isset($_GET['hidden_car'])){echo$_GET['hidden_car']; $cod = $_GET['hidden_car'];}elseif(isset($_POST['hidden_car'])){echo$_POST['hidden_car']; $cod = $_POST['hidden_car'];}?>"></input>
    <select name="jdc"><option value="0">Seleccione jefe de carrera</option>
-                      <option value="null">Ninguno</option>
+                      <option value="NULL">Ninguno</option>
      <?php 
       $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-      $sql = "CALL select_jefe_carrera()";
+      $sql = "SELECT u.Nombre_Usuario,u.RUT,u.Nombre
+               FROM Usuario AS u
+              WHERE (u.Id_Tipo = 1 OR u.Id_Tipo = 3) AND u.Nombre_Usuario NOT IN (SELECT NombreUsuario_JC FROM Carrera WHERE Codigo = '{$cod}') ORDER BY u.Nombre;";
       $res = $mysqli->prepare($sql);
       $res->execute();
       $res->bind_result($nombreUsuarioJC,$rutJC,$nombreJC);
@@ -106,8 +119,10 @@ if(isset($_SESSION['usuario']))
   <?php
     }
   }?>
-  <a href="../carreras.php" target="_parent">Cerrar</a></body>
-</html><?php
+  <a href="../carreras.php" target="_parent">Cerrar</a>
+</body>
+</html>
+<?php
   }
 }
 else

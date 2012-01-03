@@ -11,7 +11,7 @@ if(isset($_SESSION['usuario']))
     $_SESSION['usuario'] = serialize($usuario);
   }
 
-  if(isset($_POST['submit']) && $_POST['submit'] == 'Cambiar') 
+  if(isset($_POST['submit']) && $_POST['submit'] == 'Reservar') 
   {
     if(isset($_POST['vacantes']) && isset($_POST['hiddenSolicitud']) && isset($_POST['hiddenTotal']) && isset($_POST['hiddenIdSeccion']))
     {
@@ -91,15 +91,7 @@ if(isset($_SESSION['usuario']))
         <?php
           if(isset($msg))
             echo '<br><span class="error">'.$msg.'</span>';
-          if(isset($_GET['mod']) && $_GET['mod'] == 1)
-            verClases($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre'],1);
-          else
-          {
-            if(isset($_GET['mod']) && $_GET['mod'] == 0 && isset($_GET['seccionId']))
-              verClase($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre'],$_GET['seccionId']);
-            else
-              verClases($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre'],0);
-          }
+            verClases($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre']);
         ?>
       </div>
     </div>
