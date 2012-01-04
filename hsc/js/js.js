@@ -159,21 +159,24 @@ function asignarHorario(idClase,horario)
     {
       if(xmlhttp.responseText)
       {
-        alert("ajax: "+xmlhttp.responseText);
+        //alert("ajax: "+xmlhttp.responseText);
         ans = xmlhttp.responseText;
-        alert("answer: "+ans);
+        //alert("answer: "+ans);
         //document.getElementById("horario").innerHTML=err;
-        //if(xmlhttp.responseText == '0')
-          //return '0';
+        if(xmlhttp.responseText == -2)
+          return -2;
           //document.getElementById("horario").innerHTML=err;
-        //else if(xmlhttp.responseText == '1')
-          //return '1';
+        else if(xmlhttp.responseText == -1)
+          return -1;
           //document.getElementById("horario").innerHTML=acc;
-        //else if(xmlhttp.responseText == '2')
-          //return '2';
+        else if(xmlhttp.responseText == 0)
+          return 0;
           //document.getElementById("horario").innerHTML=errmysql;
+        else if(xmlhttp.responseText == 1)
+          return 1;
+        else if(xmlhttp.responseText == 2)
+          return 2;
       }
     }
   }
-  return ans;
 }

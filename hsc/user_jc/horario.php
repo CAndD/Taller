@@ -58,7 +58,7 @@ if(isset($_SESSION['usuario']))
 					} else {
 						var c = $(source).addClass('assigned');
                                                 var resp = asignarHorario($(source).attr('id'),$(this).attr('id'));
-                                                //alert("respuesta: "+resp);
+                                                alert("respuesta: "+resp);
                                                 //$('.up').empty();
 						$(this).append(c);
 						c.draggable({
