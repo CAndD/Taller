@@ -41,6 +41,9 @@ if(isset($_SESSION['usuario']))
 			$('.up .item').draggable({
 				revert:true
 			});
+                        $('.down .item').draggable({
+                                revert:true
+                        });
 			$('.down td.drop').droppable({
 				onDragEnter:function(){
 					$(this).addClass('over');
@@ -53,7 +56,7 @@ if(isset($_SESSION['usuario']))
 					if ($(source).hasClass('assigned')){
 						$(this).append(source);
 					} else {
-						var c = $(source).clone().addClass('assigned');
+						var c = $(source).addClass('assigned');
                                                 var resp = asignarHorario($(source).attr('id'),$(this).attr('id'));
                                                 //alert("respuesta: "+resp);
                                                 //$('.up').empty();
