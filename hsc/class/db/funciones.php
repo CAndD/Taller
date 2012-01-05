@@ -464,7 +464,7 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre) {
     $form = '<form method="post" target="_self" name="vacantes"><input type="text" name="vacantes" value="'.$vacantesUtilizadas.'" class="xs" maxlength="2"></input><input type="hidden" name="hiddenSolicitud" value="'.$vacantesSolicitud.'"></input><input type="hidden" name="hiddenTotal" value="'.$vacantes.'"></input><input type="hidden" name="hiddenIdSeccion" value="'.$id.'"></input> <input type="submit" name="submit" value="Reservar"></input></form>';
     echo '<tr><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombre.'</td><td>'.$codigoSemestre.'</td><td>Disponibles: '.$vacantes.'<br>Solicitud: '.$vacantesSolicitud.'<br>Utilizadas: '.$vacantesUtilizadas.' '.$form.'<br>Total: '.$vacantesFinal.'</td></tr>';
 
-    $mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    /*$mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
     $sql2 = "SELECT c.Id,c.Clase_Tipo,c.RUT_Profesor,c.Modulo_Inicio,c.Modulo_Termino,c.Dia,c.Codigo_Semestre,ctr.Semestre
               FROM Clase AS c
               INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Ramo = '{$codigoRamo}' AND ctr.Codigo_Carrera = '{$codigoCarrera}'
@@ -492,7 +492,7 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre) {
     }
     if($flag2 == 0)
       echo '<tr><td class="dc">No existen clases para esta sección.</td></tr>';
-    $res2->free_result();
+    $res2->free_result();*/
   }
   if($flag == 0)
     echo '<tr><td>No hay secciones para este ramo.</td><td></td></tr>';
@@ -696,6 +696,49 @@ function verHorario($codigoCarrera,$codigoSemestre,$numeroSemestre)
   }
   $res2->free_result();  
   echo '</table></div>';
+}
+
+function verClasesSinHorarioSemestre($codigoCarrera,$codigoSemestre,$numeroSemestre)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sql = "SELECT c.id,s.Codigo_Ramo,s.Numero_Seccion,c.Clase_Tipo
+           FROM Clase AS c
+           INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Semestre = '{$numeroSemestre}'
+           INNER JOIN Seccion AS s ON s.Codigo_Ramo = ctr.Codigo_Ramo AND s.Codigo_Carrera = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}'
+          WHERE c.Seccion_Id = s.Id AND c.Codigo_Semestre = '{$codigoSemestre}' AND c.Dia IS NULL AND c.Modulo_Inicio IS NULL AND c.Modulo_Termino IS NULL ORDER BY s.Codigo_Ramo,s.Numero_Seccion;"; 
+  $res = $mysqli->prepare($sql);
+  $res->execute();
+  $res->bind_result($idClase,$codigoRamo,$numeroSeccion,$tipoClase);
+  $lastSeccion = 0;
+  $lastCodigoRamo = 0;
+  $flag = 0;
+  $new = 0;
+  while($res->fetch())
+  {
+    if($flag == 0) {
+      $lastSeccion = $numeroSeccion;
+      $lastCodigoRamo = $codigoRamo;
+      $flag = 1;
+      echo '<table><tr>'; }
+    if($lastCodigoRamo != $codigoRamo) {
+      echo '</tr>';
+      $lastCodigoRamo = $codigoRamo; 
+      $new = 1;}
+    else {
+      if($lastSeccion != $numeroSeccion) {
+        echo '</tr>';
+        $lastSeccion = $numeroSeccion;
+        $new = 1; }
+    }
+    if($new == 1) {
+      echo '<tr>';
+      $new = 0; }
+    echo '<td><div class="item" id="'.$idClase.'">'.$codigoRamo.'<br>'.$numeroSeccion.'. '.$tipoClase.'</div></td>';
+  }
+  if($flag == 1)
+    echo '</table>';
+  $res->free_result();
 }
 
 function numeroSemestres($codigoCarrera)

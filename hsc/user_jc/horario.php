@@ -103,55 +103,69 @@ if(isset($_SESSION['usuario']))
         <!-- insert the page content here -->
         <h2>Horario</h2>
         <div>
-         <div id="horario"></div>
-        <?php 
-          if(isset($_GET['idClase']))
-          {
-            
-            echo '<div class="up">';
-            echo '<div class="item" id="'.$_GET['idClase'].'">'.$_GET['codigoRamo'].'<br>'.$_GET['numeroSeccion'].'. '.$_GET['tipoClase'].'</div>';
-            echo '</div>';
-          }
-
+        <?php
           $numeroSemestres = numeroSemestres($_SESSION['carrera']);
+          if(isset($_POST['submit']) && $_POST['submit'] == 'Cambiar' && isset($_POST['numeroSemestre'])) {
+            echo '<table class="centerTable"><tr><td>1 <a href="horario.php?numeroSemestre=2">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>'; 
+            unset($_GET['numeroSemestre']);}
+          elseif(isset($_GET['numeroSemestre'])) {
+            if($_GET['numeroSemestre'] <= 0 || $_GET['numeroSemestre'] > $numeroSemestres) {
+              echo '<div><span class="error">*Debe escoger un semestre entre 1 y '.$numeroSemestres.'.</span></div>';
+              echo '<table class="centerTable"><tr><td>1 <a href="horario.php?numeroSemestre=2">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>'; }
+            elseif($_GET['numeroSemestre'] == 1) {
+              echo '<table class="centerTable"><tr><td>1 <a href="horario.php?numeroSemestre=2">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>'; }
+            elseif($_GET['numeroSemestre'] == $numeroSemestres)
+              echo '<table class="centerTable"><tr><td><a href="horario.php?numeroSemestre='.($numeroSemestres-1).'">atrás</a> '.$numeroSemestres.'</td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>';
+            else
+              echo '<table class="centerTable"><tr><td><a href="horario.php?numeroSemestre='.($_GET['numeroSemestre']-1).'">atrás</a> '.$_GET['numeroSemestre'].' <a href="horario.php?numeroSemestre='.($_GET['numeroSemestre']+1).'">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>';
+          }
+          else
+            echo '<table class="centerTable"><tr><td>1 <a href="horario.php?numeroSemestre=2">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>';
+
+          echo '<div class="up">';
+          if(isset($_GET['numeroSemestre']))
+            verClasesSinHorarioSemestre($_SESSION['carrera'],$_SESSION['codigoSemestre'],$_GET['numeroSemestre']);
+          elseif(isset($_POST['numeroSemestre']))
+            verClasesSinHorarioSemestre($_SESSION['carrera'],$_SESSION['codigoSemestre'],$_POST['numeroSemestre']);
+          else
+            verClasesSinHorarioSemestre($_SESSION['carrera'],$_SESSION['codigoSemestre'],1);
+          echo '</div>';
+
           if(isset($_GET['numeroSemestre']) || (isset($_POST['submit']) && $_POST['submit'] == 'Cambiar' && isset($_POST['numeroSemestre'])))
           {
             if(isset($_GET['numeroSemestre'])) 
             {
               verHorario($_SESSION['carrera'],$_SESSION['codigoSemestre'],$_GET['numeroSemestre']);
               echo '</div>';
-              echo '<table class="centerTable"><tr><td>';
-              if($_GET['numeroSemestre'] - 1 > 0)
-                echo '<a href="horario.php?numeroSemestre='.($_GET['numeroSemestre']-1).'">atrás</a>';
-              echo ' '.$_GET['numeroSemestre'].' ';
-              if($_GET['numeroSemestre'] + 1 <= $numeroSemestres)
-                echo '<a href="horario.php?numeroSemestre='.($_GET['numeroSemestre']+1).'">adelante</a>';
-              echo '</td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>';
             }
             elseif(isset($_POST['submit']) && $_POST['submit'] == 'Cambiar' && isset($_POST['numeroSemestre']))
             {
-              if($_POST['numeroSemestre'] <= 0 || $_POST['numeroSemestre'] > $numeroSemestres)
-              {
-                $_POST['numeroSemestre'] = 1;
-                echo '<span class="error">*Debe escoger un semestre entre 1 y '.$numeroSemestres.'.</span>';
-              }
               verHorario($_SESSION['carrera'],$_SESSION['codigoSemestre'],$_POST['numeroSemestre']);
               echo '</div>';
-              echo '<table class="centerTable"><tr><td>';
-              if($_POST['numeroSemestre'] - 1 > 0)
-                echo '<a href="horario.php?numeroSemestre='.($_POST['numeroSemestre']-1).'">atrás</a>';
-              echo ' '.$_POST['numeroSemestre'].' ';
-              if($_POST['numeroSemestre'] + 1 <= $numeroSemestres)
-                echo '<a href="horario.php?numeroSemestre='.($_POST['numeroSemestre']+1).'">adelante</a>';
-              echo '</td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>';
             }
           }
           else
           {
             verHorario($_SESSION['carrera'],$_SESSION['codigoSemestre'],1);
             echo '</div>';
-            echo '<table class="centerTable"><tr><td>1 <a href="horario.php?numeroSemestre=2">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>';
           }   
+
+          if(isset($_POST['submit']) && $_POST['submit'] == 'Cambiar' && isset($_POST['numeroSemestre'])) {
+            echo '<table class="centerTable"><tr><td>1 <a href="horario.php?numeroSemestre=2">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>'; 
+            unset($_GET['numeroSemestre']);}
+          elseif(isset($_GET['numeroSemestre'])) {
+            if($_GET['numeroSemestre'] <= 0 || $_GET['numeroSemestre'] > $numeroSemestres) {
+              echo '<div><span class="error">*Debe escoger un semestre entre 1 y '.$numeroSemestres.'.</span></div>';
+              echo '<table class="centerTable"><tr><td>1 <a href="horario.php?numeroSemestre=2">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>'; }
+            elseif($_GET['numeroSemestre'] == 1) {
+              echo '<table class="centerTable"><tr><td>1 <a href="horario.php?numeroSemestre=2">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>'; }
+            elseif($_GET['numeroSemestre'] == $numeroSemestres)
+              echo '<table class="centerTable"><tr><td><a href="horario.php?numeroSemestre='.($numeroSemestres-1).'">atrás</a> '.$numeroSemestres.'</td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>';
+            else
+              echo '<table class="centerTable"><tr><td><a href="horario.php?numeroSemestre='.($_GET['numeroSemestre']-1).'">atrás</a> '.$_GET['numeroSemestre'].' <a href="horario.php?numeroSemestre='.($_GET['numeroSemestre']+1).'">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>';
+          }
+          else
+            echo '<table class="centerTable"><tr><td>1 <a href="horario.php?numeroSemestre=2">adelante</a></td><td><form method="post" target="_self" name="cambiarSemestre"><input type="text" name="numeroSemestre" value="" maxlength="2" class="xs"></input> <input type="submit" name="submit" value="Cambiar"></input></form></td></tr></table>';
         ?>
         <br><br>
       </div>
