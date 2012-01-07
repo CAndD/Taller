@@ -161,7 +161,7 @@ function asignarHorario(idClase,horario)
       {
         //alert("ajax: "+xmlhttp.responseText);
         ans = xmlhttp.responseText;
-        //alert("answer: "+ans);
+        alert("answer: "+ans);
         //document.getElementById("horario").innerHTML=err;
         if(xmlhttp.responseText == -2)
           return -2;

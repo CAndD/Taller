@@ -674,7 +674,7 @@ function verHorario($codigoCarrera,$codigoSemestre,$numeroSemestre)
           {
             if($flag == 0) {
               $flag = 1;
-              echo '<td class="drop" id="'.$dias[$i].'.'.$moduloInicio.'.'.$moduloTermino.'">';
+              echo '<td class="drop" id="'.$dias[$i].'.'.$moduloInicio.'.'.$modulo.'">';
             }
             if($moduloTermino == 'SI')
               echo '<div class="item" id="'.$claseId.'">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'</div>';
