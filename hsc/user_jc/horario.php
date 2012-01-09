@@ -53,9 +53,6 @@ if(isset($_SESSION['usuario']))
 				},
 				onDrop:function(e,source){
 					$(this).removeClass('over');
-					if ($(source).hasClass('assigned')){
-						$(this).append(source);
-					} else {
                                                 var err1 = '<span class="error">*Horario ya pertenece a un ramo diferente.</span>';
                                                 var err2 = '<span class="error">*Ya existe una clase de la misma sección en este horario.</span>';
                                                 var err3 = '<span class="error">*Este horario tiene una clase de una sección obtenida por solicitud.</span>';
@@ -63,7 +60,6 @@ if(isset($_SESSION['usuario']))
                                                 var err4 = '<span class="error">*Horario no asignado, intentelo más tarde.</span>';
                                                 var resp;
                                                 resp = asignarHorario($(source).attr('id'),$(this).attr('id'));
-                                                //alert("respuesta: "+resp);
                                                 if(resp == '-2')
                                                 {
                                                   document.getElementById("resp").innerHTML=err1;
@@ -89,7 +85,6 @@ if(isset($_SESSION['usuario']))
                                                 {
                                                   document.getElementById("resp").innerHTML=err4;
                                                 }
-					}
 				}
 			});
 		});
