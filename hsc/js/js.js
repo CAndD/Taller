@@ -145,38 +145,33 @@ function buscarAbreviacion(abrev)
 
 function asignarHorario(idClase,horario)
 {
-  var err = '<span class="error">*Tope de horario.</span>';
-  var acc = '<span class="error">*Horario asignado.</span>';
-  var errmysql = '<span class="error">*No se pudo asignar horario.</span>';
   var xmlhttp;
   var ans;
   xmlhttp=new XMLHttpRequest();
-  xmlhttp.open("GET","../user_admin/secundario/ajax.php?idClase="+idClase+"&horario="+horario,true);
+  xmlhttp.open("GET","../user_admin/secundario/ajax.php?idClase="+idClase+"&horario="+horario,false);
   xmlhttp.send();
-  xmlhttp.onreadystatechange=function()
+  return xmlhttp.responseText;
+  /*xmlhttp.onreadystatechange=function()
   {
     if(xmlhttp.status==200 && xmlhttp.readyState==4)
     {
       if(xmlhttp.responseText)
       {
-        //alert("ajax: "+xmlhttp.responseText);
+        alert("ajax: "+xmlhttp.responseText);
         ans = xmlhttp.responseText;
         alert("answer: "+ans);
-        //document.getElementById("horario").innerHTML=err;
-        if(xmlhttp.responseText == -2)
-          return -2;
-          //document.getElementById("horario").innerHTML=err;
-        else if(xmlhttp.responseText == -1)
-          return -1;
-          //document.getElementById("horario").innerHTML=acc;
-        else if(xmlhttp.responseText == 0)
-          return 0;
-          //document.getElementById("horario").innerHTML=errmysql;
-        else if(xmlhttp.responseText == 1)
-          return 1;
-        else if(xmlhttp.responseText == 2)
-          return 2;
+        if(xmlhttp.responseText == '-2'){
+          alert("devolvemos menos dos.");
+          return xmlhttp.responseText;}
+        else if(xmlhttp.responseText == '-1')
+          return '-1';
+        else if(xmlhttp.responseText == '0')
+          return '0';
+        else if(xmlhttp.responseText == '1')
+          return '1';
+        else if(xmlhttp.responseText == '2')
+          return '2';
       }
     }
-  }
+  }*/
 }

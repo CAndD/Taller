@@ -56,13 +56,39 @@ if(isset($_SESSION['usuario']))
 					if ($(source).hasClass('assigned')){
 						$(this).append(source);
 					} else {
-						var c = $(source).addClass('assigned');
-                                                var resp = asignarHorario($(source).attr('id'),$(this).attr('id'));
+                                                var err1 = '<span class="error">*Horario ya pertenece a un ramo diferente.</span>';
+                                                var err2 = '<span class="error">*Ya existe una clase de la misma sección en este horario.</span>';
+                                                var err3 = '<span class="error">*Este horario tiene una clase de una sección obtenida por solicitud.</span>';
+                                                var scc = '<span class="error">*Horario asignado.</span>';
+                                                var err4 = '<span class="error">*Horario no asignado, intentelo más tarde.</span>';
+                                                var resp;
+                                                resp = asignarHorario($(source).attr('id'),$(this).attr('id'));
                                                 //alert("respuesta: "+resp);
-						$(this).append(c);
-						c.draggable({
-							revert:true
-						});
+                                                if(resp == '-2')
+                                                {
+                                                  document.getElementById("resp").innerHTML=err1;
+                                                }
+                                                else if(resp == '-1')
+                                                {
+                                                  document.getElementById("resp").innerHTML=err2;
+                                                }
+                                                else if(resp == '0')
+                                                {
+                                                  document.getElementById("resp").innerHTML=err3;
+                                                }
+                                                else if(resp == '1')
+                                                {
+                                                  document.getElementById("resp").innerHTML=scc;
+                                                  var c = $(source).addClass('assigned');
+						  $(this).append(c);
+						  c.draggable({
+						       	revert:true
+						  });
+                                                }
+                                                else if(resp == '2')
+                                                {
+                                                  document.getElementById("resp").innerHTML=err4;
+                                                }
 					}
 				}
 			});
@@ -130,6 +156,8 @@ if(isset($_SESSION['usuario']))
             verClasesSinHorarioSemestre($_SESSION['carrera'],$_SESSION['codigoSemestre'],1);
           echo '</div>';
 
+          echo '<div id="resp"></div>';
+ 
           if(isset($_GET['numeroSemestre']) || (isset($_POST['submit']) && $_POST['submit'] == 'Cambiar' && isset($_POST['numeroSemestre'])))
           {
             if(isset($_GET['numeroSemestre'])) 

@@ -140,7 +140,7 @@ if(isset($_SESSION['usuario']))
     }
     if($flag2 == 1)
     {
-      echo '(-2) Existe una clase de un ramo distinto en este horario.';
+      echo '-2';
     }
     else
     {
@@ -156,7 +156,7 @@ if(isset($_SESSION['usuario']))
       $res4->bind_result($idClase);
       if($res4->fetch())
       {
-        echo '(-1) Ya se ha asignado una clase de la misma sección en este horario.';
+        echo '-1';
       }
       else
       {
@@ -172,7 +172,7 @@ if(isset($_SESSION['usuario']))
         $res5->bind_result($idClase);
         if($res5->fetch())
         {
-          echo '(0)Existe una clase de un ramo pedido por solicitud.';
+          echo '0';
         }
         else
         {
@@ -180,11 +180,11 @@ if(isset($_SESSION['usuario']))
           $sql6 = "UPDATE Clase SET Dia = '{$dia}',Modulo_Inicio = '{$moduloInicioF}',Modulo_Termino = '{$moduloTerminoF}' WHERE Id = '{$_GET['idClase']}';";
           if(($mysqli6->query($sql6)) == true)
           {
-            echo '(1)Horario asignado.';
+            echo '1';
           }
           else
           {
-            echo '(2)Horario no asignado, intente en un rato más.';
+            echo '2';
           }
         }
       }
