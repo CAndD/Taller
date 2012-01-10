@@ -464,9 +464,18 @@ div.mid {
          text-align:center;
 	 border:1px solid #499b33;
 	 background:#fafafa;
-         height: 35px;
-	 width:110px;
+         height: 55px;
+	 width:115px;
        }
+
+.prof {
+        text-align: center;
+        display: block;
+        border: 0px solid #499b33;
+        background: #fafafa;
+        height: 19px;
+        width: 115px;
+      }
 
 .assigned {
           }

@@ -654,21 +654,21 @@ function verHorario($codigoCarrera,$codigoSemestre,$numeroSemestre)
         for($i = 0;$i<5;$i++)
         {
           $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-          $sql = "(SELECT c.Id,s.Codigo_Ramo,s.Numero_Seccion,c.Clase_Tipo,c.Dia,c.Modulo_Inicio,'SI'
+          $sql = "(SELECT c.Id,s.Codigo_Ramo,s.Numero_Seccion,c.Clase_Tipo,c.Dia,c.Modulo_Inicio,'SI',c.RUT_Profesor
                    FROM Carrera_Tiene_Ramos AS ctr 
                    INNER JOIN Ramos_Impartidos AS ri ON ri.Codigo_Carrera = ctr.Codigo_Carrera AND ri.Codigo_Ramo = ctr.Codigo_Ramo AND ri.Codigo_Semestre = '{$codigoSemestre}' AND ri.Impartido = 1
                    INNER JOIN Seccion AS s ON s.Codigo_Ramo = ri.Codigo_Ramo AND s.Codigo_Carrera = ri.Codigo_Carrera AND s.Codigo_Semestre = ri.Codigo_Semestre
                    INNER JOIN Clase AS c ON c.Seccion_Id = s.Id AND c.Modulo_Inicio = '{$moduloAnterior}' AND c.Modulo_Termino = '{$modulo}' AND c.Dia = '{$dias[$i]}'
                   WHERE ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Semestre = '{$numeroSemestre}')
                   UNION
-                  (SELECT c.Id,CONCAT(s.Carrera,' ',s.Codigo_Ramo),s.Seccion_Asignada,c.Clase_Tipo,c.Dia,c.Modulo_Inicio,'NO'
+                  (SELECT c.Id,CONCAT(s.Carrera,' ',s.Codigo_Ramo),s.Seccion_Asignada,c.Clase_Tipo,c.Dia,c.Modulo_Inicio,'NO',c.RUT_Profesor
                    FROM Solicitud AS s
                    INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Codigo_Ramo = s.Codigo_Ramo AND ctr.Semestre = '{$numeroSemestre}'
                    INNER JOIN Clase AS c ON c.Seccion_Id = s.Seccion_Asignada AND c.Modulo_Inicio = '{$moduloAnterior}' AND c.Modulo_Termino = '{$modulo}' AND c.Dia = '{$dias[$i]}'
                   WHERE s.Carrera_Solicitante = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}' AND s.Estado = 2);"; 
           $res = $mysqli->prepare($sql);
           $res->execute();
-          $res->bind_result($claseId,$codigoRamo,$numeroSeccion,$claseTipo,$dia,$moduloInicio,$moduloTermino);
+          $res->bind_result($claseId,$codigoRamo,$numeroSeccion,$claseTipo,$dia,$moduloInicio,$moduloTermino,$profesor);
           $flag = 0;
           while($res->fetch())
           {
@@ -676,10 +676,22 @@ function verHorario($codigoCarrera,$codigoSemestre,$numeroSemestre)
               $flag = 1;
               echo '<td class="drop" id="'.$dias[$i].'.'.$moduloInicio.'.'.$modulo.'">';
             }
-            if($moduloTermino == 'SI')
-              echo '<div class="item" id="'.$claseId.'">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'</div>';
-            elseif($moduloTermino == 'NO')
-              echo '<div class="" id="'.$claseId.'" style="background-color: #c7c7c7;">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'</div>';
+            if($moduloTermino == 'SI') {
+              if($profesor == NULL)
+                $profesor = '<a id="'.$claseId.'.'.$numeroSemestre.'" class="cambiarProfesor" href="">S/Profesor</a>';
+              else {
+                $profesor = verProfesor($profesor);
+                $profesor = '<a id="'.$claseId.'.'.$numeroSemestre.'" class="cambiarProfesor" href="">'.$profesor.'</a>'; }
+              echo '<div class="item" id="'.$claseId.'">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'<div class="prof">'.$profesor.'</div></div>';
+            }
+            elseif($moduloTermino == 'NO') {
+              if($profesor == NULL)
+                $profesor = 'S/Profesor';
+              else {
+                $profesor = verProfesor($profesor);
+                $profesor = '<a id="'.$claseId.'.'.$numeroSemestre.'" class="cambiarProfesor" href="">'.$profesor.'</a>'; }
+              echo '<div class="" id="'.$claseId.'" style="background-color: #c7c7c7;">'.$codigoRamo.'<br>'.$numeroSeccion.'.'.$claseTipo.'<br>'.$profesor.'</div>';
+            }
           }
           if($flag == 0)
             echo '<td class="drop" id="'.$dias[$i].'.'.$moduloAnterior.'.'.$modulo.'"></td>';
@@ -702,14 +714,14 @@ function verClasesSinHorarioSemestre($codigoCarrera,$codigoSemestre,$numeroSemes
 {
   global $mysqli,$db_host,$db_user,$db_pass,$db_database;
   $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-  $sql = "SELECT c.id,s.Codigo_Ramo,s.Numero_Seccion,c.Clase_Tipo
+  $sql = "SELECT c.id,s.Codigo_Ramo,s.Numero_Seccion,c.Clase_Tipo,c.RUT_Profesor
            FROM Clase AS c
            INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Carrera = '{$codigoCarrera}' AND ctr.Semestre = '{$numeroSemestre}'
            INNER JOIN Seccion AS s ON s.Codigo_Ramo = ctr.Codigo_Ramo AND s.Codigo_Carrera = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}'
           WHERE c.Seccion_Id = s.Id AND c.Codigo_Semestre = '{$codigoSemestre}' AND c.Dia IS NULL AND c.Modulo_Inicio IS NULL AND c.Modulo_Termino IS NULL ORDER BY s.Codigo_Ramo,s.Numero_Seccion;"; 
   $res = $mysqli->prepare($sql);
   $res->execute();
-  $res->bind_result($idClase,$codigoRamo,$numeroSeccion,$tipoClase);
+  $res->bind_result($idClase,$codigoRamo,$numeroSeccion,$tipoClase,$profesor);
   $lastSeccion = 0;
   $lastCodigoRamo = 0;
   $flag = 0;
@@ -734,11 +746,33 @@ function verClasesSinHorarioSemestre($codigoCarrera,$codigoSemestre,$numeroSemes
     if($new == 1) {
       echo '<tr>';
       $new = 0; }
-    echo '<td><div class="item" id="'.$idClase.'">'.$codigoRamo.'<br>'.$numeroSeccion.'. '.$tipoClase.'</div></td>';
+    if($profesor == NULL)
+      $profesor = '<a id="'.$idClase.'.'.$numeroSemestre.'" class="cambiarProfesor" href="">S/Profesor</a>';
+    else {
+      $profesor = verProfesor($profesor);
+      $profesor = '<a id="'.$idClase.'.'.$numeroSemestre.'" class="cambiarProfesor" href="">'.$profesor.'</a>';}
+    echo '<td><div class="item" id="'.$idClase.'">'.$codigoRamo.'<br>'.$numeroSeccion.'. '.$tipoClase.'<div class="prof">'.$profesor.'</div></div></td>';
   }
   if($flag == 1)
     echo '</table>';
   $res->free_result();
+}
+
+function verProfesor($rutProfesor)
+{
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqliVP = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sqlVP = "SELECT p.Nombre
+           FROM Profesor AS p
+          WHERE p.RUT_Profesor = '{$rutProfesor}';"; 
+  $resVP = $mysqliVP->prepare($sqlVP);
+  $resVP->execute();
+  $resVP->bind_result($nombreProfesor);
+  $resVP->fetch();
+  $resVP->free_result();  
+  if(strlen($nombreProfesor)>17)
+    $nombreProfesor = substr($nombreProfesor,0,17);
+  return $nombreProfesor;
 }
 
 function numeroSemestres($codigoCarrera)
