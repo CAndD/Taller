@@ -72,20 +72,20 @@ if(isset($_SESSION['usuario']))
    <input type="hidden" name="hidden_car" value="<?php if(isset($_GET['hidden_car'])){echo$_GET['hidden_car']; $cod = $_GET['hidden_car'];}elseif(isset($_POST['hidden_car'])){echo$_POST['hidden_car']; $cod = $_POST['hidden_car'];}?>"></input>
    <select name="jdc"><option value="0">Seleccione jefe de carrera</option>
      <?php 
-      $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-      $sql = "SELECT u.Nombre_Usuario,u.RUT,u.Nombre
+      $mysqlii = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+      $sqli = "SELECT u.Nombre_Usuario,u.RUT,u.Nombre
                FROM Usuario AS u
-              WHERE (u.Id_Tipo = 1 OR u.Id_Tipo = 3) AND u.Nombre_Usuario NOT IN (SELECT NombreUsuario_JC FROM Carrera WHERE Codigo = '{$cod}') ORDER BY u.Nombre;";
-      $res = $mysqli->prepare($sql);
-      $res->execute();
-      $res->bind_result($nombreUsuarioJC,$rutJC,$nombreJC);
-      while($res->fetch())
+              WHERE (u.Id_Tipo = 1 OR u.Id_Tipo = 3) ORDER BY u.Nombre;";
+      $resi = $mysqlii->prepare($sqli);
+      $resi->execute();
+      $resi->bind_result($nombreUsuarioJC,$rutJC,$nombreJC);
+      while($resi->fetch())
       {
         echo '<option value="'.$nombreUsuarioJC.'">'.$nombreJC.'</option>';
       }
       if(!isset($rutJC))
         echo '<option value="0">No hay Jefes de Carrera.</option>';
-      $res->free_result();
+      $resi->free_result();
      ?>
    </select>
    <input type="submit" name="asignarJDC" value="Ingresar"></input>

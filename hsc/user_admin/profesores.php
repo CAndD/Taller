@@ -13,14 +13,14 @@ if(isset($_SESSION['usuario']))
 
   if(isset($_POST['agrega']) && $_POST['agrega'] == 'Agregar profesor')
   {
-    if(isset($_POST['rut']) && ctype_digit($_POST['rut']) && $_POST['nombre'] != '' && $_POST['grado'] != 0)
+    if(isset($_POST['rut']) && validaRut(substr($_POST['rut'],0,strlen($_POST['rut'])-2),substr($_POST['rut'],strlen($_POST['rut'])-1,1)) == true && $_POST['nombre'] != '' && $_POST['grado'] != 0)
     {
       $answer = $usuario->agregarProfesor($_POST['rut'],$_POST['nombre'],$_POST['grado']);
     }
     else
     {
       if(!ctype_digit($_POST['rut']))
-        $ruterror = '*Debe ingresar solamente números en<br> el rut y sin guiones ni puntos.';
+        $ruterror = '*Debe ingresar solamente números y k en<br> el rut y sin guiones ni puntos.';
       if($_POST['nombre'] == '')
         $nombreerror = '*Debe ingresar un nombre.';
       else
