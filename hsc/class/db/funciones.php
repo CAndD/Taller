@@ -1,6 +1,12 @@
 <?php
 require_once('connect.php');
 
+function validarRUT($rut)
+{
+  $rut = substr($rut,0,strlen($rut)-1);
+  
+}
+
 function verJefesDeCarrera() {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
     $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
@@ -352,7 +358,7 @@ function verRamosImpartidos($codigoCarrera,$codigoSemestre) {
         $seccionesCreadasOtroNumero = $seccionesCreadasOtroNumero.'<br><a id="'.$codigoRamo.'" class="seccionesCreadasOtros" href="">Pedir vacantes</a>';
       $res3->free_result();
 
-      if($tipo == '1')
+      if($tipo == '1' || $tipo == '5')
       {
         echo '<tr><td class="mid">'.$semestreRamo.'</td><td>'.$codigoRamo.'</td><td>'.$nombreRamo.'</td><td class="mid"><form method="post" name="crearSeccion" target="_self"><input type="hidden" name="hiddenCodigoRamo" value="'.$codigoRamo.'"></input><input type="hidden" name="hiddenCodigoSemestre" value="'.$codigoSemestre.'"></input><input type="hidden" name="hiddenCodigoCarrera" value="'.$codigoCarrera.'"></input><input type="submit" name="submit" value="Crear"></input></form></td><td class="mid">'.$seccionesCreadasNumero.'</td><td class="mid">'.$seccionesPedidasNumero.'</td><td class="mid">'.$seccionesCreadasOtroNumero.'</td></tr>';
       }
@@ -771,7 +777,7 @@ function verProfesor($rutProfesor)
   $resVP->fetch();
   $resVP->free_result();  
   if(strlen($nombreProfesor)>17)
-    $nombreProfesor = substr($nombreProfesor,0,17);
+    $nombreProfesor = substr($nombreProfesor,0,15);
   return $nombreProfesor;
 }
 

@@ -15,17 +15,24 @@ if(isset($_SESSION['usuario']))
   {
     if(isset($_POST['vacantes']) && isset($_POST['hiddenSolicitud']) && isset($_POST['hiddenTotal']) && isset($_POST['hiddenIdSeccion']))
     {
-      if($_POST['vacantes'] > $_POST['hiddenTotal'])
+      if($_POST['vacantes'] > 0)
       {
-        $msg = '*El número que ingresó, excede el máximo de vacantes de '.$_POST['hiddenTotal'].'.';
-      }
-      elseif(($_POST['hiddenSolicitud'] + $_POST['vacantes']) > $_POST['hiddenTotal'])
-      {
-        $msg = '*El número que ingresó, excede la suma de vacantes.';
+        if($_POST['vacantes'] > $_POST['hiddenTotal'])
+        {
+          $msg = '*El número que ingresó, excede el máximo de vacantes de '.$_POST['hiddenTotal'].'.';
+        }
+        elseif(($_POST['hiddenSolicitud'] + $_POST['vacantes']) > $_POST['hiddenTotal'])
+        {
+          $msg = '*El número que ingresó, excede la suma de vacantes.';
+        }
+        else
+        {
+          $msg = $usuario->cambiarVacantes($_POST['hiddenIdSeccion'],$_POST['vacantes']);
+        }
       }
       else
       {
-        $msg = $usuario->cambiarVacantes($_POST['hiddenIdSeccion'],$_POST['vacantes']);
+        $msg = '*Debe ingresar un número de vacantes válido.';
       }
     }
     else
