@@ -1,62 +1,25 @@
 <?php
 require_once('connect.php');
 
-/* Iniciamos PHP */
-function validaRut($rut,$dv)
-{
-/* Con las lineas anteriores le asignanos a las variables $rut y $dv, lo ingresado por formulario en la página anterior, solo utilizaremos el rut. El digito verificador, lo usaremos al final*/
-$rutin=strrev($rut);
-/* Invertimos el rut con la funcion “strrev” */
-$cant=strlen($rutin);
-/* Contamos la cantidad de numeros que tiene el rut */
-$c=0;
-/* Creamos un contador con valor inicial cero */
-while($c<$cant)
-{
-$r[$c]=substr($rutin,$c,1);
-$c++;
-}
-/* Hacemos un ciclo en el que se creara un array o arreglo que se llamara $r, en el cual se le asignara a cada valor del array, el valor correspodiente del rut, Por ej: para el rut 12346578, que invertido sería 87654321, el valor de $r[0] es 8, de $r[5] es 3 y asi sucesiva y respectivamente. */
-$ca=count($r);
-/* Contamos la cantidad de valores que tiene el arreglo con la función “count” */
-$m=2;
-$c2=0;
-$suma=0;
-/* En las lineas anteriores creamos 3 cosas, un multiplicador con el nombre $m y que su valor inicial es 2, ya que por formula es el primero que necesitamos, creamos tambien un segundo contador con el nombre $c2 y valor inicial cero y por ultimo creamos un acumulador de nombre $suma en el cual se guardara el total luego de multiplicar y sumar como manda la formula */
-while($c2<$ca)
-{
-$suma=$suma+($r[$c2]*$m);
-if($m==7)
-{
-$m=2;
-}else{
-$m++;
-}
-$c2++;
-}
-/* Hacemos un nuevo ciclo en el cual a $suma se le suma (valga la redundancia) su propio valor (que inicialmente es cero) más el resultado de la multiplicación entre el valor del array correspondiente por el multiplicador correspondiente, basandonos en la formula */
-$resto=$suma%11;
-/* Calculamos el resto de la división usando el simbolo % */
-$digito=11-$resto;
-/* Calculamos el digito que corresponde al Rut, restando a 11 el resto obtenido anteriormente */
-if($digito==10)
-{
-$digito="K";
-}else{
-if($digito==11)
-{
-$digito="0";
-}
-}
-/* Creamos dos condiciones, la primero dice que si el valor de $digito es 11, lo reemplazamos por un cero (el cero va entre comillas. De no hacerlo así, el programa considerará “nada” como cero, es decir si la persona no ingresa Digito Verificado y este corresponde a un cero, lo tomará como valido, las comillas, al considerarlo texto, evitan eso). El segundo dice que si el valor de $digito es 10, lo reemplazamos por una K, de no cumplirse ninguno de las condiciones, el valor de $digito no cambiará. */
-if($dv==$digito)
-{
-  return true;
-}else{
- return false;
-}
-/* Por ultimo comprobamos si el resultado que obtuvimos es el mismo que ingreso la persona, de ser así se muestra el mensaje “Valido”, de no ser así se muestra el mensaje “No Valido” */
-}
+function rut($rut) 
+    { 
+        $rut    =   strtoupper(preg_replace('{\.|,|-}','',$rut)); 
+        $sub_rut=   substr($rut,0,strlen($rut)-1); 
+        $sub_dv =   substr($rut,-1); 
+        $x=2; 
+        $s=0; 
+        for($i=strlen($sub_rut)-1;$i>=0;$i--){ 
+            $x  =   ($x>7) ? 2 : $x;
+            $s  +=  $sub_rut[$i]*$x; 
+            $x++; 
+        }
+        
+        $dv = 11 - ($s%11); 
+        
+        $dv = ($dv==10) ? 'K' : (($dv==11) ? '0' : $dv);
+        
+        return ($dv==$sub_dv) ? TRUE : FALSE; 
+    }
 
 function verJefesDeCarrera() {
     global $mysqli,$db_host,$db_user,$db_pass,$db_database;
@@ -520,36 +483,6 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre) {
 
     $form = '<form method="post" target="_self" name="vacantes"><input type="text" name="vacantes" value="'.$vacantesUtilizadas.'" class="xs" maxlength="2"></input><input type="hidden" name="hiddenSolicitud" value="'.$vacantesSolicitud.'"></input><input type="hidden" name="hiddenTotal" value="'.$vacantes.'"></input><input type="hidden" name="hiddenIdSeccion" value="'.$id.'"></input> <input type="submit" name="submit" value="Reservar"></input></form>';
     echo '<tr><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombre.'</td><td>'.$codigoSemestre.'</td><td>Disponibles: '.$vacantes.'<br>Solicitud: '.$vacantesSolicitud.'<br>Utilizadas: '.$vacantesUtilizadas.' '.$form.'<br>Total: '.$vacantesFinal.'</td></tr>';
-
-    /*$mysqli2 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
-    $sql2 = "SELECT c.Id,c.Clase_Tipo,c.RUT_Profesor,c.Modulo_Inicio,c.Modulo_Termino,c.Dia,c.Codigo_Semestre,ctr.Semestre
-              FROM Clase AS c
-              INNER JOIN Carrera_Tiene_Ramos AS ctr ON ctr.Codigo_Ramo = '{$codigoRamo}' AND ctr.Codigo_Carrera = '{$codigoCarrera}'
-             WHERE c.Seccion_Id = '{$id}';";
-    $res2 = $mysqli2->prepare($sql2);
-    $res2->execute();
-    $res2->bind_result($idClase,$claseTipo,$rutProfesor,$moduloInicio,$moduloTermino,$diaClase,$codigoSemestreClase,$semestreRamo);
-    while($res2->fetch())
-    {
-      if($flag2 == 0)
-        $flag2 = 1;
-      if($rutProfesor == NULL)
-        $profesor = 'Profesor no asignado.<br><a id="'.$idClase.'" class="cambiarProfesor" href="">Asignar</a>';
-      else
-        $profesor = $rutProfesor.'<br><a id="'.$idClase.'" class="cambiarProfesor" href="">Cambiar</a>';
-      if($diaClase == NULL && $moduloInicio == NULL && $moduloTermino == NULL) {
-        $horario = 'Horario no asignado.<br><a id="'.$idClase.'" class="asignarHorario" href="horario.php?idClase='.$idClase.'&codigoRamo='.$codigoRamo.'&numeroSeccion='.$numeroSeccion.'&tipoClase='.$claseTipo.'&numeroSemestre='.$semestreRamo.'">Asignar</a>'; 
-      }
-      else
-      {
-        $hora2 = obtenerHoraModulo($moduloTermino,$idClase);
-        $horario = $diaClase.' '.$moduloInicio.'-'.$moduloTermino.'. '.$hora2.' <br><a id="'.$idClase.'" class="cambiarHorario">Cambiar</a>';
-      }
-      echo '<tr><td class="dc">'.$claseTipo.'</td><td class="dc">'.$profesor.'</td><td class="dc">'.$horario.'</td></tr>';
-    }
-    if($flag2 == 0)
-      echo '<tr><td class="dc">No existen clases para esta sección.</td></tr>';
-    $res2->free_result();*/
   }
   if($flag == 0)
     echo '<tr><td>No hay secciones para este ramo.</td><td></td></tr>';

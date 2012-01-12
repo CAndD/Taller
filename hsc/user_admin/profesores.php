@@ -7,20 +7,22 @@ if(isset($_SESSION['usuario']))
 {
   $usuario = unserialize($_SESSION['usuario']);
   if(get_class($usuario) == 'jefeDeCarrera') {
-    $usuario = new administrador($usuario->getNombre(),$usuario->getNombreUsuario(),$usuario->getRut(),$usuario->getTipo());
+    $usuario = new administrador($usuario->getNombre(),$usuario->getNombreUsuario(),$usuario->getRut());
     $_SESSION['usuario'] = serialize($usuario);
   }
 
   if(isset($_POST['agrega']) && $_POST['agrega'] == 'Agregar profesor')
   {
-    if(isset($_POST['rut']) && validaRut(substr($_POST['rut'],0,strlen($_POST['rut'])-2),substr($_POST['rut'],strlen($_POST['rut'])-1,1)) == true && $_POST['nombre'] != '' && $_POST['grado'] != 0)
+    if(isset($_POST['rut']) && rut($_POST['rut']) == true && $_POST['nombre'] != '' && $_POST['grado'] != 0)
     {
       $answer = $usuario->agregarProfesor($_POST['rut'],$_POST['nombre'],$_POST['grado']);
     }
     else
     {
-      if(!ctype_digit($_POST['rut']))
+      if($_POST['rut'] == '')
         $ruterror = '*Debe ingresar solamente números y k en<br> el rut y sin guiones ni puntos.';
+      elseif(rut($_POST['rut']) == false)
+        $ruterror = '*Rut incorrecto.';
       if($_POST['nombre'] == '')
         $nombreerror = '*Debe ingresar un nombre.';
       else

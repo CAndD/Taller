@@ -14,7 +14,7 @@ if(isset($_SESSION['usuario']))
   {
     if(isset($_POST['rut']) && isset($_POST['nombre']) && isset($_POST['nusuario']) && isset($_POST['pass']))
     {
-      if($_POST['rut'] != '' && $_POST['nombre'] != '' && $_POST['nusuario'] != '' && $_POST['pass'] != '')
+      if($_POST['rut'] != '' && rut($_POST['rut']) == true && $_POST['nombre'] != '' && $_POST['nusuario'] != '' && $_POST['pass'] != '')
       {
         $answer = $usuario->agregarJefeDeCarrera($_POST['rut'],$_POST['nombre'],$_POST['nusuario'],$_POST['pass']);
       }
@@ -30,6 +30,8 @@ if(isset($_SESSION['usuario']))
           {
             $ruterror = '*Debe ingresar el rut del jefe de carrera.';
           }
+          elseif(rut($_POST['rut']) == false) 
+            $ruterror = '*Rut incorrecto.';
           else
           {
             $rutold = $_POST['rut'];
