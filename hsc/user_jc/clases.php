@@ -98,7 +98,10 @@ if(isset($_SESSION['usuario']))
         <?php
           if(isset($msg))
             echo '<br><span class="error">'.$msg.'</span>';
-            verClases($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre']);
+            if(!isset($_GET['otros']))
+              verClases($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre']);
+            else
+              verSeccionesPedidas($_GET['codigoRamo'],$_SESSION['carrera'],$_SESSION['codigoSemestre']);
         ?>
       </div>
     </div>

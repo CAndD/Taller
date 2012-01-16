@@ -97,7 +97,7 @@ if(isset($_SESSION['usuario']))
           ?>
         </div></td></tr>
         <tr>
-        <td><div class="prof_asig"><span class="title">Profesores asignados</span><br>
+        <td><div class="prof_asig"  style="overflow: scroll;"><span class="title">Profesores asignados</span><br>
           <?php
             $usuario->verProfesoresAsignados($_SESSION['carrera'],$_SESSION['codigoSemestre']);
           ?>

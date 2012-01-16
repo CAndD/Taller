@@ -359,7 +359,7 @@ function verRamosImpartidos($codigoCarrera,$codigoSemestre) {
       $res22->bind_result($seccionesPedidasNumero);
       $res22->fetch();
       if($seccionesPedidasNumero > 0)
-        $seccionesPedidasNumero = '<a href="clases.php?codigoRamo='.$codigoRamo.'">'.$seccionesPedidasNumero.'</a>';
+        $seccionesPedidasNumero = '<a href="clases.php?codigoRamo='.$codigoRamo.'&otros=1">'.$seccionesPedidasNumero.'</a>';
       $res22->free_result();
 
       $mysqli3 = @new mysqli($db_host, $db_user, $db_pass, $db_database);
@@ -411,8 +411,45 @@ function verSeccionesCreadas($codigoRamo,$codigoSemestre,$codigoCarrera) {
   $res->free_result();
 }
 
-function verSeccionesPedidas() {
-  
+function verSeccionesPedidas($codigoRamo,$codigoCarrera,$codigoSemestre) {
+  global $mysqli,$db_host,$db_user,$db_pass,$db_database;
+  $mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+  $sql = "SELECT s.Carrera,se.Id,se.Numero_Seccion,se.NRC,se.Codigo_Ramo,r.Nombre,se.Codigo_Carrera,se.Codigo_Semestre,se.Vacantes,s.Vacantes_Asignadas
+           FROM Solicitud AS s
+           INNER JOIN Seccion AS se ON se.Id = s.Seccion_asignada
+           INNER JOIN Ramo AS r ON r.Codigo = se.Codigo_Ramo
+          WHERE s.Carrera_Solicitante = '{$codigoCarrera}' AND s.Codigo_Semestre = '{$codigoSemestre}' AND s.Estado = 2 ORDER BY se.Numero_Seccion;";
+  $res = $mysqli->prepare($sql);
+  $res->execute();
+  $res->bind_result($carrera,$id,$numeroSeccion,$NRC,$codigoRamo,$nombre,$codigoCarrera,$codigoSemestre,$vacantes,$vacantesUtilizadas);
+  $flag = 0;
+  echo '<table><tr><td>Carrera</td><td>Sección</td><td>NRC</td><td>Nombre</td><td>Semestre</td><td>Vacantes</td></tr>';
+  while($res->fetch())
+  {
+    if($flag == 0)
+      $flag = 1;
+    $flag2 = 0;
+    $vacantesFinal = calcularVacantesRestantes($id);
+    $mysqlio = @new mysqli($db_host, $db_user, $db_pass, $db_database);
+    $sqlo = "SELECT SUM(s.Vacantes_Asignadas)
+              FROM Solicitud AS s
+             WHERE s.Seccion_Asignada = '{$id}';";
+    $reso = $mysqlio->prepare($sqlo);
+    $reso->execute();
+    $reso->bind_result($vacantesSolicitud);
+    $reso->fetch();
+    $reso->free_result();
+   
+    if($vacantesSolicitud == NULL)
+      $vacantesSolicitud = 0;    
+
+    $form = '<form method="post" target="_self" name="vacantes"><input type="text" name="vacantes" value="'.$vacantesUtilizadas.'" class="xs" maxlength="2"></input><input type="hidden" name="hiddenSolicitud" value="'.$vacantesSolicitud.'"></input><input type="hidden" name="hiddenTotal" value="'.$vacantes.'"></input><input type="hidden" name="hiddenIdSeccion" value="'.$id.'"></input> <input type="submit" name="submit" value="Reservar" disabled></input></form>';
+    echo '<tr><td>'.$carrera.'</td><td>'.$numeroSeccion.'</td><td>'.$NRC.'</td><td>'.$nombre.'</td><td>'.$codigoSemestre.'</td><td>Disponibles: '.$vacantes.'<br>Solicitud: '.$vacantesSolicitud.'<br>Utilizadas: '.$vacantesUtilizadas.' '.$form.'<br>Total: '.$vacantesFinal.'</td></tr>';
+  }
+  if($flag == 0)
+    echo '<tr><td>No hay secciones para este ramo.</td><td></td></tr>';
+  echo '</table>';
+  $res->free_result();
 }
 
 function verSeccionesCreadasOtros($codigoRamo,$codigoSemestre,$codigoCarreraMia) {
@@ -489,6 +526,8 @@ function verClases($codigoRamo,$codigoCarrera,$codigoSemestre) {
   echo '</table>';
   $res->free_result();
 }
+
+
 
 function obtenerHoraModulo($modulo,$idClase)
 {
